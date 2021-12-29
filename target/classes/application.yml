@@ -1,0 +1,11 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /onlineExam
+
+spring:
+  mvc:
+    favicon:
+      enabled: false
+  thymeleaf:
+    cache: false
