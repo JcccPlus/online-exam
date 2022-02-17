@@ -6,6 +6,39 @@ server:
 spring:
   mvc:
     favicon:
-      enabled: false
+      enabled: true
+    date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
     cache: false
+    mode: HTML
+    encoding: UTF-8
+  # 文件上传
+  servlet:
+    multipart:
+      # 单个文件大小
+      max-file-size: 10MB
+      # 设置总上传的文件大小
+      max-request-size: 20MB
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: false
+  profiles:
+    active: druid
+
+# MyBatis
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: cn.edu.hstc.domain,cn.edu.hstc.vo
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath:mybatis-mapper/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:config/mybatis-config.xml
+
+# PageHelper分页插件
+pagehelper:
+  helperDialect: oracle
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
