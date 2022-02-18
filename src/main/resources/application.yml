@@ -1,8 +1,10 @@
+# Basic
 server:
   port: 8888
   servlet:
     context-path: /onlineExam
 
+# Spring
 spring:
   mvc:
     favicon:
@@ -30,13 +32,13 @@ spring:
 # MyBatis
 mybatis:
   # 搜索指定包别名
-  typeAliasesPackage: cn.edu.hstc.domain,cn.edu.hstc.vo
+  typeAliasesPackage: cn.edu.hstc.pojo,cn.edu.hstc.vo
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath:mybatis-mapper/*Mapper.xml
   # 加载全局的配置文件
   configLocation: classpath:config/mybatis-config.xml
 
-# PageHelper分页插件
+# PageHelper
 pagehelper:
   helperDialect: oracle
   reasonable: true
