@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.TeacherDao">
+
+    <resultMap id="TeacherResult" type="Teacher">
+        <id column="id" property="id"/>
+        <result column="tea_num" property="teaNum"/>
+        <result column="name" property="name"/>
+        <result column="password" property="password"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="head_pic" property="head_pic"/>
+        <result column="code" property="code"/>
+        <result column="college_id" property="collegeId"/>
+        <association column="college_id" property="college" select="cn.edu.hstc.dao.CollegeDao.selectCollegeById"
+                     fetchType="lazy"/>
+    </resultMap>
+
+    <select id="selectTeacherById" parameterType="int" resultMap="TeacherResult">
+        select *
+        from tb_teacher
+        where id = #{id}
+    </select>
+
+    <select id="findTeacher" parameterType="String" resultMap="TeacherResult">
+        select *
+        from tb_teacher
+        where tea_num = #{teaNum}
+          and password = #{password}
+    </select>
+
+    <select id="selectTeacherList" parameterType="Teacher" resultMap="TeacherResult">
+        <if test="searchValue == null and searchValue == ''">
+            select * from tb_teacher
+            <where>
+                <if test="id != null">and id = #{id}</if>
+                <if test="teaNum != null and teaNum != ''">and tea_num = #{teaNum}</if>
+                <if test="name != null and name != ''">and name = #{name}</if>
+                <if test="password != null and password != ''">password = #{password},</if>
+                <if test="gender != null and gender != ''">gender = #{gender},</if>
+                <if test="phone != null and phone != ''">phone = #{phone},</if>
+                <if test="head_pic != null and head_pic != ''">head_pic = #{head_pic},</if>
+                <if test="code != null and code != ''">code = #{code},</if>
+                <if test="collegeId != null">college_id = #{collegeId},</if>
+            </where>
+        </if>
+        <if test="searchValue != null and searchValue != ''">
+            select m.* from tb_teacher t,tb_college c where t.college_id = c.id and
+            t.tea_num like "%${searchValue}%" or
+            t.name like "%${searchValue}%" or
+            c.name like "%${searchValue}%"
+        </if>
+    </select>
+
+    <insert id="insertTeacher" parameterType="Teacher">
+        insert into tb_teacher
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="teaNum != null and teaNum != ''">tea_num,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="password != null and password != ''">password,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="head_pic != null and head_pic != ''">head_pic,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="collegeId != null">college_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="teaNum != null and teaNum != ''">#{teaNum},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="password != null and password != ''">#{password},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="head_pic != null and head_pic != ''">#{head_pic},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="collegeId != null">#{collegeId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTeacher" parameterType="Teacher">
+        update tb_teacher
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teaNum != null and teaNum != ''">tea_num = #{teaNum},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="head_pic != null and head_pic != ''">head_pic = #{head_pic},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="collegeId != null">college_id = #{collegeId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTeacher" parameterType="String">
+        delete
+        from tb_teacher
+        where code = #{code}
+    </delete>
+
+</mapper>

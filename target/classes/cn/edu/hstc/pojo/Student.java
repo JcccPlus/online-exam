@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Student extends BaseEntity {
-    /** 学号 */
+    /** 主键 */
     private Integer id;
+    /** 学号 */
+    private String stuNum;
     /** 姓名 */
     private String name;
     /** 密码 */

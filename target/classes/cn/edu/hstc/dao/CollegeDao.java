@@ -8,7 +8,9 @@ import java.util.List;
 @Mapper
 public interface CollegeDao {
 
-    List<College> selectColleges(College college);
+    College selectCollegeById(Integer id);
+
+    List<College> selectCollegeList(College college);
 
     int insertCollege(College college);
 

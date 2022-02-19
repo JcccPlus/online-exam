@@ -8,12 +8,16 @@ import java.util.List;
 @Mapper
 public interface MajorDao {
 
-    int insertMajor(Major major);
+    Major selectMajorById(Integer id);
 
-    List<Major> selecMajors(Major major);
+    List<Major> selectMajorList(Major major);
+
+    int insertMajor(Major major);
 
     int updateMajor(Major major);
 
     int deleteMajor(Integer id);
+
+    List<Major> selectMajorsByCollege(String name);
 
 }

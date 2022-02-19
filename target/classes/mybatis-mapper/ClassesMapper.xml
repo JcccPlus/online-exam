@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.ClassesDao">
+
+    <resultMap id="ClassesResult" type="Classes">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="major_id" property="majorId"/>
+        <association column="major_id" property="major" select="cn.edu.hstc.dao.MajorDao.selectMajorById"
+                     fetchType="lazy"/>
+    </resultMap>
+
+    <select id="selectClassById" parameterType="int" resultMap="ClassesResult">
+        select *
+        from tb_class
+        where id = #{id}
+    </select>
+
+    <select id="selectClassesList" parameterType="Classes" resultMap="ClassesResult">
+        <if test="searchValue == null and searchValue == ''">
+            select * from tb_class
+            <where>
+                <if test="id != null">and id = #{id}</if>
+                <if test="name != null  and name != ''">and name = #{name}</if>
+            </where>
+        </if>
+        <if test="searchValue != null and searchValue != ''">
+            select cla.* from tb_class cla,tb_college co,tb_major maj where cla.major_id = maj.id and
+            maj.college_id = co.id and
+            maj.name like "%${searchValue}%" or
+            cla.name like "%${searchValue}%" or
+            co.name like "%${searchValue}%"
+        </if>
+    </select>
+
+    <insert id="insertClass" parameterType="Classes">
+        insert into tb_class
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="majorId != null">major_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="majorId != null">#{majorId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateClasses" parameterType="Classes">
+        update tb_class
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="majorId != null">major_id = #{majorId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteClass" parameterType="int">
+        delete
+        from tb_class
+        where id = #{id}
+    </delete>
+
+    <select id="selectClassesByCollegeAndMajor" parameterType="String">
+        select cla.*
+        from tb_class cla,
+        tb_college co,
+        tb_major maj
+        where cla.major_id = maj.id
+        and maj.college_id = co.id
+        <if test="collegeName != null and collegeName != ''">
+            and co.name = #{collegeName}
+        </if>
+        <if test="majorName != null and majorName != ''">
+            and maj.name = #{majorName}
+        </if>
+    </select>
+
+</mapper>

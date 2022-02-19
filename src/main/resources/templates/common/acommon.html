@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员公共模块</title>
+</head>
+<body>
+<!--头部导航栏-->
+<div class="header bg-light navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow" th:fragment="header">
+    <div class="space-unit" style="height: 100%;">
+        <h4>在线考试云平台</h4>
+    </div>
+    <div style="height: 25px;width: 155px;">
+        <script>
+            document.writeln("<iframe name=\"weather_inc\" src=\"http:\/\/i.tianqi.com\/?c=code&id=26\" width=\"180\" height=\"25\" frameborder=\"0\" marginwidth=\"0\" marginheight=\"0\" scrolling=\"no\"><\/iframe>");
+        </script>
+    </div>
+    <div class="user-self">
+        <div class="user">
+            <img th:src="@{/images/boy.png}">
+            <span th:text="${session.user.username}">管理员</span>
+            <svg t="1642757085955" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 p-id="2469"
+                 width="20" height="20">
+                <path d="M787.2 380.8c-9.6-9.6-22.4-12.8-35.2-12.8l-480 3.2c-12.8 0-25.6 3.2-35.2 12.8-19.2 19.2-19.2 48 0 67.2l240 240c0 0 0 0 0 0 0 0 0 0 0 0 3.2 3.2 9.6 6.4 12.8 9.6 0 0 3.2 3.2 3.2 3.2 16 6.4 38.4 3.2 51.2-9.6l240-243.2C806.4 428.8 803.2 400 787.2 380.8z"
+                      p-id="2470"></path>
+            </svg>
+            <div class="user-popup">
+                <ul>
+                    <li onclick="">
+                        <svg t="1642790514332" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="7977"
+                             width="20" height="20">
+                            <path d="M662.016 247.6544a32 32 0 1 1 29.4912-56.832 390.4 390.4 0 1 1-359.0144 0 32 32 0 1 1 29.4912 56.832 326.4 326.4 0 1 0 300.032 0zM544 384a32 32 0 1 1-64 0v-256a32 32 0 1 1 64 0v256z"
+                                  p-id="7978"></path>
+                        </svg>
+                        退出系统
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!--侧边导航栏-->
+<div class="content-left bg-light shadow" th:fragment="sidebar">
+    <div class="user-block">
+        <img class="head-img" th:src="@{/images/boy.png}">
+        <p class="user-name" th:text="${session.user.username}">管理员</p>
+    </div>
+    <hr style="margin: 0;">
+    <div class="user-navbar">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <div th:class="${active=='amain1.html'?'nav-link active':'nav-link'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    学院管理
+                </div>
+            </li>
+            <li class="nav-item">
+                <div th:class="${active=='amain2.html'?'nav-link active':'nav-link'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    专业管理
+                </div>
+            </li>
+            <li class="nav-item">
+                <div th:class="${active=='amain3.html'?'nav-link active':'nav-link'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    班级管理
+                </div>
+            </li>
+            <li class="nav-item">
+                <div th:class="${active=='amain4.html'?'nav-link active':'nav-link'}" onclick="toPage()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    教师管理
+                </div>
+            </li>
+            <li th:class="${active=='amain5.html'?'nav-link active':'nav-link'}">
+                <div class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    学生管理
+                </div>
+            </li>
+        </ul>
+    </div>
+</div >
+</body>
+</html>

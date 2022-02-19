@@ -4,15 +4,13 @@ import cn.edu.hstc.pojo.Admin;
 import cn.edu.hstc.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -20,10 +18,10 @@ public class LoginController {
     @Autowired
     private AdminService adminService;
 
-    @PostMapping("/user/login")
-    public String login(@RequestParam("user_id") String id, @RequestParam("user_password") String password, @RequestParam("user_role") String role, HttpSession session, Model model) {
+    @RequestMapping("/user/login")
+    public String login(@RequestParam("user_id") String id, @RequestParam("user_password") String password, @RequestParam("user_role") String role, HttpSession session, RedirectAttributes redirectAttributes) {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(password) || ObjectUtils.isEmpty(role)) {
-            return "index";
+            return "redirect:/";
         }
         if ("教师".equals(role)) {
 
@@ -33,19 +31,18 @@ public class LoginController {
             Admin admin = adminService.getAdmin(id, password);
             if (admin != null) {
                 session.setAttribute("user", admin);
-                model.addAttribute("user", admin);
-                return "admin/amain1";
+                return "redirect:/college/college.html";
             }
         } else {
-            return "index";
+            return "redirect:/";
         }
-        model.addAttribute("message", "账号或密码错误");
-        return "index";
+        redirectAttributes.addFlashAttribute("message", "账号或密码错误");
+        return "redirect:/";
     }
 
     @GetMapping("/user/logout")
-    public String logout(HttpServletRequest req, HttpServletResponse resp){
+    public String logout(HttpServletRequest req){
         req.getSession().removeAttribute("user");
-        return "index";
+        return "redirect:/login.html";
     }
 }

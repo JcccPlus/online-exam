@@ -2,15 +2,18 @@ package cn.edu.hstc.dao;
 
 import cn.edu.hstc.pojo.Teacher;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface TeacherDao {
 
-    Teacher findTeacher(Teacher teacher);
+    Teacher selectTeacherById(Integer id);
 
-    List<Teacher> selectTeachers(Teacher teacher);
+    Teacher findTeacher(@Param("teaNum") String teaNum, @Param("password") String password);
+
+    List<Teacher> selectTeacherList(Teacher teacher);
 
     int insertTeacher(Teacher teacher);
 
