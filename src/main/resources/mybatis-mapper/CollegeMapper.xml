@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.CollegeDao">
+
+    <select id="selectCollegeById" parameterType="int" resultType="College">
+        select * from tb_college where id = #{id}
+    </select>
+
+    <select id="selectCollegeList" parameterType="College" resultType="College">
+        select * from tb_college
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="name != null  and name != ''">and name like "%${name}%"</if>
+        </where>
+    </select>
+
+    <insert id="insertCollege" parameterType="College">
+        insert into tb_college
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCollege" parameterType="College">
+        update tb_college
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCollege" parameterType="int">
+        delete
+        from tb_college
+        where id = #{id}
+    </delete>
+
+</mapper>

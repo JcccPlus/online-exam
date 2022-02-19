@@ -12,7 +12,7 @@
     <link type="text/css" th:href="@{/css/signin.css}" rel="stylesheet">
     <style>
         body {
-            background-image: url(images/login_bg.jpg);
+            background-image: url([[@{/images/login_bg.jpg}]]);
             background-size: 100% 100%;
             background-repeat: no-repeat;
             background-position: center center;
@@ -37,21 +37,38 @@
 <body class="text-center">
 <div class="form-signin">
     <h1 class="h3 mb-3 fw-normal" style="margin-bottom:0px!important;">考试云登录</h1>
-    <div style="width: 100%;height: 24px;"><span style="color:red" id="message"></span></div>
-    <form id="user_form" action="#" method="post" onsubmit="return rememberMe()">
+    <div style="width: 100%;height: 24px;"><span style="color:red" id="message" th:text="${message}"></span></div>
+    <form id="user_form" th:action="@{/user/login}" method="post" onsubmit="return rememberMe()">
         <div class="form-floating">
-            <input type="text" class="form-control" id="floatingInput" name="user_id" placeholder="请输入你的账号" required autofocus>
+            <input type="text" class="form-control" id="floatingInput" name="user_id" placeholder="请输入你的账号" required>
             <label for="floatingInput">请输入您的账号</label>
         </div>
         <div class="form-floating">
             <input type="password" class="form-control" id="floatingPassword" name="user_password"
-                   placeholder="请输入账号密码" required autofocus>
+                   placeholder="请输入账号密码" required>
             <label for="floatingPassword">请输入账号密码</label>
         </div>
-        <div class="checkbox mb-3" style="margin-bottom: 3rem!important;">
-            <label style="float: left;">
-                <input type="checkbox" value="remember-me" id="remember-me"> 记住我
-            </label>
+        <div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="user_role" id="inlineRadio1" value="教师" checked>
+                <label class="form-check-label" for="inlineRadio1">教师</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="user_role" id="inlineRadio2" value="学生">
+                <label class="form-check-label" for="inlineRadio2">学生</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="user_role" id="inlineRadio3" value="管理员">
+                <label class="form-check-label" for="inlineRadio3">管理员</label>
+            </div>
+        </div>
+        <div class="checkbox mb-3" style="margin-bottom: 0!important;">
+            <div style="float: left;">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="remember-me" value="remember-me">
+                    <label class="form-check-label" for="remember-me">记住我</label>
+                </div>
+            </div>
             <a type="button" style="float: right;color: #0d6efd" data-bs-toggle="modal" data-bs-target="#findPswModal">忘记密码？</a>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">登录</button>

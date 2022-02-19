@@ -16,6 +16,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class BaseEntity {
     /**
+     * 搜索值
+     */
+    private String searchValue;
+    /**
      * 创建时间
      */
     private Date createTime;

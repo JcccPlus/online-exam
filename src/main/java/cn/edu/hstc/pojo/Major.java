@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Major {
+public class Major extends BaseEntity{
     /** 主键 */
     private Integer id;
     /** 专业名称 */
