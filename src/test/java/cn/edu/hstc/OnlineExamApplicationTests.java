@@ -2,9 +2,12 @@ package cn.edu.hstc;
 
 import cn.edu.hstc.dao.AdminDao;
 import cn.edu.hstc.dao.CollegeDao;
+import cn.edu.hstc.dao.MajorDao;
 import cn.edu.hstc.pojo.Admin;
 import cn.edu.hstc.pojo.College;
+import cn.edu.hstc.pojo.Major;
 import cn.edu.hstc.service.AdminService;
+import cn.edu.hstc.util.ProjectUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +64,19 @@ public class OnlineExamApplicationTests {
     public void test04(){
         List<College> colleges = collegeDao.selectCollegeList(new College(1, "计算机"));
         System.out.println(colleges);
+    }
+
+    @Autowired
+    MajorDao majorDao;
+    @Test
+    public void test05(){
+        List<Major> majors = majorDao.selectMajorList(new Major());
+        System.out.println(majors);
+    }
+
+    @Test
+    public void test06(){
+        System.out.println(ProjectUtil.getMD5String("2018115157").substring(0,16));
     }
 
 }

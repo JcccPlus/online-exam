@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class College {
+public class College extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 学院名称 */

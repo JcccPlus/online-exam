@@ -19,6 +19,8 @@ public interface StudentDao {
 
     int updateStudent(Student student);
 
-    int deleteStudent(String code);
+    int deleteStudent(Integer id);
+
+    int deleteStudentByCode(String code);
 
 }

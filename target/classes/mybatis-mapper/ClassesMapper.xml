@@ -9,7 +9,7 @@
         <result column="name" property="name"/>
         <result column="major_id" property="majorId"/>
         <association column="major_id" property="major" select="cn.edu.hstc.dao.MajorDao.selectMajorById"
-                     fetchType="lazy"/>
+                     fetchType="eager"/>
     </resultMap>
 
     <select id="selectClassById" parameterType="int" resultMap="ClassesResult">
@@ -19,19 +19,15 @@
     </select>
 
     <select id="selectClassesList" parameterType="Classes" resultMap="ClassesResult">
-        <if test="searchValue == null and searchValue == ''">
-            select * from tb_class
-            <where>
-                <if test="id != null">and id = #{id}</if>
-                <if test="name != null  and name != ''">and name = #{name}</if>
-            </where>
-        </if>
+        select cla.* from tb_class cla,tb_college co,tb_major maj where cla.major_id = maj.id and maj.college_id = co.id
+        <if test="id != null">and cla.id = #{id}</if>
+        <if test="name != null  and name != ''">and cla.name = #{name}</if>
+        <if test="majorId != null  and majorId != ''">and cla.major_id = #{majorId}</if>
         <if test="searchValue != null and searchValue != ''">
-            select cla.* from tb_class cla,tb_college co,tb_major maj where cla.major_id = maj.id and
-            maj.college_id = co.id and
-            maj.name like "%${searchValue}%" or
+            and
+            (maj.name like "%${searchValue}%" or
             cla.name like "%${searchValue}%" or
-            co.name like "%${searchValue}%"
+            co.name like "%${searchValue}%")
         </if>
     </select>
 
@@ -64,7 +60,7 @@
         where id = #{id}
     </delete>
 
-    <select id="selectClassesByCollegeAndMajor" parameterType="String">
+    <select id="selectClassesByCollegeAndMajor" parameterType="String" resultMap="ClassesResult">
         select cla.*
         from tb_class cla,
         tb_college co,
@@ -76,6 +72,15 @@
         </if>
         <if test="majorName != null and majorName != ''">
             and maj.name = #{majorName}
+        </if>
+    </select>
+
+    <select id="selectClassesByCollegeId" parameterType="int" resultMap="ClassesResult">
+        select cla.*
+        from tb_class cla,tb_major maj
+        where cla.major_id = maj.id
+        <if test="collegeId != null">
+            and maj.college_id = #{collegeId}
         </if>
     </select>
 

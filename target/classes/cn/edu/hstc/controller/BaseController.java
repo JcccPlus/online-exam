@@ -1,5 +1,14 @@
-package cn.edu.hstc.framework;
+package cn.edu.hstc.controller;
 
+import cn.edu.hstc.framework.AjaxResult;
+import cn.edu.hstc.framework.Convert;
+import cn.edu.hstc.framework.page.PageDomain;
+import cn.edu.hstc.framework.page.TableDataInfo;
+import cn.edu.hstc.framework.page.TableSupport;
+import cn.edu.hstc.framework.util.DateUtils;
+import cn.edu.hstc.framework.util.ServletUtils;
+import cn.edu.hstc.framework.util.SqlUtil;
+import cn.edu.hstc.framework.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -17,8 +26,6 @@ import java.util.List;
 
 /**
  * web层通用数据处理
- *
- * @author Jc
  */
 public class BaseController {
     protected final Logger logger = LoggerFactory.getLogger(BaseController.class);
@@ -40,17 +47,20 @@ public class BaseController {
     /**
      * 设置请求分页数据
      */
-    protected void startPage() {
+    protected void startPage(Integer pageNum) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
-        /*Integer pageNum = pageDomain.getPageNum();
-        Integer pageSize = pageDomain.getPageSize();*/
-        Integer pageNum = Convert.toInt(ServletUtils.getRequest().getAttribute("pageNum"));
-        Integer pageSize = Convert.toInt(ServletUtils.getRequest().getAttribute("pageSize"));
-        String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
-        if (StringUtils.isNull(pageNum) || StringUtils.isNull(pageSize)) {
-            //如果页码及单页数量为空，则设置为默认值
+        if(pageNum==null){
+            pageNum = pageDomain.getPageNum();
+        }
+        Integer pageSize = pageDomain.getPageSize();
+        String orderBy = (String) ServletUtils.getRequest().getAttribute("orderBy");
+        //String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
+        //如果页码及单页数量为空，则设置为默认值
+        if (StringUtils.isNull(pageNum)) {
             pageNum = 1;
-            pageSize = 20;
+        }
+        if(StringUtils.isNull(pageSize)){
+            pageSize = 3;
         }
         PageHelper.startPage(pageNum, pageSize, orderBy);
     }
@@ -149,5 +159,12 @@ public class BaseController {
      */
     public AjaxResult error(AjaxResult.Type type, String message) {
         return new AjaxResult(type, message);
+    }
+
+    /**
+     * 页面跳转
+     */
+    public String redirect(String url) {
+        return StringUtils.format("redirect:{}", url);
     }
 }

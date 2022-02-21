@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>在线考试云平台</title>
     <link rel="icon" href="images/logo.png">
+    <link rel="icon" th:href="@{/images/logo.png}">
     <!-- Bootstrap core CSS -->
-    <link href="bootstrapv5/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/dashboard.css" rel="stylesheet">
-    <link href="css/common.css" rel="stylesheet">
-    <link href="css/public.css" rel="stylesheet">
+    <link type="text/css" th:href="@{/bootstrapv5/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/public.css}" rel="stylesheet">
+    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -33,7 +35,7 @@
 <body>
 <div th:replace="~{common/acommon::header}"></div>
 <div class="content">
-  <div th:replace="~{common/acommon::sidebar(active='amain5.html')}"></div>
+    <div th:replace="~{common/acommon::sidebar(active='amain5.html')}"></div>
     <div class="content-right">
         <div class="right-con">
             <div class="right-operation">
@@ -41,7 +43,8 @@
                     <h5 class="title-con">学生列表</h5>
                 </div>
                 <div class="input-group mb-3" style="width:250px;float: right;right: 45px;top:17px;">
-                    <button class="btn btn-outline-secondary">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal"
+                            data-bs-target="#addModal">
                         <svg t="1643124208177" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="2073"
                              width="18" height="18">
@@ -49,9 +52,11 @@
                                   fill="" p-id="2074"></path>
                         </svg>
                     </button>
-                    <input type="text" class="form-control" placeholder="学号/姓名/班级" aria-label="Recipient's username"
-                           aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                    <input type="text" class="form-control" id="searchValue" name="searchValue" placeholder="学号/姓名/班级"
+                           aria-label="Recipient's username"
+                           aria-describedby="button-addon2" th:value="${searchValue}">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                            onclick="getStudentList(null,this)">
                         <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3506"
                              width="16" height="16">
@@ -62,26 +67,40 @@
                 </div>
             </div>
             <hr style="margin: 0">
-            <div class="right-list">
-                <table class="table table-striped table-hover caption-bottom">
-                    <caption>共1页2条数据，当前为第1页</caption>
+            <div class="right-list" style="padding: 0px 40px">
+                <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 275px"
+                     th:if="${#lists.isEmpty(studentList)}">无学生数据，请<a href="#" data-bs-toggle="modal"
+                                                                      data-bs-target="#addModal"
+                                                                      style="color: #53a4f4; text-decoration: none">点击</a>添加...
+                </div>
+                <table class="table table-striped table-hover caption-bottom"
+                       th:if="${not #lists.isEmpty(studentList)}">
+                    <caption>共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第
+                        [[${pageInfo.getPageNum()}]] 页
+                    </caption>
                     <thead>
                     <tr>
+                        <th scope="col">#</th>
                         <th scope="col">学号</th>
                         <th scope="col">姓名</th>
+                        <th scope="col">性别</th>
                         <th scope="col">手机号码</th>
                         <th scope="col">班级</th>
                         <th scope="col">操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>李四</td>
-                        <td>10086</td>
-                        <td>18计科51班</td>
+                    <tr th:each="student:${studentList}">
+                        <th scope="row" th:text="${student.getId()}"></th>
+                        <td th:text="${student.stuNum}"></td>
+                        <td th:text="${student.getName()}"></td>
+                        <td th:text="${student.getGender()}"></td>
+                        <td th:text="${student.getPhone()}"></td>
+                        <td th:text="${student.getClasses().getName()}"></td>
                         <td>
-                            <button class="btn btn-outline-secondary">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    th:onclick="getEditStudent([[${student.getId()}]],[[${student.getName()}]],[[${student.getStuNum()}]],[[${student.getGender()}]],[[${student.getPhone()}]],[[${student.getClassId()}]],[[${student.getClasses().getMajorId()}]],[[${student.getClasses().getMajor().getCollegeId()}]])">
                                 <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="4042"
                                      width="16" height="16">
@@ -91,37 +110,8 @@
                                           fill="#2c2c2c" p-id="4044"></path>
                                 </svg>
                             </button>
-                            <button class="btn btn-outline-secondary">
-                                <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                     xmlns="http://www.w3.org/2000/svg" p-id="2260"
-                                     width="16" height="16">
-                                    <path d="M742.4 944H281.6c-49.4 0-89.6-43.1-89.6-96V368h64v480c0 17.3 11.7 32 25.6 32h460.8c13.9 0 25.6-14.7 25.6-32V368h64v480c0 52.9-40.2 96-89.6 96z"
-                                          p-id="2261"></path>
-                                    <path d="M384 368h64v416h-64zM592 368h64v416h-64zM64 224h896v64H64z"
-                                          p-id="2262"></path>
-                                    <path d="M768 288H256V160c0-52.9 43.1-96 96-96h320c52.9 0 96 43.1 96 96v128z m-448-64h384v-64c0-17.6-14.4-32-32-32H352c-17.6 0-32 14.4-32 32v64z"
-                                          p-id="2263"></path>
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>钱七</td>
-                        <td>10000</td>
-                        <td>18英语20班</td>
-                        <td>
-                            <button class="btn btn-outline-secondary">
-                                <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                     xmlns="http://www.w3.org/2000/svg" p-id="4042"
-                                     width="16" height="16">
-                                    <path d="M76.094377 995.097685c-8.806174 0-17.612348-3.612789-23.93473-9.935171a34.547299 34.547299 0 0 1-9.709371-27.32172l26.192723-267.120618c0.451599-43.579272 18.515546-86.029548 49.450055-116.738258L544.176406 151.285557c13.322161-13.096362 34.547299-13.096362 47.869459 0l296.926131 296.92613a33.847321 33.847321 0 0 1 0 47.86946l-426.76075 423.373759a165.917354 165.917354 0 0 1-115.835061 48.546858l-266.894818 27.095921h-3.38699zM567.885336 223.089746L165.736714 622.077178c-18.741345 18.515546-29.353914 44.25667-29.353914 70.449393 0 1.128997 0 2.257993-0.225799 3.38699l-22.128335 227.379934 227.379934-23.031532c1.128997-0.225799 2.257993-0.225799 3.38699-0.2258 26.418523 0 51.25645-10.16097 69.997795-28.902315L817.167806 471.920617 567.885336 223.089746zM102.5129 692.526571z"
-                                          fill="#2c2c2c" p-id="4043"></path>
-                                    <path d="M865.037266 506.016318c-9.031974 0-17.612348-3.612789-23.93473-9.935171L544.402205 199.606615a33.644101 33.644101 0 0 1 0-47.86946l93.480926-93.480926a98.267872 98.267872 0 0 1 138.640794 0l204.122602 204.122602c18.967144 18.967144 29.579713 44.25667 29.579713 71.126792s-10.38677 52.159647-29.579713 71.126792l-91.448732 91.448732c-6.548181 6.322381-15.354355 9.935171-24.160529 9.935171zM616.206395 175.671885L864.811466 424.276957l67.514003-67.514002c6.322381-6.322381 9.709372-14.451158 9.709371-23.257332s-3.38699-16.93495-9.709371-23.257332L728.428666 106.125689a30.257111 30.257111 0 0 0-42.676075 0l-69.546196 69.546196z"
-                                          fill="#2c2c2c" p-id="4044"></path>
-                                </svg>
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <button class="btn btn-outline-secondary"
+                                    th:onclick="delStudent([[${student.getId()}]],[[${student.getName()}]])">
                                 <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                      width="16" height="16">
@@ -137,19 +127,23 @@
                     </tr>
                     </tbody>
                 </table>
-                <nav aria-label="Page navigation example">
+                <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(studentList)}">
                     <ul class="pagination justify-content-center" style="margin: 0;">
-                        <li class="page-item disabled">
-                            <a class="page-link">&laquo;</a>
+                        <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getStudentList([[${pageInfo.getPrePage()}]],this)">
+                            <a class="page-link" href="">&laquo;</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">首页</a>
+                        <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
+                            th:onclick="getStudentList([[${pageInfo.getFirstPage()}]],this)">
+                            <a class="page-link" href="">首页</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">末页</a>
+                        <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getStudentList([[${pageInfo.getLastPage()}]],this)">
+                            <a class="page-link" href="">末页</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">&raquo;</a>
+                        <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getStudentList([[${pageInfo.getNextPage()}]],this)">
+                            <a class="page-link" href="">&raquo;</a>
                         </li>
                     </ul>
                 </nav>
@@ -157,8 +151,165 @@
         </div>
     </div>
 </div>
-<script src="js/jquery-3.3.1.min.js "></script>
-<script src="bootstrapv5/js/bootstrap.bundle.min.js "></script>
+<!-- 添加学生Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">添加学生</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="new_student_form" name="new_student_form">
+                    <div class="div">
+                        <label class="div1">所属学院</label>
+                        <div class="div2">
+                            <select class="form-control" id="add_college" name="college">
+                                <option value="0">-------------------请选择学院-------------------</option>
+                                <option th:each="college:${collegeList}" th:text="${college.getName()}"
+                                        th:value="${college.getId()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">所属专业</label>
+                        <div class="div2">
+                            <select class="form-control" id="add_major" name="major">
+                                <option value="0">-------------------请选择专业-------------------</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">所属班级</label>
+                        <div class="div2">
+                            <select class="form-control" id="add_class" name="classId">
+                                <option value="0">-------------------请选择班级-------------------</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">学号</label>
+                        <div class="div2">
+                            <input type="text" id="add_stuNum" class="form-control" name="stuNum" placeholder="请输入学生学号">
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">姓名</label>
+                        <div class="div2">
+                            <input type="text" id="add_name" class="form-control" name="name" placeholder="请输入学生姓名">
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">性别</label>
+                        <div class="div2">
+                            <div class="form-check form-check-inline" style="margin-bottom:0">
+                                <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="男"
+                                       style="margin-top: 0.9em;" checked>
+                                <label class="form-check-label" for="inlineRadio1">男</label>
+                            </div>
+                            <div class="form-check form-check-inline" style="margin-bottom:0">
+                                <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="女"
+                                       style="margin-top: 0.9em;">
+                                <label class="form-check-label" for="inlineRadio2">女</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">手机号码</label>
+                        <div class="div2">
+                            <input type="text" id="add_phone" class="form-control" name="phone"
+                                   placeholder="请输入手机号码（非必填）">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addStudent()">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 更新学生Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">编辑教师信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit_student_form" name="edit_student_form">
+                    <input type="hidden" id="edit_id" name="id">
+                    <div class="div">
+                        <label class="div1">所属学院</label>
+                        <div class="div2">
+                            <select class="form-control" id="edit_college" name="college">
+                                <option th:each="college:${collegeList}" th:text="${college.getName()}"
+                                        th:value="${college.getId()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">所属专业</label>
+                        <div class="div2">
+                            <select class="form-control" id="edit_major" name="major">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">所属班级</label>
+                        <div class="div2">
+                            <select class="form-control" id="edit_class" name="classId">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">学号</label>
+                        <div class="div2">
+                            <input type="text" id="edit_stuNum" class="form-control" name="stuNum"
+                                   placeholder="请输入学生学号">
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">姓名</label>
+                        <div class="div2">
+                            <input type="text" id="edit_name" class="form-control" name="name" placeholder="请输入学生姓名">
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">性别</label>
+                        <div class="div2">
+                            <div class="form-check form-check-inline" style="margin-bottom:0">
+                                <input class="form-check-input" type="radio" name="gender" id="edit_gender1" value="男"
+                                       style="margin-top: 0.9em;">
+                                <label class="form-check-label" for="edit_gender1">男</label>
+                            </div>
+                            <div class="form-check form-check-inline" style="margin-bottom:0">
+                                <input class="form-check-input" type="radio" name="gender" id="edit_gender2" value="女"
+                                       style="margin-top: 0.9em;">
+                                <label class="form-check-label" for="edit_gender2">女</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">手机号码</label>
+                        <div class="div2">
+                            <input type="text" id="edit_phone" class="form-control" name="phone"
+                                   placeholder="请输入手机号码（非必填）">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="editStudent()">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script>
     $(document).ready(function () {
         $(".user ").mouseover(function () {
@@ -177,6 +328,132 @@
             $(".user-popup ").hide();
         });
     })
+
+    function addStudent() {
+        $.post("[[@{/student/add}]]",
+            $("#new_student_form").serialize(), function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            });
+    }
+
+    function getStudentList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/student/search}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/student/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
+
+    function delStudent(studentId, studentName) {
+        if (confirm("确定删除" + studentName + "吗？")) {
+            $.post("[[@{/student/delete}]]", {"studentId": studentId}, function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    }
+
+    function getEditStudent(studentId, studentName, studentNum, studentGender, studentPhone, classId, majorId, collegeId) {
+        document.edit_student_form.major.length = 0;
+        $.post("[[@{/major/getMajorsByCid}]]", {"collegeId": collegeId}, function (d) {
+            for (var i = 0; i < d.data.length; i++) {
+                $("#edit_major").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+            }
+        });
+        document.edit_student_form.classId.length = 0;
+        $.post("[[@{/class/getClassesByMid}]]", {"majorId": majorId}, function (d) {
+            for (var i = 0; i < d.data.length; i++) {
+                $("#edit_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+            }
+        });
+        $("#edit_college").val(collegeId)
+        $("#edit_major").val(majorId);
+        $("#edit_class").val(classId);
+        $("#edit_id").val(studentId);
+        $("#edit_name").val(studentName);
+        $("#edit_stuNum").val(studentNum);
+        if (studentGender === "男") {
+            $("#edit_gender1").prop('checked', true);
+        } else {
+            $("#edit_gender2").prop('checked', true);
+        }
+        $("#edit_phone").val(studentPhone);
+    }
+
+    function editStudent() {
+        if (confirm("确定更新吗？")) {
+            $.post("[[@{/student/edit}]]", $("#edit_student_form").serialize(), function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    }
+
+    //添加modal根据学院异步获取专业、班级
+    $("#add_college").change(function () {
+        document.new_student_form.major.length = 1;
+        document.new_student_form.classId.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/major/getMajorsByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_major").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+            $.post("[[@{/class/getClassesByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    //添加modal根据专业异步获取班级
+    $("#add_major").change(function () {
+        document.new_student_form.classId.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/class/getClassesByMid}]]", {"majorId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    //更新modal根据学院异步获取专业、班级
+    $("#edit_college").change(function () {
+        document.edit_student_form.major.length = 0;
+        document.edit_student_form.classId.length = 0;
+        $.post("[[@{/major/getMajorsByCid}]]", {"collegeId": this.value}, function (d) {
+            for (var i = 0; i < d.data.length; i++) {
+                $("#edit_major").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+            }
+        });
+        $.post("[[@{/class/getClassesByCid}]]", {"collegeId": this.value}, function (d) {
+            for (var i = 0; i < d.data.length; i++) {
+                $("#edit_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+            }
+        });
+    });
+
+    //更新modal根据专业异步获取班级
+    $("#edit_major").change(function () {
+        document.edit_student_form.classId.length = 0;
+        $.post("[[@{/class/getClassesByMid}]]", {"majorId": this.value}, function (d) {
+            for (var i = 0; i < d.data.length; i++) {
+                $("#edit_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+            }
+        });
+    });
 </script>
 </body>
 

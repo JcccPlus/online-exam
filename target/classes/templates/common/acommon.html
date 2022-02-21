@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>管理员公共模块</title>
+    <script th:src="@{/js/common.js}"></script>
 </head>
 <body>
 <!--头部导航栏-->
@@ -17,7 +18,7 @@
     </div>
     <div class="user-self">
         <div class="user">
-            <img th:src="@{/images/boy.png}">
+            <img th:src="@{${session.user.head_pic}}">
             <span th:text="${session.user.username}">管理员</span>
             <svg t="1642757085955" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                  p-id="2469"
@@ -27,7 +28,7 @@
             </svg>
             <div class="user-popup">
                 <ul>
-                    <li onclick="">
+                    <li th:onclick="toPage([[@{/user/logout}]])">
                         <svg t="1642790514332" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="7977"
                              width="20" height="20">
@@ -44,14 +45,14 @@
 <!--侧边导航栏-->
 <div class="content-left bg-light shadow" th:fragment="sidebar">
     <div class="user-block">
-        <img class="head-img" th:src="@{/images/boy.png}">
+        <img class="head-img" th:src="@{${session.user.head_pic}}">
         <p class="user-name" th:text="${session.user.username}">管理员</p>
     </div>
     <hr style="margin: 0;">
     <div class="user-navbar">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <div th:class="${active=='amain1.html'?'nav-link active':'nav-link'}">
+                <div th:class="${active=='amain1.html'?'nav-link active':'nav-link'}" th:onclick="toPage([[@{/college/list.html}]])">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
@@ -65,7 +66,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <div th:class="${active=='amain2.html'?'nav-link active':'nav-link'}">
+                <div th:class="${active=='amain2.html'?'nav-link active':'nav-link'}" th:onclick="toPage([[@{/major/list.html}]])">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
@@ -79,7 +80,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <div th:class="${active=='amain3.html'?'nav-link active':'nav-link'}">
+                <div th:class="${active=='amain3.html'?'nav-link active':'nav-link'}" th:onclick="toPage([[@{/class/list.html}]])">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
@@ -93,7 +94,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <div th:class="${active=='amain4.html'?'nav-link active':'nav-link'}" onclick="toPage()">
+                <div th:class="${active=='amain4.html'?'nav-link active':'nav-link'}" th:onclick="toPage([[@{/teacher/list.html}]])">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
@@ -105,8 +106,8 @@
                     教师管理
                 </div>
             </li>
-            <li th:class="${active=='amain5.html'?'nav-link active':'nav-link'}">
-                <div class="nav-link">
+            <li class="nav-item">
+                <div th:class="${active=='amain5.html'?'nav-link active':'nav-link'}" th:onclick="toPage([[@{/student/list.html}]])">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">

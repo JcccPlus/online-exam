@@ -11,6 +11,7 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
+    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -49,9 +50,11 @@
                                   fill="" p-id="2074"></path>
                         </svg>
                     </button>
-                    <input type="text" class="form-control" name="searchValue" placeholder="搜索学院" aria-label="Recipient's username"
-                           aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                    <input type="text" class="form-control" id="searchValue" name="searchValue" placeholder="搜索学院"
+                           aria-label="Recipient's username"
+                           aria-describedby="button-addon2" th:value="${searchValue}">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                            onclick="getCollegeList(null,this)">
                         <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3506"
                              width="16" height="16">
@@ -64,24 +67,29 @@
             <hr style="margin: 0">
             <div class="right-list" style="padding: 0px 40px;">
                 <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 275px"
-                     th:if="${#lists.isEmpty(colleges)}">无学院数据，请<a href="#"
+                     th:if="${#lists.isEmpty(colleges)}">无学院数据，请<a href="" data-bs-toggle="modal"
+                                                                   data-bs-target="#addModal"
                                                                    style="color: #53a4f4; text-decoration: none">点击</a>添加...
                 </div>
                 <table class="table table-striped table-hover caption-bottom" th:if="${not #lists.isEmpty(colleges)}">
-                    <caption>共1页3条数据，当前为第1页</caption>
+                    <caption>
+                        共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第 [[${pageInfo.getPageNum()}]]
+                        页
+                    </caption>
                     <thead>
                     <tr>
-                        <th scope="col">编号</th>
+                        <th scope="col">#</th>
                         <th scope="col">名称</th>
                         <th scope="col">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="college:${colleges}">
-                        <th scope="row" th:text="${college.getId()}">1</th>
+                        <th scope="row" th:text="${college.getId()}"></th>
                         <td>[[${college.getName()}]]</td>
                         <td>
-                            <button class="btn btn-outline-secondary">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal"
+                                    th:onclick="getEditCollege([[${college.getId()}]],[[${college.getName()}]])">
                                 <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="4042"
                                      width="16" height="16">
@@ -91,7 +99,8 @@
                                           fill="#2c2c2c" p-id="4044"></path>
                                 </svg>
                             </button>
-                            <button class="btn btn-outline-secondary">
+                            <button class="btn btn-outline-secondary"
+                                    th:onclick="delCollege([[${college.getId()}]],[[${college.getName()}]])">
                                 <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                      width="16" height="16">
@@ -109,17 +118,21 @@
                 </table>
                 <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(colleges)}">
                     <ul class="pagination justify-content-center" style="margin: 0;">
-                        <li class="page-item disabled">
-                            <a class="page-link">&laquo;</a>
+                        <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getCollegeList([[${pageInfo.getPrePage()}]],this)">
+                            <a class="page-link" href="">&laquo;</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">首页</a>
+                        <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
+                            th:onclick="getCollegeList([[${pageInfo.getFirstPage()}]],this)">
+                            <a class="page-link" href="">首页</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">末页</a>
+                        <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getCollegeList([[${pageInfo.getLastPage()}]],this)">
+                            <a class="page-link" href="">末页</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">&raquo;</a>
+                        <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                            th:onclick="getCollegeList([[${pageInfo.getNextPage()}]],this)">
+                            <a class="page-link" href="">&raquo;</a>
                         </li>
                     </ul>
                 </nav>
@@ -132,7 +145,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">添加学院信息</h5>
+                <h5 class="modal-title" id="addModalLabel">添加学院</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -140,8 +153,7 @@
                     <div class="div">
                         <label class="div1">学院名称</label>
                         <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称"
-                                   required>
+                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称">
                         </div>
                     </div>
                 </form>
@@ -153,9 +165,37 @@
         </div>
     </div>
 </div>
+<!-- 更新学院Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">编辑学院信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit_college_form">
+                    <div class="div">
+                        <label class="div1">学院名称</label>
+                        <div class="div2">
+                            <input type="hidden" id="edit_id" name="id">
+                            <input type="text" id="edit_name" class="form-control" name="name"
+                                   placeholder="请输入学院名称">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="editCollege()">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script>
+
     $(document).ready(function () {
         $(".user ").mouseover(function () {
             $(".user-popup ").show();
@@ -177,9 +217,49 @@
     function addCollege() {
         $.post("[[@{/college/add}]]",
             $("#new_college_form").serialize(), function (data) {
-                alert(data);
-                window.location.reload();
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
             });
+    }
+
+    function getCollegeList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/college/search}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/college/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
+
+    function delCollege(collegeId, collegeName) {
+        if (confirm("确定删除" + collegeName + "吗？")) {
+            $.post("[[@{/college/delete}]]", {"collegeId": collegeId}, function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    }
+
+    function getEditCollege(collegeId, collegeName) {
+        $("#edit_id").val(collegeId);
+        $("#edit_name").val(collegeName);
+    }
+
+    function editCollege() {
+        if (confirm("确定更新吗？")) {
+            $.post("[[@{/college/edit}]]", $("#edit_college_form").serialize(), function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
     }
 
 </script>

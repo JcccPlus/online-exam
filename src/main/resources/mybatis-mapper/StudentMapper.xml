@@ -14,8 +14,8 @@
         <result column="head_pic" property="head_pic"/>
         <result column="code" property="code"/>
         <result column="class_id" property="classId"/>
-        <association column="class_id" property="classes" select="cn.edu.hstc.dao.CollegeDao.selectClassById"
-                     fetchType="lazy"/>
+        <association column="class_id" property="classes" select="cn.edu.hstc.dao.ClassesDao.selectClassById"
+                     fetchType="eager"/>
     </resultMap>
 
     <select id="selectStudentById" parameterType="int" resultMap="StudentResult">
@@ -32,25 +32,21 @@
     </select>
 
     <select id="selectStudentList" parameterType="Student" resultMap="StudentResult">
-        <if test="searchValue == null and searchValue == ''">
-            select * from tb_student
-            <where>
-                <if test="id != null">and id = #{id}</if>
-                <if test="stuNum != null and stuNum != ''">and stu_num = #{stuNum}</if>
-                <if test="name != null and name != ''">and name = #{name}</if>
-                <if test="password != null and password != ''">password = #{password},</if>
-                <if test="gender != null and gender != ''">gender = #{gender},</if>
-                <if test="phone != null and phone != ''">phone = #{phone},</if>
-                <if test="head_pic != null and head_pic != ''">head_pic = #{head_pic},</if>
-                <if test="code != null and code != ''">code = #{code},</if>
-                <if test="classId != null">class_id = #{classId},</if>
-            </where>
-        </if>
+        select s.* from tb_student s,tb_class c where s.class_id = c.id
+        <if test="id != null">and id = #{id}</if>
+        <if test="stuNum != null and stuNum != ''">and stu_num = #{stuNum}</if>
+        <if test="name != null and name != ''">and name = #{name}</if>
+        <if test="password != null and password != ''">and password = #{password},</if>
+        <if test="gender != null and gender != ''">and gender = #{gender},</if>
+        <if test="phone != null and phone != ''">and phone = #{phone},</if>
+        <if test="head_pic != null and head_pic != ''">and head_pic = #{head_pic},</if>
+        <if test="code != null and code != ''">and code = #{code},</if>
+        <if test="classId != null">and class_id = #{classId},</if>
         <if test="searchValue != null and searchValue != ''">
-            select m.* from tb_student s,tb_class c where t.class_id = c.id and
-            s.stu_num like "%${searchValue}%" or
+            and
+            (s.stu_num like "%${searchValue}%" or
             s.name like "%${searchValue}%" or
-            c.name like "%${searchValue}%"
+            c.name like "%${searchValue}%")
         </if>
     </select>
 
@@ -95,7 +91,13 @@
         where id = #{id}
     </update>
 
-    <delete id="deleteStudent" parameterType="String">
+    <delete id="deleteStudent" parameterType="int">
+        delete
+        from tb_student
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteStudentByCode" parameterType="String">
         delete
         from tb_student
         where code = #{code}

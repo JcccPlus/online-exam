@@ -846,6 +846,7 @@ ALL PRIVILEGES|systemofcontrol!
       <Position>4</Position>
       <Comment>头像</Comment>
       <DataType>varchar(64)|0s</DataType>
+      <DefaultExpression>&apos;/images/boy.png&apos;</DefaultExpression>
     </column>
     <column id="273" parent="249" name="code">
       <Position>5</Position>

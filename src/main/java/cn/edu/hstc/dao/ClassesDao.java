@@ -21,4 +21,6 @@ public interface ClassesDao {
 
     List<Classes> selectClassesByCollegeAndMajor(@Param("collegeName") String collegeName, @Param("majorName") String majorName);
 
+    List<Classes> selectClassesByCollegeId(@Param("collegeId") Integer collegeId);
+
 }

@@ -9,7 +9,7 @@
         <result column="name" property="name"/>
         <result column="college_id" property="collegeId"/>
         <association column="college_id" property="college" select="cn.edu.hstc.dao.CollegeDao.selectCollegeById"
-                     fetchType="lazy"/>
+                     fetchType="eager"/>
     </resultMap>
 
     <select id="selectMajorById" parameterType="int" resultMap="MajorResult">
@@ -19,17 +19,13 @@
     </select>
 
     <select id="selectMajorList" parameterType="Major" resultMap="MajorResult">
-        <if test="searchValue == null and searchValue == ''">
-            select * from tb_major
-            <where>
-                <if test="id != null">and id = #{id}</if>
-                <if test="name != null  and name != ''">and name = #{name}</if>
-            </where>
-        </if>
+        select m.* from tb_major m,tb_college c where m.college_id = c.id
+        <if test="id != null">and m.id = #{id}</if>
+        <if test="name != null  and name != ''">and m.name = #{name}</if>
+        <if test="collegeId != null  and collegeId != ''">and m.college_id = #{collegeId}</if>
         <if test="searchValue != null and searchValue != ''">
-            select m.* from tb_major m,tb_college c where m.college_id = c.id and
-            m.name like "%${searchValue}%" or
-            c.name like "%${searchValue}%"
+            and (m.name like "%${searchValue}%" or
+            c.name like "%${searchValue}%")
         </if>
     </select>
 
@@ -62,7 +58,7 @@
         where id = #{id}
     </delete>
 
-    <select id="selectMajorsByCollege" parameterType="String">
+    <select id="selectMajorsByCollege" parameterType="String" resultMap="MajorResult">
         select m.*
         from tb_major m,
              tb_college c

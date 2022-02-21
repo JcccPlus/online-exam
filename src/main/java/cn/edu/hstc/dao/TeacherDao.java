@@ -19,6 +19,8 @@ public interface TeacherDao {
 
     int updateTeacher(Teacher teacher);
 
-    int deleteTeacher(String code);
+    int deleteTeacherByCode(String code);
+
+    int deleteTeacher(Integer id);
 
 }

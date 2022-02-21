@@ -15,7 +15,7 @@
         <result column="code" property="code"/>
         <result column="college_id" property="collegeId"/>
         <association column="college_id" property="college" select="cn.edu.hstc.dao.CollegeDao.selectCollegeById"
-                     fetchType="lazy"/>
+                     fetchType="eager"/>
     </resultMap>
 
     <select id="selectTeacherById" parameterType="int" resultMap="TeacherResult">
@@ -32,25 +32,21 @@
     </select>
 
     <select id="selectTeacherList" parameterType="Teacher" resultMap="TeacherResult">
-        <if test="searchValue == null and searchValue == ''">
-            select * from tb_teacher
-            <where>
-                <if test="id != null">and id = #{id}</if>
-                <if test="teaNum != null and teaNum != ''">and tea_num = #{teaNum}</if>
-                <if test="name != null and name != ''">and name = #{name}</if>
-                <if test="password != null and password != ''">password = #{password},</if>
-                <if test="gender != null and gender != ''">gender = #{gender},</if>
-                <if test="phone != null and phone != ''">phone = #{phone},</if>
-                <if test="head_pic != null and head_pic != ''">head_pic = #{head_pic},</if>
-                <if test="code != null and code != ''">code = #{code},</if>
-                <if test="collegeId != null">college_id = #{collegeId},</if>
-            </where>
-        </if>
+        select t.* from tb_teacher t,tb_college c where t.college_id = c.id
+        <if test="id != null">and id = #{id}</if>
+        <if test="teaNum != null and teaNum != ''">and tea_num = #{teaNum}</if>
+        <if test="name != null and name != ''">and name = #{name}</if>
+        <if test="password != null and password != ''">and password = #{password},</if>
+        <if test="gender != null and gender != ''">and gender = #{gender},</if>
+        <if test="phone != null and phone != ''">and phone = #{phone},</if>
+        <if test="head_pic != null and head_pic != ''">and head_pic = #{head_pic},</if>
+        <if test="code != null and code != ''">and code = #{code},</if>
+        <if test="collegeId != null">and college_id = #{collegeId},</if>
         <if test="searchValue != null and searchValue != ''">
-            select m.* from tb_teacher t,tb_college c where t.college_id = c.id and
-            t.tea_num like "%${searchValue}%" or
+            and
+            (t.tea_num like "%${searchValue}%" or
             t.name like "%${searchValue}%" or
-            c.name like "%${searchValue}%"
+            c.name like "%${searchValue}%")
         </if>
     </select>
 
@@ -95,10 +91,16 @@
         where id = #{id}
     </update>
 
-    <delete id="deleteTeacher" parameterType="String">
+    <delete id="deleteTeacherByCode" parameterType="String">
         delete
         from tb_teacher
         where code = #{code}
+    </delete>
+
+    <delete id="deleteTeacher" parameterType="int">
+        delete
+        from tb_teacher
+        where id = #{id}
     </delete>
 
 </mapper>

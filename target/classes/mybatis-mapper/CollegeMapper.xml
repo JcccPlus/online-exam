@@ -5,14 +5,17 @@
 <mapper namespace="cn.edu.hstc.dao.CollegeDao">
 
     <select id="selectCollegeById" parameterType="int" resultType="College">
-        select * from tb_college where id = #{id}
+        select *
+        from tb_college
+        where id = #{id}
     </select>
 
     <select id="selectCollegeList" parameterType="College" resultType="College">
         select * from tb_college
         <where>
             <if test="id != null">and id = #{id}</if>
-            <if test="name != null  and name != ''">and name like "%${name}%"</if>
+            <if test="name != null  and name != ''">and name = #{name}</if>
+            <if test="searchValue != null and searchValue != ''">and name like "%${searchValue}%"</if>
         </where>
     </select>
 
