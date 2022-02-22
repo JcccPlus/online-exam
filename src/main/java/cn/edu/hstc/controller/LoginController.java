@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class LoginController {
                     Teacher teacher = teachers.get(0);
                     if (teacher.getPassword().equals(password)) {
                         session.setAttribute("user", teacher);
-                        return "redirect:/teacher/main.html";
+                        return "redirect:/course/list.html";
                     } else {
                         message = "账号或密码错误";
                     }
@@ -63,7 +62,7 @@ public class LoginController {
                     Student student = students.get(0);
                     if (student.getPassword().equals(password)) {
                         session.setAttribute("user", student);
-                        return "redirect:/student/main.html";
+                        return "redirect:/exam/current.html";
                     } else {
                         message = "账号或密码错误";
                     }
