@@ -20,6 +20,10 @@ public class BaseEntity {
      */
     private String searchValue;
     /**
+     * 唯一码
+     */
+    private String code;
+    /**
      * 创建时间
      */
     private Date createTime;

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Course {
+public class Course extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 课程名称 */

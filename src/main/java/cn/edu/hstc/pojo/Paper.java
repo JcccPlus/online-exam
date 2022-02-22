@@ -21,6 +21,8 @@ public class Paper extends BaseEntity {
     private Double score;
     /** 唯一码 */
     private String code;
+    /** 所属课程 */
+    private String courseId;
     /** 所属教师 */
     private Integer teaId;
     /** 教师实体 */
