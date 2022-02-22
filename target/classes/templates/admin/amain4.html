@@ -131,19 +131,19 @@
                     <ul class="pagination justify-content-center" style="margin: 0;">
                         <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
                             th:onclick="getTeacherList([[${pageInfo.getPrePage()}]],this)">
-                            <a class="page-link" href="">&laquo;</a>
+                            <a class="page-link" href="#">&laquo;</a>
                         </li>
                         <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
                             th:onclick="getTeacherList([[${pageInfo.getFirstPage()}]],this)">
-                            <a class="page-link" href="">首页</a>
+                            <a class="page-link" href="#">首页</a>
                         </li>
                         <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
                             th:onclick="getTeacherList([[${pageInfo.getLastPage()}]],this)">
-                            <a class="page-link" href="">末页</a>
+                            <a class="page-link" href="#">末页</a>
                         </li>
                         <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
                             th:onclick="getTeacherList([[${pageInfo.getNextPage()}]],this)">
-                            <a class="page-link" href="">&raquo;</a>
+                            <a class="page-link" href="#">&raquo;</a>
                         </li>
                     </ul>
                 </nav>

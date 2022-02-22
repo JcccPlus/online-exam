@@ -82,6 +82,9 @@ public class LoginController {
             message = "请确认系统角色是否勾选";
         }
         redirectAttributes.addFlashAttribute("message", message);
+        redirectAttributes.addFlashAttribute("user_id", id);
+        redirectAttributes.addFlashAttribute("user_password", password);
+        redirectAttributes.addFlashAttribute("user_role", role);
         return "redirect:/";
     }
 

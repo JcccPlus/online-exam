@@ -14,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -85,8 +86,7 @@ public class TeacherController extends BaseController {
     }
 
     @RequestMapping("/self.html")
-    public String self(Teacher teacher) {
-
+    public String self() {
         return "teacher/tmain5";
     }
 }
