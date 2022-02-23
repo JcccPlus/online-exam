@@ -85,22 +85,16 @@
             <if test="gender != null and gender != ''">gender = #{gender},</if>
             <if test="phone != null and phone != ''">phone = #{phone},</if>
             <if test="head_pic != null and head_pic != ''">head_pic = #{head_pic},</if>
-            <if test="code != null and code != ''">code = #{code},</if>
+            <!--<if test="code != null and code != ''">code = #{code},</if>-->
             <if test="collegeId != null">college_id = #{collegeId},</if>
         </trim>
-        where id = #{id}
+        where id = #{id} and code = #{code}
     </update>
 
-    <delete id="deleteTeacherByCode" parameterType="String">
+    <delete id="deleteTeacher" parameterType="Teacher">
         delete
         from tb_teacher
-        where code = #{code}
-    </delete>
-
-    <delete id="deleteTeacher" parameterType="int">
-        delete
-        from tb_teacher
-        where id = #{id}
+        where id = #{id} and code = #{code}
     </delete>
 
 </mapper>

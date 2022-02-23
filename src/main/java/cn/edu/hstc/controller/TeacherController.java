@@ -74,11 +74,14 @@ public class TeacherController extends BaseController {
 
     @PostMapping("/delete")
     @ResponseBody
-    public AjaxResult delete(@RequestParam("teacherId") Integer id) {
-        if (ObjectUtils.isEmpty(id)) {
+    public AjaxResult delete(@RequestParam("teacherId") Integer id, @RequestParam("code") String code) {
+        if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
         }
-        if (teacherService.deleteTeacher(id)) {
+        Teacher param = new Teacher();
+        param.setId(id);
+        param.setCode(code);
+        if (teacherService.deleteTeacher(param)) {
             return success("删除成功");
         } else {
             return error("删除失败");

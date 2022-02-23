@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.LevelDao">
+
+    <select id="selectLevelList" parameterType="Level" resultType="Level">
+        select * from tb_level
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="name != null  and name != ''">and name = #{name}</if>
+        </where>
+    </select>
+
+    <select id="selectLevelById" parameterType="int" resultType="Level">
+        select *
+        from tb_level
+        where id = #{id}
+    </select>
+
+</mapper>

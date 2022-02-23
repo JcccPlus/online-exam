@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.TopicCopyDao">
+
+    <resultMap id="TopicCopyResult" type="TopicCopy">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="opts" property="opts"/>
+        <result column="answer" property="answer"/>
+        <result column="analysis" property="analysis"/>
+        <result column="type_id" property="typeId"/>
+        <result column="level_id" property="levelId"/>
+        <result column="stage_id" property="stageId"/>
+        <association column="type_id" property="type" select="cn.edu.hstc.dao.TopicDao.selectTypeById"
+                     fetchType="eager"/>
+        <association column="level_id" property="level" select="cn.edu.hstc.dao.LevelDao.selectLevelById"
+                     fetchType="eager"/>
+        <association column="stage_id" property="stage" select="cn.edu.hstc.dao.StageDao.selectStageById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectTopicCopyList" parameterType="TopicCopy" resultMap="TopicCopyResult">
+        select * from tb_topic_copy
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="title != null and title != ''">and title = #{title}</if>
+            <if test="opts != null and opts !=''">and opts = #{opts}</if>
+            <if test="answer != null and answer != ''">and answer = #{answer}</if>
+            <if test="analysis != null and analysis != ''">and analysis = #{analysis}</if>
+            <if test="typeId != null">and type_id = #{typeId}</if>
+            <if test="levelId != null">and level_id = #{levelId}</if>
+            <if test="stageId != null">and type_id = #{stageId}</if>
+        </where>
+    </select>
+
+    <select id="selectTopicCopyById" parameterType="int" resultMap="TopicCopyResult">
+        select *
+        from tb_topic_copy
+        where id = #{id}
+    </select>
+
+    <insert id="insertTopicCopy" parameterType="TopicCopy">
+        insert into tb_topic_copy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="opts != null and opts !=''">opts,</if>
+            <if test="answer != null and answer !=''">answer,</if>
+            <if test="analysis != null and analysis !=''">analysis,</if>
+            <if test="typeId != null">type_id,</if>
+            <if test="levelId != null">level_id,</if>
+            <if test="stageId != null">stage_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="opts != null and opts !=''">#{opts},</if>
+            <if test="answer != null and answer !=''">#{answer},</if>
+            <if test="analysis != null and analysis !=''">#{analysis},</if>
+            <if test="typeId != null">#{type_id},</if>
+            <if test="levelId != null">#{level_id},</if>
+            <if test="stageId != null">#{stage_id},</if>
+        </trim>
+    </insert>
+
+</mapper>

@@ -111,7 +111,7 @@
                                 </svg>
                             </button>
                             <button class="btn btn-outline-secondary"
-                                    th:onclick="delTeacher([[${teacher.getId()}]],[[${teacher.getName()}]])">
+                                    th:onclick="delTeacher([[${teacher.getId()}]],[[${teacher.getName()}]],[[${teacher.getCode()}]])">
                                 <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                      width="16" height="16">
@@ -320,9 +320,9 @@
         }
     }
 
-    function delTeacher(teacherId, teacherName) {
+    function delTeacher(teacherId, teacherName, code) {
         if (confirm("确定删除" + teacherName + "吗？")) {
-            $.post("[[@{/teacher/delete}]]", {"teacherId": teacherId}, function (data) {
+            $.post("[[@{/teacher/delete}]]", {"teacherId": teacherId, "code": code}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
                     window.location.reload();

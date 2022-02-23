@@ -67,7 +67,8 @@
                                 <label class="col-form-label">工号</label>
                             </div>
                             <div class="col-auto" style="margin-left: 30px;">
-                                <input type="hidden" th:value="${session.user.code}" id="code">
+                                <input type="hidden" th:value="${session.user.id}" id="user_id">
+                                <input type="hidden" th:value="${session.user.code}" id="user_code">
                                 <input type="text" class="form-control" th:value="${session.user.teaNum}" size="22"
                                        readonly>
                             </div>
