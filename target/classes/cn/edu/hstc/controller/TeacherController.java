@@ -3,9 +3,11 @@ package cn.edu.hstc.controller;
 import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.College;
 import cn.edu.hstc.pojo.Major;
+import cn.edu.hstc.pojo.Student;
 import cn.edu.hstc.pojo.Teacher;
 import cn.edu.hstc.service.CollegeService;
 import cn.edu.hstc.service.TeacherService;
+import cn.edu.hstc.util.ProjectUtil;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,7 +60,7 @@ public class TeacherController extends BaseController {
         if (teacherService.insertTeacher(teacher)) {
             return success("添加教师成功");
         } else {
-            return error("添加失败");
+            return error();
         }
     }
 
@@ -68,25 +70,122 @@ public class TeacherController extends BaseController {
         if (teacherService.updateTeacher(teacher)) {
             return success("更新成功");
         } else {
-            return error("更新失败");
+            return error();
         }
     }
 
     @PostMapping("/delete")
     @ResponseBody
-    public AjaxResult delete(@RequestParam("teacherId") Integer id) {
-        if (ObjectUtils.isEmpty(id)) {
+    public AjaxResult delete(@RequestParam("teacherId") Integer id, @RequestParam("code") String code) {
+        if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
         }
-        if (teacherService.deleteTeacher(id)) {
+        Teacher param = new Teacher();
+        param.setId(id);
+        param.setCode(code);
+        if (teacherService.deleteTeacher(param)) {
             return success("删除成功");
         } else {
-            return error("删除失败");
+            return error();
         }
     }
 
     @RequestMapping("/self.html")
     public String self() {
         return "teacher/tmain5";
+    }
+
+    @RequestMapping("/updateSex")
+    @ResponseBody
+    public AjaxResult updateSex(Integer user_id, String user_code, String user_gender) {
+        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
+            return error("系统错误，请稍后重试");
+        }
+        if (ObjectUtils.isEmpty(user_gender)) {
+            return error();
+        }
+        if (!user_gender.equals("男") && !user_gender.equals("女")) {
+            return error();
+        }
+        Teacher teacher = new Teacher();
+        teacher.setId(user_id);
+        teacher.setCode(user_code);
+        teacher.setGender(user_gender);
+        if (teacherService.updateTeacher(teacher)) {
+            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            getSession().setAttribute("user", currentTeacher);
+            return success("性别修改成功");
+        }
+        return error();
+    }
+
+    @RequestMapping("/updatePhone")
+    @ResponseBody
+    public AjaxResult updatePhone(Integer user_id, String user_code, String user_phone) {
+        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
+            return error("系统错误，请稍后重试");
+        }
+        if (ObjectUtils.isEmpty(user_phone)) {
+            return error("请输入手机号码");
+        } else {
+            if (!ProjectUtil.isPhoneNum(user_phone)) {
+                return error("手机号码格式错误");
+            }
+        }
+        Teacher teacher = new Teacher();
+        teacher.setId(user_id);
+        teacher.setCode(user_code);
+        teacher.setPhone(user_phone);
+        if (teacherService.updateTeacher(teacher)) {
+            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            getSession().setAttribute("user", currentTeacher);
+            return success("手机号码更新成功");
+        }
+        return error();
+    }
+
+    @RequestMapping("/updatePsw")
+    @ResponseBody
+    public AjaxResult updatePsw(Integer user_id, String user_code, String oldPsw, String newPsw, String confirmPsw) {
+        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
+            return error("系统错误，请稍后重试");
+        }
+        if (ObjectUtils.isEmpty(oldPsw)) {
+            return error("请输入旧密码");
+        } else {
+            if (ObjectUtils.isEmpty(newPsw)) {
+                return error("请输入新密码");
+            } else {
+                if (!ProjectUtil.isRightPsw(newPsw)) {
+                    return error("新密码组成格式不符");
+                } else {
+                    if (ObjectUtils.isEmpty(confirmPsw)) {
+                        return error("请输入确认密码");
+                    } else {
+                        if (!confirmPsw.equals(newPsw)) {
+                            return error("新密码与确认密码不一致");
+                        }
+                        Teacher preTeacher = (Teacher) getSession().getAttribute("user");
+                        if (!preTeacher.getPassword().equals(oldPsw)) {
+                            return error("旧密码输入错误");
+                        } else {
+                            if (oldPsw.equals(newPsw)) {
+                                return error("新密码不能为旧密码");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Teacher teacher = new Teacher();
+        teacher.setId(user_id);
+        teacher.setCode(user_code);
+        teacher.setPassword(newPsw);
+        if (teacherService.updateTeacher(teacher)) {
+            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            getSession().setAttribute("user", currentTeacher);
+            return success("密码修改成功");
+        }
+        return error();
     }
 }

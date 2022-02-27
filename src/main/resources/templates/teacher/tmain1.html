@@ -60,12 +60,17 @@
                 </div>
                 <hr style="margin: 0">
                 <div class="right-list" style="padding: 0px 40px;">
-                    <!--<div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
+                    <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
                          th:if="${#lists.isEmpty(courseList)}">暂无相关课程数据，请<a href="" data-bs-toggle="modal"
-                                                                       data-bs-target="#addModal"
-                                                                       style="color: #53a4f4; text-decoration: none">点击</a>添加...
-                    </div>-->
-                    <table class="table table-hover">
+                                                                            data-bs-target="#addModal"
+                                                                            style="color: #53a4f4; text-decoration: none">点击</a>添加...
+                    </div>
+                    <table class="table table-hover" th:if="${not #lists.isEmpty(courseList)}">
+                        <caption>
+                            共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第
+                            [[${pageInfo.getPageNum()}]]
+                            页
+                        </caption>
                         <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -74,9 +79,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>1</td>
+                        <tr th:each="course:${courseList}">
+                            <th scope="row" th:text="${course.id}"></th>
+                            <td th:text="${course.name}"></td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="First group">
                                     <button class="btn btn-outline-secondary" title="查看详情" data-bs-toggle="modal"
@@ -124,6 +129,26 @@
                         </tr>
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(courseList)}">
+                        <ul class="pagination justify-content-center" style="margin: 0;">
+                            <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCollegeList([[${pageInfo.getPrePage()}]],this)">
+                                <a class="page-link" href="#">&laquo;</a>
+                            </li>
+                            <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
+                                th:onclick="getCollegeList([[${pageInfo.getFirstPage()}]],this)">
+                                <a class="page-link" href="#">首页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCollegeList([[${pageInfo.getLastPage()}]],this)">
+                                <a class="page-link" href="#">末页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCollegeList([[${pageInfo.getNextPage()}]],this)">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -160,7 +185,20 @@
                     <div class="div">
                         <label class="div1">课程名称</label>
                         <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称">
+                            <input type="text" id="add_name" class="form-control" name="name" placeholder="请输入课程名称">
+                        </div>
+                    </div>
+                    <div class="div">
+                        <label class="div1">课程简介</label>
+                        <div class="div2">
+                            <textarea id="add_info" class="form-control" name="info" placeholder="请输入课程简介"></textarea>
+                        </div>
+                    </div>
+                    <div><a href="#">添加课程阶段</a></div>
+                    <div class="div">
+                        <label class="div1">阶段一</label>
+                        <div class="div2">
+                            <input type="text" id="add_stage" class="form-control" name="stage" placeholder="请输入课程阶段一">
                         </div>
                     </div>
                 </form>

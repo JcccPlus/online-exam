@@ -16,8 +16,6 @@ public interface StudentService {
 
     boolean updateStudent(Student student);
 
-    boolean deleteStudent(Integer id);
-
-    boolean deleteStudentByCode(String code);
+    boolean deleteStudent(Student student);
 
 }

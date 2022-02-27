@@ -68,12 +68,12 @@
             <if test="opts != null and opts !=''">#{opts},</if>
             <if test="answer != null and answer !=''">#{answer},</if>
             <if test="analysis != null and analysis !=''">#{analysis},</if>
-            <if test="typeId != null">#{type_id},</if>
-            <if test="levelId != null">#{level_id},</if>
-            <if test="stageId != null">#{stage_id},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="levelId != null">#{levelId},</if>
+            <if test="stageId != null">#{stageId},</if>
             <if test="code != null and code !=''">#{code},</if>
-            <if test="createTime != null">#{create_time},</if>
-            <if test="updateTime != null">#{update_time},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null and remark != ''">#{remark},</if>
         </trim>
     </insert>

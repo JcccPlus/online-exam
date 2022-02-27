@@ -14,4 +14,6 @@ public interface TopicCopyDao {
 
     int insertTopicCopy(TopicCopy topicCopy);
 
+    int updateTopicCopy(TopicCopy topicCopy);
+
 }

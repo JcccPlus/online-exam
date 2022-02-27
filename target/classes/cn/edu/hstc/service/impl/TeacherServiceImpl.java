@@ -52,12 +52,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public boolean deleteTeacherByCode(String code) {
-        return teacherDao.deleteTeacherByCode(code) > 0;
-    }
-
-    @Override
-    public boolean deleteTeacher(Integer id) {
-        return teacherDao.deleteTeacher(id) > 0;
+    public boolean deleteTeacher(Teacher teacher) {
+        return teacherDao.deleteTeacher(teacher) > 0;
     }
 }

@@ -56,8 +56,8 @@
             <if test="code != null and code != ''">code,</if>
             <if test="paperId != null">paper_id,</if>
             <if test="classId != null">class_id,</if>
-            <if test="create_time != null">create_time,</if>
-            <if test="update_time != null">update_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
             <if test="remark != null and remark != ''">remark,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -70,8 +70,8 @@
             <if test="code != null and code != ''">#{code},</if>
             <if test="paperId != null">#{paperId},</if>
             <if test="classId != null">#{classId},</if>
-            <if test="create_time != null">#{createTime},</if>
-            <if test="update_time != null">#{updateTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null and remark != ''">#{remark},</if>
         </trim>
     </insert>

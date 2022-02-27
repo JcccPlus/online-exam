@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopicCopy {
+public class TopicCopy extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 题目内容 */

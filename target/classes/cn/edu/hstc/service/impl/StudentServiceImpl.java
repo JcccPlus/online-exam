@@ -53,12 +53,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean deleteStudent(Integer id) {
-        return studentDao.deleteStudent(id) > 0;
+    public boolean deleteStudent(Student student) {
+        return studentDao.deleteStudent(student) > 0;
     }
 
-    @Override
-    public boolean deleteStudentByCode(String code) {
-        return studentDao.deleteStudentByCode(code) > 0;
-    }
 }

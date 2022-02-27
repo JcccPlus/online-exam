@@ -13,6 +13,10 @@
         <result column="type_id" property="typeId"/>
         <result column="level_id" property="levelId"/>
         <result column="stage_id" property="stageId"/>
+        <result column="code" property="code"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
         <association column="type_id" property="type" select="cn.edu.hstc.dao.TopicDao.selectTypeById"
                      fetchType="eager"/>
         <association column="level_id" property="level" select="cn.edu.hstc.dao.LevelDao.selectLevelById"
@@ -32,6 +36,7 @@
             <if test="typeId != null">and type_id = #{typeId}</if>
             <if test="levelId != null">and level_id = #{levelId}</if>
             <if test="stageId != null">and type_id = #{stageId}</if>
+            <if test="code != null and code != ''">and code = #{code}</if>
         </where>
     </select>
 
@@ -52,6 +57,10 @@
             <if test="typeId != null">type_id,</if>
             <if test="levelId != null">level_id,</if>
             <if test="stageId != null">stage_id,</if>
+            <if test="code != null and code !=''">code,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -59,10 +68,33 @@
             <if test="opts != null and opts !=''">#{opts},</if>
             <if test="answer != null and answer !=''">#{answer},</if>
             <if test="analysis != null and analysis !=''">#{analysis},</if>
-            <if test="typeId != null">#{type_id},</if>
-            <if test="levelId != null">#{level_id},</if>
-            <if test="stageId != null">#{stage_id},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="levelId != null">#{levelId},</if>
+            <if test="stageId != null">#{stageId},</if>
+            <if test="code != null and code !=''">#{code},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
         </trim>
     </insert>
+
+    <update id="updateTopicCopy" parameterType="TopicCopy">
+        update tb_topic_copy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="id != null">id = #{id},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="opts != null and opts !=''">opts = #{opts},</if>
+            <if test="answer != null and answer !=''">answer = #{answer},</if>
+            <if test="analysis != null and analysis !=''">analysis = #{analysis},</if>
+            <if test="typeId != null">type_id = #{typeOd},</if>
+            <if test="levelId != null">level_id = #{levelId},</if>
+            <if test="stageId != null">stage_id = #{stageId},</if>
+            <!--<if test="code != null and code !=''">code = #{code},</if>-->
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id} and code = #{code}
+    </update>
 
 </mapper>

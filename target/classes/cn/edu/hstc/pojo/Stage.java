@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Stage {
+public class Stage extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 阶段名称 */

@@ -26,5 +26,5 @@ public class TopicOfPaper {
     /** 试卷实体 */
     private Paper paper;
     /** 试题实体 */
-    private Topic topic;
+    private TopicCopy topic;
 }

@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Record {
+public class Record extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 所属考试 */

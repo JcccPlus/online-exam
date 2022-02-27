@@ -27,4 +27,6 @@ public class Paper extends BaseEntity {
     private Integer teaId;
     /** 教师实体 */
     private Teacher teacher;
+    /** 课程实体 */
+    private Course course;
 }
