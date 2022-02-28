@@ -158,7 +158,7 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" id="add_college">
+                            <select class="form-select" id="add_college">
                                 <option value="0">-------------------请选择学院-------------------</option>
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
@@ -168,7 +168,7 @@
                     <div class="div">
                         <label class="div1">所属专业</label>
                         <div class="div2">
-                            <select class="form-control" id="add_major" name="majorId">
+                            <select class="form-select" id="add_major" name="majorId">
                                 <option value="0">-------------------请选择专业-------------------</option>
                             </select>
                         </div>
@@ -202,7 +202,7 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_college">
+                            <select class="form-select" id="edit_college">
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
                             </select>
@@ -211,7 +211,7 @@
                     <div class="div">
                         <label class="div1">所属专业</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_major" name="majorId">
+                            <select class="form-select" id="edit_major" name="majorId">
                             </select>
                         </div>
                     </div>

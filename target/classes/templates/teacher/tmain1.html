@@ -23,6 +23,16 @@
             margin: 0;
             cursor: pointer;
         }
+
+        .mb-3 a {
+            position: relative;
+            top: -2px;
+            left: 81%;
+        }
+
+        .mb-3 h6 {
+            display: inline-block;
+        }
     </style>
 </head>
 
@@ -47,8 +57,9 @@
                             </svg>
                         </button>
                         <input type="text" class="form-control" placeholder="搜索课程" aria-label="Recipient's username"
-                               aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                               aria-describedby="button-addon2" th:value="${searchValue}" id="searchValue">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                                onclick="getCourseList(null,this)">
                             <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                  xmlns="http://www.w3.org/2000/svg" p-id="3506"
                                  width="16" height="16">
@@ -60,12 +71,17 @@
                 </div>
                 <hr style="margin: 0">
                 <div class="right-list" style="padding: 0px 40px;">
-                    <!--<div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
+                    <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
                          th:if="${#lists.isEmpty(courseList)}">暂无相关课程数据，请<a href="" data-bs-toggle="modal"
-                                                                       data-bs-target="#addModal"
-                                                                       style="color: #53a4f4; text-decoration: none">点击</a>添加...
-                    </div>-->
-                    <table class="table table-hover">
+                                                                            data-bs-target="#addModal"
+                                                                            style="color: #53a4f4; text-decoration: none">点击</a>添加...
+                    </div>
+                    <table class="table table-hover" th:if="${not #lists.isEmpty(courseList)}">
+                        <caption>
+                            共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第
+                            [[${pageInfo.getPageNum()}]]
+                            页
+                        </caption>
                         <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -74,9 +90,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>1</td>
+                        <tr th:each="course:${courseList}">
+                            <th scope="row" th:text="${course.id}"></th>
+                            <td th:text="${course.name}"></td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="First group">
                                     <button class="btn btn-outline-secondary" title="查看详情" data-bs-toggle="modal"
@@ -94,9 +110,20 @@
                                                   p-id="3004"></path>
                                         </svg>
                                     </button>
+                                    <button class="btn btn-outline-secondary" title="为此课程创建阶段" data-bs-toggle="modal"
+                                            data-bs-target="#addStageModal"
+                                            onclick="getThisCourse()">
+                                        <svg t="1646074976329" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="3684" width="16" height="16">
+                                            <path d="M882.6 325V135.8c0-39.6-32.2-71.8-71.8-71.8H213.2c-39.6 0-71.8 32.2-71.8 71.8v752.4c0 39.6 32.2 71.8 71.8 71.8h597.5c39.6 0 71.8-32.2 71.8-71.8V699c0-20.7-16.7-37.4-37.4-37.4s-37.4 16.7-37.4 37.4v186.1H416.1V138.8h391.6V325c0 20.7 16.7 37.4 37.4 37.4s37.5-16.8 37.5-37.4zM341.3 885.2h-125V138.8h125.1v746.4z"
+                                                  p-id="3685"></path>
+                                            <path d="M669.6 697.7c20.7 0 37.4-16.7 37.4-37.4V549.4h110.9c20.7 0 37.4-16.7 37.4-37.4s-16.7-37.4-37.4-37.4H707V363.7c0-20.7-16.7-37.4-37.4-37.4s-37.4 16.7-37.4 37.4v110.9H521.3c-20.7 0-37.4 16.7-37.4 37.4s16.7 37.4 37.4 37.4h110.9v110.9c-0.1 20.7 16.7 37.4 37.4 37.4z"
+                                                  p-id="3686"></path>
+                                        </svg>
+                                    </button>
                                     <button class="btn btn-outline-secondary" title="编辑" data-bs-toggle="modal"
                                             data-bs-target="#editModal"
-                                            onclick="getEditCourse()">
+                                            th:onclick="getEditCourse([[${course.id}]],[[${course.code}]],[[${course.name}]],[[${course.info}]])">
                                         <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="4042"
                                              width="16" height="16">
@@ -107,7 +134,7 @@
                                         </svg>
                                     </button>
                                     <button class="btn btn-outline-secondary" title="删除"
-                                            onclick="delCourse()">
+                                            th:onclick="delCourse([[${course.getId()}]],[[${course.getName()}]],[[${course.getCode()}]])">
                                         <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                              width="16" height="16">
@@ -124,13 +151,34 @@
                         </tr>
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(courseList)}">
+                        <ul class="pagination justify-content-center" style="margin: 0;">
+                            <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCourseList([[${pageInfo.getPrePage()}]],this)">
+                                <a class="page-link" href="#">&laquo;</a>
+                            </li>
+                            <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
+                                th:onclick="getCourseList([[${pageInfo.getFirstPage()}]],this)">
+                                <a class="page-link" href="#">首页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCourseList([[${pageInfo.getLastPage()}]],this)">
+                                <a class="page-link" href="#">末页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getCourseList([[${pageInfo.getNextPage()}]],this)">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- 查看详情Modal -->
-<div class="modal fade" id="getModal" tabindex="-1" aria-labelledby="getModalLabel" aria-hidden="true">
+<div class="modal fade" id="getModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="getModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,18 +186,42 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
+                <form id="info_form">
+                    <div class="mb-3">
+                        <h6>课程名称:</h6>
+                        <input type="text" class="form-control" readonly disabled>
+                    </div>
+                    <div class="mb-3">
+                        <h6>课程简介:</h6>
+                        <textarea class="form-control" readonly disabled></textarea>
+                    </div>
+                    <hr>
+                    <h6 align="center"><b>阶段信息</b></h6>
+                    <form>
+                        <div class="mb-3">
+                            <h6>阶段1:</h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="name" readonly disabled>
+                                <input class="btn btn-outline-secondary" type="button" value="修改">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6>阶段1简介:</h6>
+                            <div class="input-group">
+                                <textarea class="form-control" name="info" readonly disabled></textarea>
+                                <input class="btn btn-outline-secondary" type="button" value="修改">
+                            </div>
+                        </div>
+                    </form>
+                </form>
             </div>
         </div>
     </div>
 </div>
 <!-- 添加课程Modal -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addModalLabel">添加课程</h5>
@@ -157,23 +229,57 @@
             </div>
             <div class="modal-body">
                 <form id="new_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称">
-                        </div>
+                    <div class="mb-3">
+                        <h6>课程名称:</h6>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                    <div class="mb-3">
+                        <h6>课程简介:</h6>
+                        <textarea class="form-control" name="info"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
+                <button type="button" class="btn btn-primary" onclick="addMore()">批量</button>
+                <button type="button" class="btn btn-primary" onclick="addCourse()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 添加阶段Modal -->
+<div class="modal fade" id="addStageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="addStageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStageModalLabel">添加阶段</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="new_stage_form">
+                    <input type="hidden" name="course_id" id="course_id">
+                    <div class="mb-3">
+                        <h6>阶段名称:</h6>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                    <div class="mb-3">
+                        <h6>阶段简介:</h6>
+                        <textarea class="form-control" name="info"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addMoreStage()">批量</button>
+                <button type="button" class="btn btn-primary" onclick="addStage()">确定</button>
             </div>
         </div>
     </div>
 </div>
 <!-- 更新课程Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -182,19 +288,21 @@
             </div>
             <div class="modal-body">
                 <form id="edit_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="hidden" id="edit_id" name="id">
-                            <input type="text" id="edit_name" class="form-control" name="name"
-                                   placeholder="请输入学院名称">
-                        </div>
+                    <input type="hidden" name="id" id="edit_id">
+                    <input type="hidden" name="code" id="edit_code">
+                    <div class="mb-3">
+                        <h6>课程名称:</h6>
+                        <input type="text" class="form-control" name="name" id="edit_name">
+                    </div>
+                    <div class="mb-3">
+                        <h6>课程简介:</h6>
+                        <textarea class="form-control" name="info" id="edit_info"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="editCollege()">更新</button>
+                <button type="button" class="btn btn-primary" onclick="editCourse()">更新</button>
             </div>
         </div>
     </div>
@@ -210,6 +318,150 @@
             $(".user-popup ").hide();
         });
     })
+
+    function addMore() {
+        $("#new_course_form").append(" <div>\n" +
+            "                        <hr>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>课程名称:</h6>\n" +
+            "                            <a href=\"javascript:void(0)\" title=\"删除该课程\" onclick=\"dropMore(this)\">\n" +
+            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+            "                                     xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#895251\" p-id=\"10603\"></path>\n" +
+            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\"\n" +
+            "                                          fill=\"#808080\" p-id=\"10605\"></path>\n" +
+            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\"\n" +
+            "                                          fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+            "                                </svg>\n" +
+            "                            </a>\n" +
+            "                            <input type=\"text\" class=\"form-control\" name='name'>\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>课程简介:</h6>\n" +
+            "                            <textarea class=\"form-control\" name='info'></textarea>\n" +
+            "                        </div>\n" +
+            "                    </div>")
+    }
+
+    function addMoreStage() {
+        $("#new_stage_form").append("<div>\n" +
+            "                        <hr>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>阶段名称:</h6>\n" +
+            "                            <a href=\"javascript:void(0)\" onclick=\"dropMore(this)\" title=\"删除该阶段\">\n" +
+            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+            "                                     xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#895251\" p-id=\"10603\"></path>\n" +
+            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\"\n" +
+            "                                          fill=\"#808080\" p-id=\"10605\"></path>\n" +
+            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\"\n" +
+            "                                          fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+            "                                </svg>\n" +
+            "                            </a>\n" +
+            "                            <input type=\"text\" class=\"form-control\" name=\"name\">\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>阶段简介:</h6>\n" +
+            "                            <textarea class=\"form-control\" name=\"info\"></textarea>\n" +
+            "                        </div>\n" +
+            "                    </div>");
+    }
+
+    function dropMore(obj) {
+        $(obj).parent().parent().remove();
+    }
+
+    function addCourse() {
+        var formArray = $("#new_course_form").serializeArray();
+        /*var courseArray = [];
+        var courseObj = "";
+        $.each(formArray, function (i, item) {
+            if (item.name === "name") {
+                courseObj += "{\"name\":\"" + item.value + "\",";
+            } else if (item.name === "info") {
+                courseObj += "\"info\":\"" + item.value + "\"}";
+            }
+            if (i % 2 !== 0) {
+                console.log(courseObj);
+                console.log(JSON.parse(courseObj));
+                courseArray.push(JSON.parse(courseObj));
+                courseObj = "";
+            }
+        })
+        console.log(courseArray);*/
+        var courseArray = [];
+        var courseObj = {};
+        $.each(formArray, function (i, item) {
+            if (item.name === "name") {
+                courseObj.name = item.value;
+            } else if (item.name === "info") {
+                courseObj.info = item.value;
+            }
+            if (i % 2 !== 0) {
+                courseArray.push(courseObj);
+                courseObj = {};
+            }
+        })
+        console.log(courseArray);
+        console.log(JSON.stringify(courseArray));
+        $.ajax({
+            type: "post",
+            url: "[[@{/course/add}]]",
+            data: JSON.stringify(courseArray),
+            success: function (data, textStatus) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+
+    function delCourse(courseId, courseName, code) {
+        if (confirm("确定删除" + courseName + "这门课吗？")) {
+            $.post("[[@{/course/delete}]]", {"courseId": courseId, "code": code}, function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            }, "json");
+        }
+    }
+
+    function getEditCourse(courseId, code, courseName, courseInfo) {
+        $("#edit_id").val(courseId);
+        $("#edit_code").val(code);
+        $("#edit_name").val(courseName);
+        $("#edit_info").val(courseInfo)
+    }
+
+    function editCourse() {
+        $.post("[[@{/course/edit}]]", $("#edit_course_form").serialize(), function (data) {
+            alert(data.msg);
+            if (data.code === 0) {
+                window.location.reload();
+            }
+        });
+    }
+
+    function getCourseList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/course/search}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/course/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
 </script>
 </body>
 

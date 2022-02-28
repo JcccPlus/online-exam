@@ -163,7 +163,7 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" id="add_college" name="college">
+                            <select class="form-select" id="add_college" name="college">
                                 <option value="0">-------------------请选择学院-------------------</option>
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
@@ -173,7 +173,7 @@
                     <div class="div">
                         <label class="div1">所属专业</label>
                         <div class="div2">
-                            <select class="form-control" id="add_major" name="major">
+                            <select class="form-select" id="add_major" name="major">
                                 <option value="0">-------------------请选择专业-------------------</option>
                             </select>
                         </div>
@@ -181,7 +181,7 @@
                     <div class="div">
                         <label class="div1">所属班级</label>
                         <div class="div2">
-                            <select class="form-control" id="add_class" name="classId">
+                            <select class="form-select" id="add_class" name="classId">
                                 <option value="0">-------------------请选择班级-------------------</option>
                             </select>
                         </div>
@@ -244,7 +244,7 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_college" name="college">
+                            <select class="form-select" id="edit_college" name="college">
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
                             </select>
@@ -253,14 +253,14 @@
                     <div class="div">
                         <label class="div1">所属专业</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_major" name="major">
+                            <select class="form-select" id="edit_major" name="major">
                             </select>
                         </div>
                     </div>
                     <div class="div">
                         <label class="div1">所属班级</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_class" name="classId">
+                            <select class="form-select" id="edit_class" name="classId">
                             </select>
                         </div>
                     </div>

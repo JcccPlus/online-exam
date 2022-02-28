@@ -154,8 +154,8 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" name="collegeId">
-                                <option value="0">----------------------请选择----------------------</option>
+                            <select class="form-select" name="collegeId">
+                                <option value="0">-------------------请选择--------------------</option>
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
                             </select>
@@ -197,7 +197,7 @@
                     <div class="div">
                         <label class="div1">所属学院</label>
                         <div class="div2">
-                            <select class="form-control" id="edit_collegeName" name="collegeId">
+                            <select class="form-select" id="edit_collegeName" name="collegeId">
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
                             </select>

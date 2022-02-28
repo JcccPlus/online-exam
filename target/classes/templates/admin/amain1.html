@@ -205,15 +205,6 @@
         });
     })
 
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
-
     function addCollege() {
         $.post("[[@{/college/add}]]",
             $("#new_college_form").serialize(), function (data) {
