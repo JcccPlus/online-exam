@@ -334,7 +334,7 @@
             $("#new_student_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getStudentList([[${pageInfo.getPageNum()}]],null);
                 }
             });
     }
@@ -355,7 +355,7 @@
             $.post("[[@{/student/delete}]]", {"studentId": studentId, "code": code}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getStudentList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }
@@ -394,7 +394,7 @@
             $.post("[[@{/student/edit}]]", $("#edit_student_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getStudentList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }

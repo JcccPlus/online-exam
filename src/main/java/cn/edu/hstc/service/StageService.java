@@ -1,5 +1,6 @@
 package cn.edu.hstc.service;
 
+import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.Stage;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface StageService {
     boolean updateStage(Stage stage);
 
     boolean deleteStage(Stage stage);
+
+    AjaxResult insertMoreStage(List<Stage> stages);
 }

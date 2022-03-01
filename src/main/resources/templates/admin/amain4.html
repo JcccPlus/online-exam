@@ -296,7 +296,7 @@
             $("#new_teacher_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getTeacherList([[${pageInfo.getPageNum()}]],null);
                 }
             });
     }
@@ -317,7 +317,7 @@
             $.post("[[@{/teacher/delete}]]", {"teacherId": teacherId, "code": code}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getTeacherList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }
@@ -342,7 +342,7 @@
             $.post("[[@{/teacher/edit}]]", $("#edit_teacher_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getTeacherList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }

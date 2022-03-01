@@ -21,6 +21,8 @@ public class Stage extends BaseEntity {
     private String info;
     /** 所属课程 */
     private Integer courseId;
+    /** 所属课程的唯一码 */
+    private String code;
     /** 课程实体 */
     private Course course;
 }

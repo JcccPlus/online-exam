@@ -238,7 +238,7 @@
             $("#new_major_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getMajorList([[${pageInfo.getPageNum()}]],null);
                 }
             });
     }
@@ -259,7 +259,7 @@
             $.post("[[@{/major/delete}]]", {"majorId": majorId}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getMajorList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }
@@ -276,7 +276,7 @@
             $.post("[[@{/major/edit}]]", $("#edit_major_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getMajorList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }

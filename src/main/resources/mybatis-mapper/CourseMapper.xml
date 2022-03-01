@@ -53,7 +53,7 @@
         update tb_course
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
-            <if test="info != null and info !=''">info = #{info},</if>
+            <if test="info != null">info = #{info},</if>
             <if test="teaId != null">tea_id = #{teaId},</if>
             <!--<if test="code != null and code !=''">code = #{code},</if>-->
         </trim>

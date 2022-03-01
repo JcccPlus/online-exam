@@ -8,6 +8,7 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="info" property="info"/>
+        <result column="code" property="code"/>
         <result column="course_id" property="courseId"/>
         <association column="course_id" property="course" select="cn.edu.hstc.dao.CourseDao.selectCourseById"
                      fetchType="eager"/>
@@ -53,7 +54,7 @@
         update tb_stage
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
-            <if test="info != null and info !=''">info = #{info},</if>
+            <if test="info != null">info = #{info},</if>
             <if test="courseId != null">course_id = #{courseId},</if>
             <!--<if test="code != null and code !=''">code = #{code},</if>-->
         </trim>
