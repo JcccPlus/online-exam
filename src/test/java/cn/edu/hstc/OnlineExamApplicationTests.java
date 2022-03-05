@@ -21,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -106,5 +107,15 @@ public class OnlineExamApplicationTests {
     public void test08(){
         String psw = "12345678a\\-[]啊";
         System.out.println(ProjectUtil.isRightPsw(psw));
+    }
+
+    @Test
+    public void test09(){
+        String psw = "1{{separator}}2{{separator}}3{{separator}}";
+        String[] s = psw.split("_");
+        System.out.println(Arrays.toString(s));
+        System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
+        System.out.println((psw.substring(0,psw.lastIndexOf("{{separator}}"))).substring(0,(psw.substring(0,psw.lastIndexOf("{{separator}}"))).lastIndexOf("{{separator}}")));
+        System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
     }
 }

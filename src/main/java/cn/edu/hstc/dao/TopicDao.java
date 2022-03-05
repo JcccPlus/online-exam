@@ -1,5 +1,6 @@
 package cn.edu.hstc.dao;
 
+import cn.edu.hstc.vo.TopicVo;
 import cn.edu.hstc.pojo.Topic;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,6 +19,6 @@ public interface TopicDao {
 
     int deleteTopic(Topic topic);
 
-    List<Topic> selectTopicListByCourseId(Integer courseId);
+    List<Topic> selectTopicListByPo(TopicVo topicVo);
 
 }

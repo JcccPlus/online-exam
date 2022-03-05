@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -305,6 +304,7 @@
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
     $(document).ready(function () {
         $(".user ").mouseover(function () {
@@ -385,7 +385,7 @@
             }
             if (i % 2 !== 0) {
                 console.log(courseObj);
-                console.log(JSON.parse(courseObj));
+                console.log(JSON.parse(courseObj));  //转为Json对象
                 courseArray.push(JSON.parse(courseObj));
                 courseObj = "";
             }
@@ -409,7 +409,7 @@
         $.ajax({
             type: "post",
             url: "[[@{/course/add}]]",
-            data: JSON.stringify(courseArray),
+            data: JSON.stringify(courseArray),  //转为Json字符串
             success: function (data, textStatus) {
                 alert(data.msg);
                 if (data.code === 0) {
@@ -493,7 +493,7 @@
         $.ajax({
             type: "post",
             url: "[[@{/stage/add}]]",
-            data: JSON.stringify(stageArray),
+            data: JSON.stringify(stageArray),  //转为Json字符串
             success: function (data, textStatus) {
                 alert(data.msg);
                 if (data.code === 0) {

@@ -14,7 +14,7 @@
                      fetchType="eager"/>
     </resultMap>
 
-    <select id="selectStageList" parameterType="Course" resultMap="StageResult">
+    <select id="selectStageList" parameterType="Stage" resultMap="StageResult">
         select * from tb_stage
         <where>
             <if test="id != null">and id = #{id}</if>

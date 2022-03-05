@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -22,6 +21,11 @@
             line-height: 70px;
             margin: 0;
             cursor: pointer;
+        }
+
+        .page-link {
+            padding: 0.3rem 2rem;
+            font-size: 16px;
         }
 
         .mb-3 a {
@@ -97,7 +101,7 @@
                                 <div class="btn-group" role="group" aria-label="First group">
                                     <button class="btn btn-outline-secondary" title="查看详情" data-bs-toggle="modal"
                                             data-bs-target="#getModal"
-                                            onclick="getThisCourse()">
+                                            th:onclick="getThisCourse([[${course.id}]],[[${course.code}]],[[${course.name}]],[[${course.info}]])">
                                         <svg t="1645547346995" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="3000" width="17" height="21">
                                             <path d="M262.4 288m-57.6 0a57.6 57.6 0 1 0 115.2 0 57.6 57.6 0 1 0-115.2 0Z"
@@ -112,7 +116,7 @@
                                     </button>
                                     <button class="btn btn-outline-secondary" title="为此课程创建阶段" data-bs-toggle="modal"
                                             data-bs-target="#addStageModal"
-                                            onclick="getThisCourse()">
+                                            th:onclick="initStage([[${course.id}]],[[${course.code}]],[[${course.name}]])">
                                         <svg t="1646074976329" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="3684" width="16" height="16">
                                             <path d="M882.6 325V135.8c0-39.6-32.2-71.8-71.8-71.8H213.2c-39.6 0-71.8 32.2-71.8 71.8v752.4c0 39.6 32.2 71.8 71.8 71.8h597.5c39.6 0 71.8-32.2 71.8-71.8V699c0-20.7-16.7-37.4-37.4-37.4s-37.4 16.7-37.4 37.4v186.1H416.1V138.8h391.6V325c0 20.7 16.7 37.4 37.4 37.4s37.5-16.8 37.5-37.4zM341.3 885.2h-125V138.8h125.1v746.4z"
@@ -179,41 +183,31 @@
 <!-- 查看详情Modal -->
 <div class="modal fade" id="getModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
      aria-labelledby="getModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="getModalLabel">课程详情</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="info_form">
+                <form>
                     <div class="mb-3">
-                        <h6>课程名称:</h6>
-                        <input type="text" class="form-control" readonly disabled>
+                        <h5 id="detail_name" align="center">课程名称</h5>
                     </div>
                     <div class="mb-3">
                         <h6>课程简介:</h6>
-                        <textarea class="form-control" readonly disabled></textarea>
+                        <textarea class="form-control" id="detail_info" readonly disabled></textarea>
                     </div>
-                    <hr>
-                    <h6 align="center"><b>阶段信息</b></h6>
-                    <form>
-                        <div class="mb-3">
-                            <h6>阶段1:</h6>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="name" readonly disabled>
-                                <input class="btn btn-outline-secondary" type="button" value="修改">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <h6>阶段1简介:</h6>
-                            <div class="input-group">
-                                <textarea class="form-control" name="info" readonly disabled></textarea>
-                                <input class="btn btn-outline-secondary" type="button" value="修改">
-                            </div>
-                        </div>
-                    </form>
                 </form>
+                <hr>
+                <h6 align="center"><b>阶段信息</b></h6>
+                <div align="center" id="emptyStageWarn">
+                    该课程暂无相关阶段信息，<a href="" data-bs-toggle="modal"
+                                   data-bs-target="#addStageModal"
+                                   style="color: #53a4f4; text-decoration: none">点击</a>添加...
+                </div>
+                <div id="stageInfoDiv">
+                </div>
             </div>
         </div>
     </div>
@@ -258,7 +252,8 @@
             </div>
             <div class="modal-body">
                 <form id="new_stage_form">
-                    <input type="hidden" name="course_id" id="course_id">
+                    <input type="hidden" name="courseId" id="new_courseId">
+                    <input type="hidden" name="code" id="new_courseCode">
                     <div class="mb-3">
                         <h6>阶段名称:</h6>
                         <input type="text" class="form-control" name="name">
@@ -309,6 +304,7 @@
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
     $(document).ready(function () {
         $(".user ").mouseover(function () {
@@ -389,7 +385,7 @@
             }
             if (i % 2 !== 0) {
                 console.log(courseObj);
-                console.log(JSON.parse(courseObj));
+                console.log(JSON.parse(courseObj));  //转为Json对象
                 courseArray.push(JSON.parse(courseObj));
                 courseObj = "";
             }
@@ -413,11 +409,11 @@
         $.ajax({
             type: "post",
             url: "[[@{/course/add}]]",
-            data: JSON.stringify(courseArray),
+            data: JSON.stringify(courseArray),  //转为Json字符串
             success: function (data, textStatus) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getCourseList([[${pageInfo.getPageNum()}]], null);
                 }
             },
             dataType: "json",
@@ -430,7 +426,7 @@
             $.post("[[@{/course/delete}]]", {"courseId": courseId, "code": code}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getCourseList([[${pageInfo.getPageNum()}]], null);
                 }
             }, "json");
         }
@@ -447,7 +443,7 @@
         $.post("[[@{/course/edit}]]", $("#edit_course_form").serialize(), function (data) {
             alert(data.msg);
             if (data.code === 0) {
-                window.location.reload();
+                getCourseList([[${pageInfo.getPageNum()}]], null);
             }
         });
     }
@@ -460,6 +456,137 @@
             } else {
                 window.location.href = "[[@{/course/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
             }
+        }
+    }
+
+    function initStage(id, code, courseName) {
+        $("#addStageModalLabel").text(courseName+"——添加阶段");
+        $("#new_courseId").val(id);
+        $("#new_courseCode").val(code);
+    }
+
+    function addStage() {
+        var formArray = $("#new_stage_form").serializeArray();
+        var stageArray = [];
+        var stageObj = {};
+        var courseId;
+        var code;
+        $.each(formArray, function (i, item) {
+            if (item.name === "name") {
+                stageObj.name = item.value;
+            } else if (item.name === "info") {
+                stageObj.info = item.value;
+            } else if (item.name === "courseId") {
+                courseId = item.value;
+            } else if (item.name === "code") {
+                code = item.value;
+            }
+            if (i !== 1 && i % 2 !== 0) {
+                stageObj.courseId = courseId;
+                stageObj.code = code;
+                stageArray.push(stageObj);
+                stageObj = {};
+            }
+        })
+        console.log(stageArray);
+        console.log(JSON.stringify(stageArray));
+        $.ajax({
+            type: "post",
+            url: "[[@{/stage/add}]]",
+            data: JSON.stringify(stageArray),  //转为Json字符串
+            success: function (data, textStatus) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    getCourseList([[${pageInfo.getPageNum()}]], null);
+                }
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+
+    function getThisCourse(courseId, code, courseName, courseInfo) {
+        $("#detail_name").text(courseName);
+        $("#detail_info").val(courseInfo);
+        $.post("[[@{/stage/list}]]", {"courseId": courseId, "code": code}, function (data) {
+            if (data.code === 0) {
+                $("#stageInfoDiv").html("");
+                if (data.data.length === 0) {
+                    $("#emptyStageWarn").show();
+                    initStage(courseId, code, courseName);
+                } else {
+                    $("#emptyStageWarn").hide();
+                    for (var i = 0; i < data.data.length; i++) {
+                        var info = data.data[i].info;
+                        if (info === null) {
+                            info = "";
+                        }
+                        $("#stageInfoDiv").append("<form><hr>\n" +
+                            "                    <input type=\"hidden\" name=\"id\" value='" + data.data[i].id + "'/>\n" +
+                            "                    <input type=\"hidden\" name=\"code\" value='" + data.data[i].code + "'/>\n" +
+                            "                    <div class=\"mb-3\">\n" +
+                            "                        <h6>阶段" + (i + 1) + ":</h6>\n" + "<a href=\"javascript:void(0)\" style='left: 85%;' title=\"删除该阶段\" onclick=\"delStage(" + courseId + ",'" + code + "','" + courseName + "','" + courseInfo + "'," + data.data[i].id + ",'" + data.data[i].name + "')\">\n" +
+                            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+                            "                                     xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+                            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+                            "                                          fill=\"#895251\" p-id=\"10603\"></path>\n" +
+                            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+                            "                                          fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+                            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\"\n" +
+                            "                                          fill=\"#808080\" p-id=\"10605\"></path>\n" +
+                            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\"\n" +
+                            "                                          fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+                            "                                </svg>\n" +
+                            "                            </a>\n" +
+                            "                        <div class=\"input-group\">\n" +
+                            "                            <input type=\"text\" class=\"form-control\" name=\"name\" value='" + data.data[i].name + "' readonly disabled>\n" +
+                            "                            <input class=\"btn btn-outline-secondary\" onclick='editStageBtn(this)' type=\"button\" value=\"修改\">\n" +
+                            "                        </div>\n" +
+                            "                    </div>\n" +
+                            "                    <div class=\"mb-3\">\n" +
+                            "                        <h6>阶段" + (i + 1) + "简介:</h6>\n" +
+                            "                        <div class=\"input-group\">\n" +
+                            "                            <textarea class=\"form-control\" name=\"info\" readonly disabled>" + info + "</textarea>\n" +
+                            "                            <input class=\"btn btn-outline-secondary\" onclick='editStageBtn(this)' type=\"button\" value=\"修改\">\n" +
+                            "                        </div>\n" +
+                            "                    </div>\n" +
+                            "                </form>");
+                    }
+                }
+            }
+        });
+    }
+
+    function editStageBtn(obj) {
+        var btnValue = $(obj).val();
+        if (btnValue === "修改") {
+            $(obj).val("确定");
+            $(obj).prev().removeAttr("disabled");
+            $(obj).prev().removeAttr("readonly");
+        } else {
+            console.log($(obj).closest("form").serialize());
+            $.post("[[@{/stage/edit}]]", $(obj).closest("form").serialize(), function (data) {
+                if (data.code !== 0) {
+                    alert(data.msg);
+                    $(obj).prev().focus();
+                } else {
+                    $(obj).val("修改");
+                    $(obj).prev().attr("disabled", true);
+                    $(obj).prev().attr("readonly", true);
+                }
+            });
+        }
+    }
+
+    function delStage(courseId, code, courseName, courseInfo, stageId, stageName) {
+        if (confirm("确定删除《" + courseName + "》的\"" + stageName + "\"阶段吗？")) {
+            $.post("[[@{/stage/delete}]]", {"stageId": stageId, "code": code}, function (data) {
+                if (data.code === 0) {
+                    getThisCourse(courseId, code, courseName, courseInfo);
+                } else {
+                    alert(data.msg);
+                }
+            }, "json");
         }
     }
 </script>

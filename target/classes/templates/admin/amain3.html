@@ -257,7 +257,7 @@
             $("#new_class_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getClassList([[${pageInfo.getPageNum()}]],null);
                 }
             });
     }
@@ -278,7 +278,7 @@
             $.post("[[@{/class/delete}]]", {"classId": classId}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getClassList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }
@@ -302,7 +302,7 @@
             $.post("[[@{/class/edit}]]", $("#edit_class_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getClassList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }

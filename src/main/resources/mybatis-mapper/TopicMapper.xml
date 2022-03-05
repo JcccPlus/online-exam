@@ -17,7 +17,7 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="remark" property="remark"/>
-        <association column="type_id" property="type" select="cn.edu.hstc.dao.TopicDao.selectTypeById"
+        <association column="type_id" property="type" select="cn.edu.hstc.dao.TypeDao.selectTypeById"
                      fetchType="eager"/>
         <association column="level_id" property="level" select="cn.edu.hstc.dao.LevelDao.selectLevelById"
                      fetchType="eager"/>
@@ -35,7 +35,7 @@
             <if test="analysis != null and analysis != ''">and analysis = #{analysis}</if>
             <if test="typeId != null">and type_id = #{typeId}</if>
             <if test="levelId != null">and level_id = #{levelId}</if>
-            <if test="stageId != null">and type_id = #{stageId}</if>
+            <if test="stageId != null">and stage_id = #{stageId}</if>
             <if test="code != null and code != ''">and code = #{code}</if>
         </where>
     </select>
@@ -104,14 +104,26 @@
           and code = #{code}
     </delete>
 
-    <select id="selectTopicListByCourseId" parameterType="int" resultMap="TopicResult">
+    <select id="selectTopicListByPo" parameterType="TopicVo" resultMap="TopicResult">
         select t.*
         from tb_topic t,
-             tb_course c,
-             tb_stage s
+        tb_course c,
+        tb_stage s
         where t.stage_id = s.id
-          and s.course_id = c.id
-          and c.id = #{courseId}
+        and s.course_id = c.id
+        and c.tea_id = #{teaId}
+        <if test="courseId!=null">
+            and c.id = #{courseId}
+        </if>
+        <if test="stageId!=null">
+            and t.stage_id = #{stageId}
+        </if>
+        <if test="typeId!=null">
+            and t.type_id = #{typeId}
+        </if>
+        <if test="levelId!=null">
+            and t.level_id = #{levelId}
+        </if>
     </select>
 
 </mapper>

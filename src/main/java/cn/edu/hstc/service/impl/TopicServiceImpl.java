@@ -2,13 +2,19 @@ package cn.edu.hstc.service.impl;
 
 import cn.edu.hstc.dao.TopicCopyDao;
 import cn.edu.hstc.dao.TopicDao;
+import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.framework.util.DateUtils;
+import cn.edu.hstc.pojo.Course;
+import cn.edu.hstc.vo.TopicVo;
 import cn.edu.hstc.pojo.Topic;
 import cn.edu.hstc.pojo.TopicCopy;
 import cn.edu.hstc.service.TopicService;
 import cn.edu.hstc.util.ProjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -41,7 +47,7 @@ public class TopicServiceImpl implements TopicService {
         topicCopy.setAnswer(topic.getAnswer());
         topicCopy.setAnalysis(topic.getAnalysis());
         topicCopy.setTypeId(topic.getTypeId());
-        topicCopy.setLevel(topic.getLevel());
+        topicCopy.setLevelId(topic.getLevelId());
         topicCopy.setStageId(topic.getStageId());
         topicCopy.setCode(code);
         topicCopy.setCreateTime(date);
@@ -64,7 +70,7 @@ public class TopicServiceImpl implements TopicService {
         topicCopy.setAnswer(topic.getAnswer());
         topicCopy.setAnalysis(topic.getAnalysis());
         topicCopy.setTypeId(topic.getTypeId());
-        topicCopy.setLevel(topic.getLevel());
+        topicCopy.setLevelId(topic.getLevelId());
         topicCopy.setStageId(topic.getStageId());
         topicCopy.setCode(topic.getCode());
         topicCopy.setUpdateTime(date);
@@ -82,7 +88,27 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public List<Topic> selectTopicListByCourseId(Integer courseId) {
-        return topicDao.selectTopicListByCourseId(courseId);
+    public List<Topic> selectTopicListByPo(TopicVo topicVo) {
+        return topicDao.selectTopicListByPo(topicVo);
     }
+
+    @Override
+    @Transactional
+    public AjaxResult insertMoreTopic(List<Topic> topics) {
+        int rows = 0;
+        for (int i = 0; i < topics.size(); i++) {
+            Topic topic = topics.get(i);
+            if (insertTopic(topic)) {
+                rows += 1;
+            } else {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return AjaxResult.error("题目添加失败，请稍后再试！");
+            }
+        }
+        if (rows > 0) {
+            return AjaxResult.success("成功添加" + rows + "道题！");
+        }
+        return AjaxResult.error();
+    }
+
 }

@@ -210,7 +210,7 @@
             $("#new_college_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getCollegeList([[${pageInfo.getPageNum()}]],null);
                 }
             });
     }
@@ -231,7 +231,7 @@
             $.post("[[@{/college/delete}]]", {"collegeId": collegeId}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getCollegeList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }
@@ -247,7 +247,7 @@
             $.post("[[@{/college/edit}]]", $("#edit_college_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    window.location.reload();
+                    getCollegeList([[${pageInfo.getPageNum()}]],null);
                 }
             }, "json");
         }

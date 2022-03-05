@@ -2,8 +2,10 @@ package cn.edu.hstc.controller;
 
 import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.Course;
+import cn.edu.hstc.pojo.Paper;
 import cn.edu.hstc.pojo.Teacher;
 import cn.edu.hstc.service.CourseService;
+import cn.edu.hstc.service.PaperService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,8 @@ import java.util.List;
 public class CourseController extends BaseController {
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private PaperService paperService;
 
     @RequestMapping("/list.html")
     public String list(Course course, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
@@ -55,7 +59,13 @@ public class CourseController extends BaseController {
 
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult edit(Course course){
+    public AjaxResult edit(Course course) {
+        if (ObjectUtils.isEmpty(course.getId()) || ObjectUtils.isEmpty(course.getCode())) {
+            return error("数据异常");
+        }
+        if (ObjectUtils.isEmpty(course.getName())) {
+            return error("课程名称不能为空");
+        }
         if (courseService.updateCourse(course)) {
             return success("更新成功");
         } else {
@@ -69,13 +79,18 @@ public class CourseController extends BaseController {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
         }
+        Paper paper = new Paper();
+        paper.setCourseId(id);
+        if (paperService.selectPaperList(paper).size() > 0) {
+            return error("删除失败！该课程下已关联相关试卷！");
+        }
         Course param = new Course();
         param.setId(id);
         param.setCode(code);
         if (courseService.deleteCourse(param)) {
             return success("删除成功");
         } else {
-            return error("删除失败");
+            return error();
         }
     }
 }
