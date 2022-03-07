@@ -338,12 +338,6 @@
 <script th:src="@{/js/common.js}"></script>
 <script>
     $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
         if ($("#courseListOptions").children().length === 0) {
             alert("您还未创建任何课程，请前往课程管理创建！");
         } else {
@@ -1054,10 +1048,12 @@
                 data: JSON.stringify(topicArray),  //转为Json字符串
                 success: function (data, textStatus) {
                     hideLoading();
-                    alert(data.msg);
-                    if (data.code === 0) {
-                        getTopicList([[${pageInfo.getPageNum()}]], null);
-                    }
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            getTopicList([[${pageInfo.getPageNum()}]], null);
+                        }
+                    }, 300);
                 },
                 dataType: "json",
                 contentType: "application/json"

@@ -34,7 +34,7 @@ public class ExamServiceImpl implements ExamService {
         long endTime = exam.getTime() * 60 * 1000;
         Date end = new Date(startTime + endTime);
         exam.setEnd(end);
-        exam.setCode(ProjectUtil.getUuid().substring(0, 16));
+        exam.setCode(ProjectUtil.getUuid());
         exam.setCreateTime(DateUtils.getNowDate());
         return examDao.insertExam(exam) > 0;
     }

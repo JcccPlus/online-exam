@@ -17,7 +17,7 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="remark" property="remark"/>
-        <association column="type_id" property="type" select="cn.edu.hstc.dao.TopicDao.selectTypeById"
+        <association column="type_id" property="type" select="cn.edu.hstc.dao.TypeDao.selectTypeById"
                      fetchType="eager"/>
         <association column="level_id" property="level" select="cn.edu.hstc.dao.LevelDao.selectLevelById"
                      fetchType="eager"/>

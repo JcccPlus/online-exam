@@ -14,8 +14,8 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="remark" property="remark"/>
-        <association column="tea_id" property="teacher" select="cn.edu.hstc.dao.TeacherDao.selectTeacherById"
-                     fetchType="eager"/>
+        <!--<association column="tea_id" property="teacher" select="cn.edu.hstc.dao.TeacherDao.selectTeacherById"
+                     fetchType="eager"/>-->
         <association column="course_id" property="course" select="cn.edu.hstc.dao.CourseDao.selectCourseById"
                      fetchType="eager"/>
     </resultMap>
@@ -34,6 +34,7 @@
         <if test="code != null and code != ''">and p.code = #{code}</if>
         <if test="courseId != null">and p.course_id = #{courseId}</if>
         <if test="teaId != null">and p.tea_id = #{teaId}</if>
+        <if test="teaId != null">and c.tea_id = #{teaId}</if>
         <if test="searchValue != null and searchValue != ''">and (p.name like "%${searchValue}%" or c.name like
             "%${searchValue}%")
         </if>

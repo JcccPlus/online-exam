@@ -306,15 +306,6 @@
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
-
     function addMore() {
         $("#new_course_form").append(" <div>\n" +
             "                        <hr>\n" +
@@ -374,6 +365,7 @@
     }
 
     function addCourse() {
+        showLoading();
         var formArray = $("#new_course_form").serializeArray();
         /*var courseArray = [];
         var courseObj = "";
@@ -411,10 +403,13 @@
             url: "[[@{/course/add}]]",
             data: JSON.stringify(courseArray),  //转为Json字符串
             success: function (data, textStatus) {
-                alert(data.msg);
-                if (data.code === 0) {
-                    getCourseList([[${pageInfo.getPageNum()}]], null);
-                }
+                hideLoading();
+                setTimeout(function () {
+                    alert(data.msg);
+                    if (data.code === 0) {
+                        getCourseList([[${pageInfo.getPageNum()}]], null);
+                    }
+                }, 300);
             },
             dataType: "json",
             contentType: "application/json"
@@ -460,12 +455,13 @@
     }
 
     function initStage(id, code, courseName) {
-        $("#addStageModalLabel").text(courseName+"——添加阶段");
+        $("#addStageModalLabel").text(courseName + "——添加阶段");
         $("#new_courseId").val(id);
         $("#new_courseCode").val(code);
     }
 
     function addStage() {
+        showLoading();
         var formArray = $("#new_stage_form").serializeArray();
         var stageArray = [];
         var stageObj = {};
@@ -495,10 +491,13 @@
             url: "[[@{/stage/add}]]",
             data: JSON.stringify(stageArray),  //转为Json字符串
             success: function (data, textStatus) {
-                alert(data.msg);
-                if (data.code === 0) {
-                    getCourseList([[${pageInfo.getPageNum()}]], null);
-                }
+                hideLoading();
+                setTimeout(function () {
+                    alert(data.msg);
+                    if (data.code === 0) {
+                        getCourseList([[${pageInfo.getPageNum()}]], null);
+                    }
+                }, 300);
             },
             dataType: "json",
             contentType: "application/json"

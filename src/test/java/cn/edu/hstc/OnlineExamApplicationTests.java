@@ -5,10 +5,8 @@ import cn.edu.hstc.dao.CollegeDao;
 import cn.edu.hstc.dao.ExamDao;
 import cn.edu.hstc.dao.MajorDao;
 import cn.edu.hstc.framework.util.DateUtils;
-import cn.edu.hstc.pojo.Admin;
-import cn.edu.hstc.pojo.College;
-import cn.edu.hstc.pojo.Exam;
-import cn.edu.hstc.pojo.Major;
+import cn.edu.hstc.framework.util.ServletUtils;
+import cn.edu.hstc.pojo.*;
 import cn.edu.hstc.service.AdminService;
 import cn.edu.hstc.util.ProjectUtil;
 import org.junit.Test;
@@ -21,9 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -117,5 +113,55 @@ public class OnlineExamApplicationTests {
         System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
         System.out.println((psw.substring(0,psw.lastIndexOf("{{separator}}"))).substring(0,(psw.substring(0,psw.lastIndexOf("{{separator}}"))).lastIndexOf("{{separator}}")));
         System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
+    }
+
+    @Test
+    public void test10(){
+        List<Topic> topics = new ArrayList<>();
+        Topic topic1 = new Topic();
+        topic1.setStageId(1);
+        topic1.setTypeId(5);
+        topic1.setLevelId(2);
+        Topic topic2 = new Topic();
+        topic2.setStageId(1);
+        topic2.setTypeId(5);
+        topic2.setLevelId(1);
+        Topic topic3 = new Topic();
+        topic3.setStageId(1);
+        topic3.setTypeId(1);
+        topic3.setLevelId(3);
+        Topic topic4 = new Topic();
+        topic4.setStageId(1);
+        topic4.setTypeId(1);
+        topic4.setLevelId(3);
+        Topic topic5 = new Topic();
+        topic5.setStageId(1);
+        topic5.setTypeId(3);
+        topic5.setLevelId(1);
+        topics.add(topic1);
+        topics.add(topic2);
+        topics.add(topic3);
+        topics.add(topic4);
+        topics.add(topic5);
+        Collections.sort(topics);
+        /*topics.sort(new Comparator<Topic>() {
+            @Override
+            public int compare(Topic o1, Topic o2) {
+                if (o1 instanceof Topic && o2 instanceof Topic) {
+                    if (o1.getTypeId().equals(o2.getTypeId())) {
+                        if(o1.getStageId().equals(o2.getStageId())){
+                            return Integer.compare(o1.getLevelId(), o2.getLevelId());
+                        }else{
+                            return Integer.compare(o1.getStageId(), o2.getStageId());
+                        }
+                    } else {
+                        return Integer.compare(o1.getTypeId(), o2.getTypeId());
+                    }
+                }
+                throw new RuntimeException("参数类型不一致！");
+            }
+        });*/
+        System.out.println(topics);
+        System.out.println(ServletUtils.getRequest().getServletContext().getRealPath("/exam"));
     }
 }

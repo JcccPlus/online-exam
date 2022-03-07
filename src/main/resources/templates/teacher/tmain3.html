@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -23,6 +22,81 @@
             margin: 0;
             cursor: pointer;
         }
+
+        .page-link {
+            padding: 0.3rem 2rem;
+            font-size: 16px;
+        }
+
+        .select_course_div {
+            width: 30%;
+            margin: 0 auto;
+        }
+
+        .new_paper_div {
+            width: 85%;
+            margin: 0 auto;
+        }
+
+        .new_paper_div .mb-3 {
+            display: inline-block;
+            margin-left: 16px;
+        }
+
+        .delTopic {
+            float: right;
+            position: relative;
+            top: -31px;
+            left: 30px;
+        }
+
+        .mb-3a {
+            position: relative;
+            top: -2px;
+            left: 81%;
+        }
+
+        .mb-3 h6 {
+            display: inline-block;
+        }
+
+        .new_select_div .mb-3 {
+            width: 23%;
+            display: inline-block;
+            margin-left: 16px;
+        }
+
+        .new_title_div .mb-3 {
+            width: 97.3%;
+            margin-left: 15px;
+        }
+
+        .new_opts_div .mb-3 {
+            width: 48%;
+            display: inline-block;
+            margin-left: 14px;
+        }
+
+        .new_answer_div .mb-3 {
+            width: 97.3%;
+            margin-left: 15px;
+        }
+
+        #new_topic_form hr {
+            height: 5px;
+        }
+
+        .new_select_div a {
+            position: relative;
+            top: -47px;
+            left: 98.3%;
+        }
+
+        .mb-3obj {
+            display: inline-block;
+            width: 32.6%;
+        }
+
     </style>
 </head>
 
@@ -37,9 +111,10 @@
                     <div class="title">
                         <h5 class="title-con">试卷列表</h5>
                     </div>
-                    <div class="input-group mb-3" style="width:250px;float: right;right: 45px;top:17px;">
-                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addModal"
-                                title="生成试卷">
+                    <div class="input-group mb-3" style="width:300px;float: right;right: 45px;top:17px;">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"
+                                title="新增试卷">
                             <svg t="1643124208177" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                  xmlns="http://www.w3.org/2000/svg" p-id="2073"
                                  width="18" height="18">
@@ -47,9 +122,16 @@
                                       fill="" p-id="2074"></path>
                             </svg>
                         </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addModal">自动生成试卷</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addModal2">手动生成试卷</a>
+                            </li>
+                        </ul>
                         <input type="text" class="form-control" placeholder="课程名/试卷名" aria-label="Recipient's username"
-                               aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" title="搜索">
+                               aria-describedby="button-addon2" th:value="${searchValue}" id="searchValue">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" title="搜索"
+                                onclick="getPaperList(null,this)">
                             <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                  xmlns="http://www.w3.org/2000/svg" p-id="3506"
                                  width="16" height="16">
@@ -61,37 +143,38 @@
                 </div>
                 <hr style="margin: 0">
                 <div class="right-list" style="padding: 0px 40px;">
-                    <!--<div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
-                         th:if="${#lists.isEmpty(courseList)}">暂无相关课程数据，请<a href="" data-bs-toggle="modal"
-                                                                       data-bs-target="#addModal"
-                                                                       style="color: #53a4f4; text-decoration: none">点击</a>添加...
-                    </div>-->
-                    <table class="table table-hover">
+                    <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
+                         th:if="${#lists.isEmpty(paperList)}">暂无相关试卷数据，请<a href="" data-bs-toggle="modal"
+                                                                           data-bs-target="#addModal"
+                                                                           style="color: #53a4f4; text-decoration: none">点击</a>创建...
+                    </div>
+                    <table class="table table-hover" th:if="${not #lists.isEmpty(paperList)}">
+                        <caption>
+                            共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第
+                            [[${pageInfo.getPageNum()}]]
+                            页
+                        </caption>
                         <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">名称</th>
+                            <th scope="col">试卷名称</th>
+                            <th scope="col">总分</th>
+                            <th scope="col">所属课程</th>
+                            <th scope="col">创建时间</th>
                             <th scope="col">操作</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>1</td>
+                        <tr th:each="paper:${paperList}">
+                            <th scope="row" th:text="${paper.id}"></th>
+                            <td th:text="${paper.name}"></td>
+                            <td th:text="${paper.score}"></td>
+                            <td th:text="${paper.course.name}"></td>
+                            <td th:text="${#dates.format(paper.createTime,'yyyy-MM-dd HH:mm:ss')}"></td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="First group">
-                                    <button class="btn btn-outline-secondary" title="点击生成考试" data-bs-toggle="modal"
-                                            data-bs-target="#getModal"
-                                            onclick="getThisCourse()">
-                                        <svg t="1645557457286" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                             xmlns="http://www.w3.org/2000/svg" p-id="2111" width="16" height="16">
-                                            <path d="M702.236444 14.222222a42.666667 42.666667 0 0 1 32.142223 14.677334l208.042666 238.933333a42.666667 42.666667 0 0 1 10.467556 27.989333V967.111111a42.666667 42.666667 0 0 1-42.666667 42.666667H113.777778A42.666667 42.666667 0 0 1 71.111111 967.111111V56.888889A42.666667 42.666667 0 0 1 113.777778 14.222222z m-72.647111 85.333334H156.444444v824.888888h711.111112V336.725333h-195.299556a42.666667 42.666667 0 0 1-42.268444-36.807111l-0.398223-5.802666V99.555556z m-157.013333 189.667555a42.666667 42.666667 0 0 1 77.368889 0l61.155555 131.925333 146.716445 16.611556a42.666667 42.666667 0 0 1 27.989333 69.745778l-4.209778 4.323555-108.373333 97.848889 29.240889 141.710222a42.666667 42.666667 0 0 1-57.173333 48.469334l-5.347556-2.56-128.739555-71.566222-128.625778 71.566222a42.666667 42.666667 0 0 1-63.374222-39.992889l0.796444-5.916445 29.184-141.710222-108.316444-97.848889a42.666667 42.666667 0 0 1 17.92-72.988444l5.916444-1.080889 146.602667-16.611556z m38.684444 119.352889l-32.597333 70.314667a42.666667 42.666667 0 0 1-33.905778 24.462222l-76.515555 8.590222 56.32 50.801778a42.666667 42.666667 0 0 1 13.937778 33.905778l-0.796445 6.371555-15.416889 74.524445 68.266667-37.944889a42.666667 42.666667 0 0 1 35.726222-2.616889l5.688889 2.616889 68.152889 37.888-15.36-74.524445a42.666667 42.666667 0 0 1 8.760889-35.555555l4.437333-4.664889L654.222222 512l-76.458666-8.647111a42.666667 42.666667 0 0 1-30.833778-18.887111l-3.072-5.518222-32.540445-70.314667z m203.662223-272.156444v114.972444h100.067555l-100.067555-114.972444z"
-                                                  fill="#515151" p-id="2112"></path>
-                                        </svg>
-                                    </button>
-                                    <button class="btn btn-outline-secondary" title="查看详情" data-bs-toggle="modal"
-                                            data-bs-target="#getModal"
-                                            onclick="getThisCourse()">
+                                    <button class="btn btn-outline-secondary" title="查看试卷详情"
+                                            th:onclick="getThisPaper([[${paper.code}]])">
                                         <svg t="1645547346995" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="3000" width="17" height="21">
                                             <path d="M262.4 288m-57.6 0a57.6 57.6 0 1 0 115.2 0 57.6 57.6 0 1 0-115.2 0Z"
@@ -104,20 +187,17 @@
                                                   p-id="3004"></path>
                                         </svg>
                                     </button>
-                                    <button class="btn btn-outline-secondary" title="编辑" data-bs-toggle="modal"
-                                            data-bs-target="#editModal"
-                                            onclick="getEditCourse()">
-                                        <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                             xmlns="http://www.w3.org/2000/svg" p-id="4042"
-                                             width="16" height="16">
-                                            <path d="M76.094377 995.097685c-8.806174 0-17.612348-3.612789-23.93473-9.935171a34.547299 34.547299 0 0 1-9.709371-27.32172l26.192723-267.120618c0.451599-43.579272 18.515546-86.029548 49.450055-116.738258L544.176406 151.285557c13.322161-13.096362 34.547299-13.096362 47.869459 0l296.926131 296.92613a33.847321 33.847321 0 0 1 0 47.86946l-426.76075 423.373759a165.917354 165.917354 0 0 1-115.835061 48.546858l-266.894818 27.095921h-3.38699zM567.885336 223.089746L165.736714 622.077178c-18.741345 18.515546-29.353914 44.25667-29.353914 70.449393 0 1.128997 0 2.257993-0.225799 3.38699l-22.128335 227.379934 227.379934-23.031532c1.128997-0.225799 2.257993-0.225799 3.38699-0.2258 26.418523 0 51.25645-10.16097 69.997795-28.902315L817.167806 471.920617 567.885336 223.089746zM102.5129 692.526571z"
-                                                  fill="#2c2c2c" p-id="4043"></path>
-                                            <path d="M865.037266 506.016318c-9.031974 0-17.612348-3.612789-23.93473-9.935171L544.402205 199.606615a33.644101 33.644101 0 0 1 0-47.86946l93.480926-93.480926a98.267872 98.267872 0 0 1 138.640794 0l204.122602 204.122602c18.967144 18.967144 29.579713 44.25667 29.579713 71.126792s-10.38677 52.159647-29.579713 71.126792l-91.448732 91.448732c-6.548181 6.322381-15.354355 9.935171-24.160529 9.935171zM616.206395 175.671885L864.811466 424.276957l67.514003-67.514002c6.322381-6.322381 9.709372-14.451158 9.709371-23.257332s-3.38699-16.93495-9.709371-23.257332L728.428666 106.125689a30.257111 30.257111 0 0 0-42.676075 0l-69.546196 69.546196z"
-                                                  fill="#2c2c2c" p-id="4044"></path>
+                                    <button class="btn btn-outline-secondary" title="点击生成考试" data-bs-toggle="modal"
+                                            data-bs-target="#generateExamModal"
+                                            th:onclick="initExam([[${paper.id}]],[[${paper.name}]],[[${paper.code}]])">
+                                        <svg t="1645557457286" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="2111" width="16" height="16">
+                                            <path d="M702.236444 14.222222a42.666667 42.666667 0 0 1 32.142223 14.677334l208.042666 238.933333a42.666667 42.666667 0 0 1 10.467556 27.989333V967.111111a42.666667 42.666667 0 0 1-42.666667 42.666667H113.777778A42.666667 42.666667 0 0 1 71.111111 967.111111V56.888889A42.666667 42.666667 0 0 1 113.777778 14.222222z m-72.647111 85.333334H156.444444v824.888888h711.111112V336.725333h-195.299556a42.666667 42.666667 0 0 1-42.268444-36.807111l-0.398223-5.802666V99.555556z m-157.013333 189.667555a42.666667 42.666667 0 0 1 77.368889 0l61.155555 131.925333 146.716445 16.611556a42.666667 42.666667 0 0 1 27.989333 69.745778l-4.209778 4.323555-108.373333 97.848889 29.240889 141.710222a42.666667 42.666667 0 0 1-57.173333 48.469334l-5.347556-2.56-128.739555-71.566222-128.625778 71.566222a42.666667 42.666667 0 0 1-63.374222-39.992889l0.796444-5.916445 29.184-141.710222-108.316444-97.848889a42.666667 42.666667 0 0 1 17.92-72.988444l5.916444-1.080889 146.602667-16.611556z m38.684444 119.352889l-32.597333 70.314667a42.666667 42.666667 0 0 1-33.905778 24.462222l-76.515555 8.590222 56.32 50.801778a42.666667 42.666667 0 0 1 13.937778 33.905778l-0.796445 6.371555-15.416889 74.524445 68.266667-37.944889a42.666667 42.666667 0 0 1 35.726222-2.616889l5.688889 2.616889 68.152889 37.888-15.36-74.524445a42.666667 42.666667 0 0 1 8.760889-35.555555l4.437333-4.664889L654.222222 512l-76.458666-8.647111a42.666667 42.666667 0 0 1-30.833778-18.887111l-3.072-5.518222-32.540445-70.314667z m203.662223-272.156444v114.972444h100.067555l-100.067555-114.972444z"
+                                                  fill="#515151" p-id="2112"></path>
                                         </svg>
                                     </button>
                                     <button class="btn btn-outline-secondary" title="删除"
-                                            onclick="delCourse()">
+                                            th:onclick="delPaper([[${paper.id}]],[[${paper.code}]])">
                                         <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                              width="16" height="16">
@@ -134,92 +214,1013 @@
                         </tr>
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(paperList)}">
+                        <ul class="pagination justify-content-center" style="margin: 0;">
+                            <li th:class="${pageInfo.getFirstPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getPaperList([[${pageInfo.getPrePage()}]],this)">
+                                <a class="page-link" href="#">&laquo;</a>
+                            </li>
+                            <li th:class="${pageInfo.getPageNum()==1?'page-item disabled':'page-item'}"
+                                th:onclick="getPaperList([[${pageInfo.getFirstPage()}]],this)">
+                                <a class="page-link" href="#">首页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getPaperList([[${pageInfo.getLastPage()}]],this)">
+                                <a class="page-link" href="#">末页</a>
+                            </li>
+                            <li th:class="${pageInfo.getLastPage()==pageInfo.getPageNum()?'page-item disabled':'page-item'}"
+                                th:onclick="getPaperList([[${pageInfo.getNextPage()}]],this)">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- 查看详情Modal -->
-<div class="modal fade" id="getModal" tabindex="-1" aria-labelledby="getModalLabel" aria-hidden="true">
+<!--生成考试modal-->
+<div class="modal fade" id="generateExamModal" tabindex="-1" aria-labelledby="generateExamModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="getModalLabel">课程详情</h5>
+                <h5 class="modal-title" id="generateExamModalLabel">生成考试</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
+                <form id="new_exam_form" name="new_exam_form">
+                    <input type="hidden" name="paperId">
+                    <input type="hidden" name="paperCode">
+                    <div class="mb-3">
+                        <h6>考试名称:</h6>
+                        <input type="text" class="form-control" name="name" readonly disabled>
+                    </div>
+                    <h6>考试班级:</h6>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select" id="add_college" name="college">
+                            <option value="0">请选择学院</option>
+                            <option th:each="college:${collegeList}" th:text="${college.getName()}"
+                                    th:value="${college.getId()}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select" id="add_major" name="major">
+                            <option value="0">请选择专业</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select"  id="add_class" name="class">
+                            <option value="0">请选择班级</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <h6>考试时间:</h6>
+                        <input class="form-control" type="datetime-local" name="startTime">
+                    </div>
+                    <div class="mb-3">
+                        <h6>考试时长:</h6>
+                        <input class="form-control" type="number" name="timeLen" placeholder="单位/分钟">
+                    </div>
+                    <div class="mb-3">
+                        <h6>允许迟到:</h6>
+                        <input class="form-control" type="number" name="lateTime" placeholder="单位/分钟（不填或为0则不做迟到限制）">
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
+                <button type="button" class="btn btn-primary" onclick="generateExam()">生成考试</button>
             </div>
         </div>
     </div>
 </div>
-<!-- 生成试卷Modal -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- 抽题生成试卷Modal -->
+<div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" style="min-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">添加课程</h5>
+                <h5 class="modal-title" id="addModalLabel">试卷创建—根据条件随机抽题自动生成试卷</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="new_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称">
+                <form id="new_paper_form" name="new_paper_form">
+                    <div class="select_course_div">
+                        <div class="mb-3">
+                            <input class="form-select new_courseList" list="new_courseListOptions1"
+                                   placeholder="请选择即将创建的试卷课程" name="course">
+                            <datalist id="new_courseListOptions1">
+                                <option th:each="course:${courseList}" th:value="${course.name}"
+                                        th:data-value="${course.id+'&'+course.code}"></option>
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="请输入试卷名称">
+                        </div>
+                    </div>
+                    <div class="new_paper_div">
+                        <div class="mb-3">
+                            <select class="form-select new_stageList" name="stage">
+                                <option value="0">请选择题目的课程阶段</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <select class="form-select" name="type">
+                                <option value="0">请选择题目的题型</option>
+                                <option th:each="type:${typeList}" th:value="${type.id+'&'+type.name}">[[${type.name}]]
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <select class="form-select" name="level">
+                                <option value="0">请选择题目的难度</option>
+                                <option th:each="level:${levelList}" th:value="${level.id+'&'+level.name}">
+                                    [[${level.name}]]
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="number" placeholder="请输入题目数量"
+                                   style="width: 155px">
+                        </div>
+                        <div class="mb-3" style="height: 38px;">
+                            <input type="number" class="form-control" name="score" placeholder="请输入题目分数"
+                                   style="width: 155px">
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
+                <button type="button" class="btn btn-primary" onclick="addTopic()">更多题目</button>
+                <button type="button" class="btn btn-primary" onclick="addAutoPaper()">生成试卷</button>
             </div>
         </div>
     </div>
 </div>
-<!-- 更新试卷Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- 录题生成试卷Modal -->
+<div class="modal fade" id="addModal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="addModal2Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" style="min-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">编辑课程信息</h5>
+                <h5 class="modal-title" id="addModal2Label">试卷创建—在线录题生成试卷</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="edit_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="hidden" id="edit_id" name="id">
-                            <input type="text" id="edit_name" class="form-control" name="name"
-                                   placeholder="请输入学院名称">
+                <form id="new_topic_form" name="new_topic_form">
+                    <div class="select_course_div">
+                        <div class="mb-3">
+                            <input class="form-select new_courseList2" list="new_courseListOptions2"
+                                   placeholder="请选择即将创建的试卷课程" name="course">
+                            <datalist id="new_courseListOptions2">
+                                <option th:each="course:${courseList}" th:value="${course.name}"
+                                        th:data-value="${course.id+'&'+course.code}"></option>
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="请输入试卷名称">
+                        </div>
+                    </div>
+                    <div class="topicDiv">
+                        <div class="new_select_div">
+                            <hr>
+                            <div class="mb-3">
+                                <select class="form-select new_stageList2" name="stage">
+                                    <option value="0">请选择题目的课程阶段</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select" name="type" onchange="changeTopicDiv(this)">
+                                    <option value="0">请选择题目的题型</option>
+                                    <option th:each="type:${typeList}" th:value="${type.id}">[[${type.name}]]
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select" name="level">
+                                    <option value="0">请选择题目的难度</option>
+                                    <option th:each="level:${levelList}" th:value="${level.id}">[[${level.name}]]
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <input type="number" class="form-control" name="score" placeholder="请输入本题目的分数"
+                                       style="width: 250px;">
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="editCollege()">更新</button>
+                <button type="button" class="btn btn-primary" onclick="addTopic2()">更多题目</button>
+                <button type="button" class="btn btn-primary" onclick="addOnlinePaper()">生成试卷</button>
             </div>
         </div>
     </div>
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
+    $(".new_courseList").change(function () {
+        var courseName = $(this).val();
+        var idName = $(this).next().attr("id");
+        var value = $('#' + idName + ' [value="' + courseName + '"]').data('value');
+        if (value !== undefined) {
+            var courseId = parseInt(value.substring(0, value.indexOf('&')));
+            var courseCode = value.substring(value.indexOf('&') + 1);
+            $.post("[[@{/stage/list}]]", {"courseId": courseId, "code": courseCode}, function (d) {
+                if (d.data.length > 0) {
+                    $(".new_stageList").html("<option value=\"0\">请选择题目的课程阶段</option>");
+                    for (var i = 0; i < d.data.length; i++) {
+                        $(".new_stageList").append("<option value='" + d.data[i].id + "&" + d.data[i].name + "'>" + d.data[i].name + "</option>");
+                    }
+                } else {
+                    $(".new_stageList").html("<option value=\"0\">请选择题目的课程阶段</option>");
+                    alert("《" + courseName + "》下没有任何阶段，请前往课程管理创建！");
+                }
+            });
+        } else {
+            $(this).val("");
+            $(".new_stageList").html("<option value=\"0\">请选择题目的课程阶段</option>");
+            if ($(this).next().children().length === 0) {
+                alert("您还未创建任何课程，请前往课程管理创建！");
+            }
+        }
+    });
+
+    $(".new_courseList2").change(function () {
+        var courseName = $(this).val();
+        var idName = $(this).next().attr("id");
+        var value = $('#' + idName + ' [value="' + courseName + '"]').data('value');
+        if (value !== undefined) {
+            var courseId = parseInt(value.substring(0, value.indexOf('&')));
+            var courseCode = value.substring(value.indexOf('&') + 1);
+            $.post("[[@{/stage/list}]]", {"courseId": courseId, "code": courseCode}, function (d) {
+                if (d.data.length > 0) {
+                    $(".new_stageList2").html("<option value=\"0\">请选择题目的课程阶段</option>");
+                    for (var i = 0; i < d.data.length; i++) {
+                        $(".new_stageList2").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                    }
+                } else {
+                    $(".new_stageList2").html("<option value=\"0\">请选择题目的课程阶段</option>");
+                    alert("《" + courseName + "》下没有任何阶段，请前往课程管理创建！");
+                }
+            });
+        } else {
+            $(this).val("");
+            $(".new_stageList2").html("<option value=\"0\">请选择题目的课程阶段</option>");
+            if ($(this).next().children().length === 0) {
+                alert("您还未创建任何课程，请前往课程管理创建！");
+            }
+        }
+    });
+
+    function delTopic(obj) {
+        $(obj).closest(".new_paper_div").remove();
+    }
+
+    //更多单选题选项及答案
+    function addSingleChoiceOpt(obj) {
+        var length = $(obj).closest(".singleChoiceOptsDiv").children().length;
+        if (length > 7) {
+            alert("选项不能再多了哦！");
+        } else {
+            var optIndex = String.fromCharCode(65 + length);
+            $(obj).closest(".singleChoiceOptsDiv").append("<div class=\"mb-3\">\n" +
+                "                            <h6>选项" + optIndex + ":</h6>\n" +
+                "                            <div class='input-group'><textarea class=\"form-control\" name=\"single_choice_opt\"></textarea><input class=\"btn btn-outline-secondary\" onclick=\"delOpt(this)\" type=\"button\" value=\"X\" title='删除该选项'></div>\n" +
+                "                        </div>");
+            $(obj).parent().parent().next().find(".choiceAnswerDiv").append("<div class=\"form-check form-check-inline\">\n" +
+                "                                    <input class=\"form-check-input newSingleChoiceAnswer\" onclick=\"checkOne(this)\" type=\"checkbox\" name=\"single_choice_answer\"\n" +
+                "                                           value=\"" + optIndex + "\">\n" +
+                "                                    <label class=\"form-check-label\">" + optIndex + "</label>\n" +
+                "                                </div>");
+        }
+    }
+
+    //更多多选题选项及答案
+    function addMoreChoiceOpt(obj) {
+        var length = $(obj).closest(".moreChoiceOptsDiv").children().length;
+        if (length > 7) {
+            alert("选项不能再多了哦！");
+        } else {
+            var optIndex = String.fromCharCode(65 + length);
+            $(obj).closest(".moreChoiceOptsDiv").append("<div class=\"mb-3\">\n" +
+                "                            <h6>选项" + optIndex + ":</h6>\n" +
+                "                            <div class='input-group'><textarea class=\"form-control\" name=\"more_choice_opt\"></textarea><input class=\"btn btn-outline-secondary\" onclick=\"delOpt(this)\" type=\"button\" value=\"X\" title='删除该选项'></div>\n" +
+                "                        </div>");
+            $(obj).parent().parent().next().find(".choiceAnswerDiv").append("<div class=\"form-check form-check-inline\">\n" +
+                "                                    <input class=\"form-check-input newMoreChoiceAnswer\" type=\"checkbox\" name=\"more_choice_answer\"\n" +
+                "                                           value=\"" + optIndex + "\">\n" +
+                "                                    <label class=\"form-check-label\">" + optIndex + "</label>\n" +
+                "                                </div>");
+        }
+    }
+
+    //删除选项及答案
+    function delOpt(obj) {
+        var index = $(".new_opts_div").index($(obj).closest(".new_opts_div")); //当前new_opts_div的索引
+        $(obj).closest(".new_opts_div").next().find(".choiceAnswerDiv").children("div:last-child").remove();  //删除当前选项
+        $(obj).parent().parent().remove();   //删除对应答案
+        var optsDocument = $(".new_opts_div:eq(" + index + ")").children();
+        var length = optsDocument.length;
+        if (length > 4) {
+            //更改选项索引
+            for (var i = 4; i < length; i++) {
+                optsDocument[i].children.item(0).innerText = "选项" + String.fromCharCode(65 + i) + ":";
+            }
+        }
+    }
+
+    //添加更多填空答案
+    function addMoreEmpty(obj) {
+        if ($(obj).parent().parent().children().length > 4) {
+            alert("一道填空题不能超过5个空哦！");
+        } else {
+            $(obj).parent().parent().append("<div class=\"mb-3\">\n" +
+                "                      <h6>填空答案:</h6>\n" +
+                "                      <div class=\"input-group\">\n" +
+                "                        <textarea class=\"form-control\" name=\"fillEmpty_answer\"></textarea>\n" +
+                "                        <input type=\"button\" class=\"btn btn-outline-secondary\" value=\"X\" onclick=\"delOpt(this)\" title=\"删除该填空答案\">\n" +
+                "                      </div>\n" +
+                "                    </div>");
+        }
+    }
+
+    function dropTopicDiv(obj) {
+        var className = $(obj).closest(".new_select_div").next().attr("class");
+        if (className !== undefined && className.indexOf("TopicDiv") !== -1) {
+            $(obj).closest(".new_select_div").next().remove();
+            //题号重新排序
+            for (var i = 0; i < $(".choiceTopicDiv").length; i++) {
+                $(".choiceTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("单选题" + (i + 1));
+            }
+            for (var i = 0; i < $(".moreChoiceTopicDiv").length; i++) {
+                $(".moreChoiceTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("多选题" + (i + 1));
+            }
+            for (var i = 0; i < $(".trueFalseTopicDiv").length; i++) {
+                $(".trueFalseTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("判断题" + (i + 1));
+            }
+            for (var i = 0; i < $(".fillEmptyTopicDiv").length; i++) {
+                $(".fillEmptyTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("填空题" + (i + 1));
+            }
+            for (var i = 0; i < $(".subjectiveTopicDiv").length; i++) {
+                $(".subjectiveTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("主观题" + (i + 1));
+            }
+        }
+        $(obj).closest(".new_select_div").remove();
+    }
+
+    function changeTopicDiv(obj) {
+        if ($(obj).closest(".topicDiv").children().length > 1) {
+            $(obj).closest(".topicDiv").children().last().remove();
+        }
+        var type = $(obj).val();
+        if (type === "1") {
+            //单选题
+            $(obj).closest(".topicDiv").append("<div class=\"choiceTopicDiv\">\n" +
+                "                        <div class=\"mb-3\">\n" +
+                "                            <h5 align=\"center\">单选题</h5>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_title_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>题目内容:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"single_choice_title\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <input type=\"hidden\" name=\"opts\"/>\n" +
+                "                        <div class=\"new_opts_div singleChoiceOptsDiv\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项A:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"single_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项B:</h6>\n" +
+                "                                <a href=\"javascript:void(0)\" class='mb-3a' onclick=\"addSingleChoiceOpt(this)\" style=\"left: 87%\"\n" +
+                "                                   title=\"更多选项\">\n" +
+                "                                    <svg t=\"1646250752287\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+                "                                         xmlns=\"http://www.w3.org/2000/svg\" p-id=\"5589\"\n" +
+                "                                         width=\"20\" height=\"20\">\n" +
+                "                                        <path d=\"M511.5 957.9C264.9 957.9 65 758.2 65 511.9s199.9-446 446.5-446S958 265.6 958 511.9c0.1 246.3-199.8 446-446.5 446zM509 149.1c-200.4 0-355.8 162.2-355.8 362.3 0 200.1 155.4 356.8 355.8 356.8s362.9-156.7 362.9-356.8c0-200.1-162.5-362.3-362.9-362.3zM690.5 556h-134v133.8c0 24.6-20 44.6-44.6 44.6h-0.1c-24.6 0-44.6-19.9-44.6-44.6V556h-134c-24.7 0-44.6-19.9-44.6-44.5v-0.1c0-24.6 20-44.6 44.6-44.6h134V333c0-24.6 20-44.6 44.6-44.6h0.1c24.7 0 44.6 19.9 44.6 44.6v133.8h134c24.7 0 44.6 19.9 44.6 44.6v0.1c0 24.6-19.9 44.5-44.6 44.5z m0 0\"\n" +
+                "                                              fill=\"#1296db\" p-id=\"5590\"></path>\n" +
+                "                                    </svg>\n" +
+                "                                </a>\n" +
+                "                                <textarea class=\"form-control\" name=\"single_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项C:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"single_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项D:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"single_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_answer_div\">\n" +
+                "                            <div class=\"mb-3\" align=\"center\">\n" +
+                "                                <h6>参考答案:</h6>\n" +
+                "                                <div class=\"choiceAnswerDiv\">\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newSingleChoiceAnswer\" onclick=\"checkOne(this)\" type=\"checkbox\" name=\"single_choice_answer\"\n" +
+                "                                                value=\"A\">\n" +
+                "                                        <label class=\"form-check-label\">A</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newSingleChoiceAnswer\" onclick=\"checkOne(this)\" type=\"checkbox\" name=\"single_choice_answer\"\n" +
+                "                                                value=\"B\">\n" +
+                "                                        <label class=\"form-check-label\">B</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newSingleChoiceAnswer\" onclick=\"checkOne(this)\" type=\"checkbox\" name=\"single_choice_answer\"\n" +
+                "                                                value=\"C\">\n" +
+                "                                        <label class=\"form-check-label\">C</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newSingleChoiceAnswer\" onclick=\"checkOne(this)\" type=\"checkbox\" name=\"single_choice_answer\"\n" +
+                "                                               value=\"D\">\n" +
+                "                                        <label class=\"form-check-label\">D</label>\n" +
+                "                                    </div>\n" +
+                "                                </div>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\" style=\"margin-left: 17px;width: 97%\">\n" +
+                "                                <h6>解析:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"analysis\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <br>\n" +
+                "                    </div>");
+        } else if (type === "2") {
+            //多选题
+            $(obj).closest(".topicDiv").append("<div class=\"moreChoiceTopicDiv\">\n" +
+                "                        <div class=\"mb-3\">\n" +
+                "                            <h5 align=\"center\">多选题</h5>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_title_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>题目内容:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"more_choice_title\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <input type=\"hidden\" name=\"opts\"/>\n" +
+                "                        <div class=\"new_opts_div moreChoiceOptsDiv\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项A:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"more_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项B:</h6>\n" +
+                "                                <a href=\"javascript:void(0)\" class='mb-3a' onclick=\"addMoreChoiceOpt(this)\" style=\"left: 87%\"\n" +
+                "                                   title=\"更多选项\">\n" +
+                "                                    <svg t=\"1646250752287\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+                "                                         xmlns=\"http://www.w3.org/2000/svg\" p-id=\"5589\"\n" +
+                "                                         width=\"20\" height=\"20\">\n" +
+                "                                        <path d=\"M511.5 957.9C264.9 957.9 65 758.2 65 511.9s199.9-446 446.5-446S958 265.6 958 511.9c0.1 246.3-199.8 446-446.5 446zM509 149.1c-200.4 0-355.8 162.2-355.8 362.3 0 200.1 155.4 356.8 355.8 356.8s362.9-156.7 362.9-356.8c0-200.1-162.5-362.3-362.9-362.3zM690.5 556h-134v133.8c0 24.6-20 44.6-44.6 44.6h-0.1c-24.6 0-44.6-19.9-44.6-44.6V556h-134c-24.7 0-44.6-19.9-44.6-44.5v-0.1c0-24.6 20-44.6 44.6-44.6h134V333c0-24.6 20-44.6 44.6-44.6h0.1c24.7 0 44.6 19.9 44.6 44.6v133.8h134c24.7 0 44.6 19.9 44.6 44.6v0.1c0 24.6-19.9 44.5-44.6 44.5z m0 0\"\n" +
+                "                                              fill=\"#1296db\" p-id=\"5590\"></path>\n" +
+                "                                    </svg>\n" +
+                "                                </a>\n" +
+                "                                <textarea class=\"form-control\" name=\"more_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项C:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"more_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>选项D:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"more_choice_opt\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_answer_div\">\n" +
+                "                            <div class=\"mb-3\" align=\"center\">\n" +
+                "                                <h6>参考答案:</h6>\n" +
+                "                                <div class=\"choiceAnswerDiv\" id=\"answer_radio\">\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newMoreChoiceAnswer\" type=\"checkbox\" name=\"more_choice_answer\"\n" +
+                "                                                value=\"A\">\n" +
+                "                                        <label class=\"form-check-label\">A</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newMoreChoiceAnswer\" type=\"checkbox\" name=\"more_choice_answer\"\n" +
+                "                                                value=\"B\">\n" +
+                "                                        <label class=\"form-check-label\">B</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newMoreChoiceAnswer\" type=\"checkbox\" name=\"more_choice_answer\"\n" +
+                "                                                value=\"C\">\n" +
+                "                                        <label class=\"form-check-label\">C</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newMoreChoiceAnswer\" type=\"checkbox\" name=\"more_choice_answer\"\n" +
+                "                                                value=\"D\">\n" +
+                "                                        <label class=\"form-check-label\">D</label>\n" +
+                "                                    </div>\n" +
+                "                                </div>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\" style=\"margin-left: 17px;width: 97%\">\n" +
+                "                                <h6>解析:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"analysis\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <br>\n" +
+                "                    </div>");
+        } else if (type === "3") {
+            //判断题
+            $(obj).closest(".topicDiv").append("<div class=\"trueFalseTopicDiv\">\n" +
+                "                        <div class=\"mb-3\">\n" +
+                "                            <h5 align=\"center\">判断题</h5>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_title_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>题目内容:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"estimate_title\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_answer_div\">\n" +
+                "                            <div class=\"mb-3\" align=\"center\">\n" +
+                "                                <h6>参考答案:</h6>\n" +
+                "                                <div class='estimateAnswerDiv'>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newEstimateAnswer\" type=\"checkbox\" onclick=\"checkOne(this)\" name=\"estimate_answer\"\n" +
+                "                                                value=\"true\">\n" +
+                "                                        <label class=\"form-check-label\">对</label>\n" +
+                "                                    </div>\n" +
+                "                                    <div class=\"form-check form-check-inline\">\n" +
+                "                                        <input class=\"form-check-input newEstimateAnswer\" type=\"checkbox\" onclick=\"checkOne(this)\" name=\"estimate_answer\"\n" +
+                "                                                value=\"false\">\n" +
+                "                                        <label class=\"form-check-label\">错</label>\n" +
+                "                                    </div>\n" +
+                "                                </div>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\" style=\"margin-left: 17px;width: 97%\">\n" +
+                "                                <h6>解析:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"analysis\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <br>\n" +
+                "                    </div>");
+        } else if (type === "4") {
+            //填空题
+            $(obj).closest(".topicDiv").append("<div class=\"fillEmptyTopicDiv\">\n" +
+                "                        <div class=\"mb-3\">\n" +
+                "                            <h5 align=\"center\">填空题</h5>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_title_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>题目内容:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"fillEmpty_title\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_answer_div\">\n" +
+                "                            <div>\n" +
+                "                                <div class=\"mb-3\">\n" +
+                "                                    <h6>填空答案:</h6>\n" +
+                "                                    <a href=\"javascript:void(0)\" class='mb-3a' onclick=\"addMoreEmpty(this)\" style=\"left: 92%\"\n" +
+                "                                       title=\"更多填空答案\">\n" +
+                "                                        <svg t=\"1646250752287\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+                "                                             xmlns=\"http://www.w3.org/2000/svg\" p-id=\"5589\"\n" +
+                "                                             width=\"20\" height=\"20\">\n" +
+                "                                            <path d=\"M511.5 957.9C264.9 957.9 65 758.2 65 511.9s199.9-446 446.5-446S958 265.6 958 511.9c0.1 246.3-199.8 446-446.5 446zM509 149.1c-200.4 0-355.8 162.2-355.8 362.3 0 200.1 155.4 356.8 355.8 356.8s362.9-156.7 362.9-356.8c0-200.1-162.5-362.3-362.9-362.3zM690.5 556h-134v133.8c0 24.6-20 44.6-44.6 44.6h-0.1c-24.6 0-44.6-19.9-44.6-44.6V556h-134c-24.7 0-44.6-19.9-44.6-44.5v-0.1c0-24.6 20-44.6 44.6-44.6h134V333c0-24.6 20-44.6 44.6-44.6h0.1c24.7 0 44.6 19.9 44.6 44.6v133.8h134c24.7 0 44.6 19.9 44.6 44.6v0.1c0 24.6-19.9 44.5-44.6 44.5z m0 0\"\n" +
+                "                                                  fill=\"#1296db\" p-id=\"5590\"></path>\n" +
+                "                                        </svg>\n" +
+                "                                    </a>\n" +
+                "                                    <textarea class=\"form-control\" name=\"fillEmpty_answer\"></textarea>\n" +
+                "                                </div>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>解析:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"analysis\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <br>\n" +
+                "                    </div>");
+        } else if (type === "5") {
+            //主观题
+            $(obj).closest(".topicDiv").append("<div class=\"subjectiveTopicDiv\">\n" +
+                "                        <div class=\"mb-3\">\n" +
+                "                            <h5 align=\"center\">主观题</h5>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_title_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>题目内容:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"subjective_title\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <div class=\"new_answer_div\">\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>参考答案:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"subjective_answer\"></textarea>\n" +
+                "                            </div>\n" +
+                "                            <div class=\"mb-3\">\n" +
+                "                                <h6>解析:</h6>\n" +
+                "                                <textarea class=\"form-control\" name=\"analysis\"></textarea>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                        <br>\n" +
+                "                    </div>");
+        }
+        //题号重新排序
+        for (var i = 0; i < $(".choiceTopicDiv").length; i++) {
+            $(".choiceTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("单选题" + (i + 1));
+        }
+        for (var i = 0; i < $(".moreChoiceTopicDiv").length; i++) {
+            $(".moreChoiceTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("多选题" + (i + 1));
+        }
+        for (var i = 0; i < $(".trueFalseTopicDiv").length; i++) {
+            $(".trueFalseTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("判断题" + (i + 1));
+        }
+        for (var i = 0; i < $(".fillEmptyTopicDiv").length; i++) {
+            $(".fillEmptyTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("填空题" + (i + 1));
+        }
+        for (var i = 0; i < $(".subjectiveTopicDiv").length; i++) {
+            $(".subjectiveTopicDiv:eq(" + i + ")").find("h5:eq(0)").text("主观题" + (i + 1));
+        }
+    }
+
+    //只允许checkbox选中一个
+    function checkOne(obj) {
+        var length = $(obj).parent().parent().find("input").length;
+        for (var i = 0; i < length; i++) {
+            if ($(obj).val() !== $(obj).parent().parent().find("input:eq(" + i + ")").attr("value")) {
+                $(obj).parent().parent().find("input:eq(" + i + ")").prop("checked", false);
+            }
+        }
+    }
+
+    function getPaperList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/paper/search}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/paper/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
+
+    //抽题生成试卷
+    function addAutoPaper() {
+        showLoading();
+        var formArray = $("#new_paper_form").serializeArray();
+        console.log(formArray);
+        var array = [];
+        var obj = {};
+        var isFlag = true;
+        $.each(formArray, function (i, item) {
+            if (item.name === "course") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("您未选择该试卷所属课程！");
+                    isFlag = false;
+                    return false;
+                }
+                var value = $('#new_courseListOptions1 [value="' + item.value + '"]').data('value');
+                var id = parseInt(value.substring(0, value.indexOf('&')));
+                obj.course = {"id": id, "name": item.value};
+            } else if (item.name === "name") {
+                if ($.trim(item.value) === "") {
+                    hideLoading();
+                    alert("您未输入试卷名称！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.name = $.trim(item.value);
+            } else if (item.name === "stage") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请确认是否漏选课程阶段！");
+                    isFlag = false;
+                    return false;
+                }
+                var id = item.value.substring(0, item.value.indexOf('&'));
+                var name = item.value.substring(item.value.indexOf('&') + 1);
+                obj.stage = {"id": id, "name": name};
+            } else if (item.name === "type") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请确认是否漏选题型！");
+                    isFlag = false;
+                    return false;
+                }
+                var id = item.value.substring(0, item.value.indexOf('&'));
+                var name = item.value.substring(item.value.indexOf('&') + 1);
+                obj.type = {"id": id, "name": name};
+            } else if (item.name === "level") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请确认是否漏选题目难度！");
+                    isFlag = false;
+                    return false;
+                }
+                var id = item.value.substring(0, item.value.indexOf('&'));
+                var name = item.value.substring(item.value.indexOf('&') + 1);
+                obj.level = {"id": id, "name": name};
+            } else if (item.name === "number") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("请确认题目数量是否输入！");
+                    isFlag = false;
+                    return false;
+                } else {
+                    if (parseInt(item.value) <= 0) {
+                        hideLoading();
+                        alert("题目数量不能为0或负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                obj.number = parseInt(item.value);
+            } else if (item.name === "score") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("请确认题目分数是否输入！");
+                    isFlag = false;
+                    return false;
+                } else {
+                    if (parseInt(item.value) <= 0) {
+                        hideLoading();
+                        alert("题目分数不能为0或负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                obj.score = parseInt(item.value);
+                array.push(obj);
+                var newObj = {};
+                newObj.course = obj.course;
+                newObj.name = obj.name;
+                obj = newObj;
+            }
         });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
+        console.log(array);
+        console.log(JSON.stringify(array));
+        if (isFlag) {
+            $.ajax({
+                type: "post",
+                url: "[[@{/paper/autoGenerate}]]",
+                data: JSON.stringify(array),  //转为Json字符串
+                success: function (data, textStatus) {
+                    hideLoading();
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            getPaperList([[${pageInfo.getPageNum()}]], null);
+                        }
+                    }, 300);
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        } else {
+            hideLoading();
+        }
+    }
+
+    //在线录题生成试卷
+    function addOnlinePaper() {
+        var formArray = $("#new_topic_form").serializeArray();
+        console.log(formArray);
+    }
+
+    function getThisPaper(code) {
+        window.location.href = "[[@{/paper/paperInfo.html}]]" + "/" + code;
+    }
+
+    function delPaper(id, code) {
+        if (confirm("确定删除该试卷吗？")) {
+            $.post("[[@{/paper/delete}]]", {"paperId": id, "code": code}, function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    getPaperList([[${pageInfo.getPageNum()}]], null);
+                }
+            }, "json");
+        }
+    }
+
+    //根据学院异步获取专业、班级
+    $("#add_college").change(function () {
+        document.new_exam_form.major.length = 1;
+        document.new_exam_form.class.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/major/getMajorsByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_major").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+            $.post("[[@{/class/getClassesByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    //根据专业异步获取班级
+    $("#add_major").change(function () {
+        document.new_exam_form.class.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/class/getClassesByMid}]]", {"majorId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    function initExam(id,name,code){
+        document.new_exam_form.paperId.value=id;
+        document.new_exam_form.name.value=name;
+        document.new_exam_form.paperCode.value=code;
+    }
+
+    function generateExam(){
+        showLoading();
+        var formArray = $("#new_exam_form").serializeArray();
+        console.log(formArray);
+        var obj = {};
+        var isFlag = true;
+        $.each(formArray, function (i, item) {
+            if (item.name === "paperId") {
+                obj.paperId = item.value;
+            } else if (item.name === "paperCode") {
+                obj.code = item.value;
+            } else if (item.name === "college") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("请选择学院！");
+                    isFlag = false;
+                    return false;
+                }
+            } else if (item.name === "major") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("请选择专业！");
+                    isFlag = false;
+                    return false;
+                }
+            } else if (item.name === "class") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("请选择班级！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.classId = item.value;
+            } else if (item.name === "startTime") {
+                if(item.value===""){
+                    hideLoading();
+                    alert("请选择考试时间！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.start = new Date(item.value);
+            } else if (item.name === "timeLen") {
+                if(item.value===""){
+                    hideLoading();
+                    alert("请输入考试时长！");
+                    isFlag = false;
+                    return false;
+                }else {
+                    if (parseInt(item.value) <= 0) {
+                        hideLoading();
+                        alert("考试时长不能为0或负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                obj.time = parseInt(item.value);
+            } else if (item.name === "lateTime") {
+                if(item.value===""){
+                    obj.lateTime = item.value;
+                }else{
+                    if (parseInt(item.value) < 0) {
+                        hideLoading();
+                        alert("迟到时长不能为负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                    obj.lateTime = parseInt(item.value);
+                }
+            }
         });
-    })
+        console.log(obj);
+        console.log(JSON.stringify(obj));
+        if (isFlag) {
+            $.ajax({
+                type: "post",
+                url: "[[@{/exam/add}]]",
+                data: JSON.stringify(obj),  //转为Json字符串
+                success: function (data, textStatus) {
+                    hideLoading();
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            getPaperList([[${pageInfo.getPageNum()}]], null);
+                        }
+                    }, 300);
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        } else {
+            hideLoading();
+        }
+    }
+</script>
+<script th:inline="javascript">
+    var typeList = [
+        [# th:each="type:${typeList}"]
+    [[${type}]],
+        [/]
+        ];
+    var levelList = [
+        [# th:each="level:${levelList}"]
+    [[${level}]],
+        [/]
+        ];
+    var typeOption1 = "";
+    var levelOption1 = "";
+    for (var i = 0; i < [[${typeList.size()}]]; i++) {
+        typeOption1 += "<option value='" + typeList[i].id + "&" + typeList[i].name + "'>" + typeList[i].name + "</option>"
+    }
+    for (var j = 0; j < [[${levelList.size()}]]; j++) {
+        levelOption1 += "<option value='" + levelList[j].id + "&" + levelList[j].name + "'>" + levelList[j].name + "</option>"
+    }
+    var typeOption2 = "";
+    var levelOption2 = "";
+    for (var i = 0; i < [[${typeList.size()}]]; i++) {
+        typeOption2 += "<option value='" + typeList[i].id + "'>" + typeList[i].name + "</option>"
+    }
+    for (var j = 0; j < [[${levelList.size()}]]; j++) {
+        levelOption2 += "<option value='" + levelList[j].id + "'>" + levelList[j].name + "</option>"
+    }
+
+    function addTopic() {
+        $("#new_paper_form").append("<div class=\"new_paper_div\">\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <select class=\"form-select new_stageList\" name=\"stage\">\n" + $(".new_stageList:eq(0)").html() +
+            "                            </select>\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <select class=\"form-select\" name=\"type\">\n" +
+            "                                <option value=\"0\">请选择题目的题型</option>\n" + typeOption1 +
+            "                            </select>\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <select class=\"form-select\" name=\"level\">\n" +
+            "                                <option value=\"0\">请选择题目的难度</option>\n" + levelOption1 +
+            "                            </select>\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <input type=\"number\" class=\"form-control\" name=\"number\" placeholder=\"请输入题目数量\" style=\"width: 155px\">\n" +
+            "                        </div>\n" + "<div class=\"mb-3\" style=\"height: 38px;\">\n" +
+            "                            <input type=\"number\" class=\"form-control\" name=\"score\" placeholder=\"请输入题目分数\" style=\"width: 155px\">\n" +
+            "                            <a href=\"javascript:void(0)\" class='delTopic' onclick=\"delTopic(this)\" title='删除'>\n" +
+            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\" fill=\"#895251\" p-id=\"10603\"></path>\n" +
+            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\" fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\" fill=\"#808080\" p-id=\"10605\"></path>\n" +
+            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\" fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+            "                                </svg>\n" +
+            "                            </a>\n" +
+            "                        </div>" +
+            "                    </div>");
+    }
+
+    function addTopic2() {
+        $("#new_topic_form").append("<div class=\"topicDiv\">\n" +
+            "                        <div class=\"new_select_div\">\n" +
+            "                            <hr>\n" +
+            "                            <div class=\"mb-3\">\n" +
+            "                                <select class=\"form-select new_stageList2\" name=\"stage\">\n" + $(".new_stageList2:eq(0)").html() +
+            "                                </select>\n" +
+            "                            </div>\n" +
+            "                            <div class=\"mb-3\">\n" +
+            "                                <select class=\"form-select\" name=\"type\" onchange=\"changeTopicDiv(this)\">\n" +
+            "                                    <option value=\"0\">请选择题目的题型</option>\n" + typeOption2 +
+            "                                </select>\n" +
+            "                            </div>\n" +
+            "                            <div class=\"mb-3\">\n" +
+            "                                <select class=\"form-select\" name=\"level\">\n" +
+            "                                    <option value=\"0\">请选择题目的难度</option>\n" + levelOption2 +
+            "                                </select>\n" +
+            "                            </div>\n" +
+            "                            <div class=\"mb-3\">\n" +
+            "                                <input type=\"number\" class=\"form-control\" name=\"score\" placeholder=\"请输入本题目的分数\" style=\"width: 250px;\">\n" +
+            "                            </div>\n" +
+            "                            <a href=\"javascript:void(0)\" title=\"删除该题目\" onclick=\"dropTopicDiv(this)\">\n" +
+            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\" fill=\"#895251\" p-id=\"10603\"></path>\n" +
+            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\" fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\" fill=\"#808080\" p-id=\"10605\"></path>\n" +
+            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\" fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+            "                                </svg>\n" +
+            "                            </a>\n" +
+            "                        </div>\n" +
+            "                    </div>");
+    }
 </script>
 </body>
 

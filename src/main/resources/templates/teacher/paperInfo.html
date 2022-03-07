@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线考试云平台</title>
+    <link rel="icon" th:href="@{/images/logo.png}">
+    <!-- Bootstrap core CSS -->
+    <link type="text/css" th:href="@{/bootstrapv5/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/public.css}" rel="stylesheet">
+    <style>
+        .content .content-right .right-con .right-operation .title {
+            float: left;
+            margin-left: 40px;
+        }
+
+        .content .content-right .right-con .right-operation .title .title-con {
+            line-height: 70px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .right-list h5 {
+            display: inline-block;
+        }
+
+        .right-list .paperTopicDiv {
+            padding: 30px 15px 10px 15px;
+        }
+
+        .paperTopicDiv .topic {
+            margin-bottom: 45px;
+        }
+
+        .paperTopicDiv h6 {
+            font-weight: bold;
+        }
+
+        .paperTopicDiv .topic p {
+            font-size: 15px;
+        }
+
+        .mb-3obj {
+            display: inline-block;
+            width: 32.6%;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{common/tcommon::header}"></div>
+<div class="content">
+    <div th:replace="~{common/tcommon::sidebar(active='tmain3.html')}"></div>
+    <div class="content-right">
+        <div class="right-con">
+            <div class="right-con">
+                <div class="right-operation">
+                    <div class="title">
+                        <h5 class="title-con">试卷管理->试卷详情</h5>
+                    </div>
+                    <div class="btn-group" role="group" style="float: right;margin: 16px 40px 16px 0px;">
+                        <button class="btn btn-outline-secondary" type="button" title="点击生成考试" data-bs-toggle="modal"
+                                data-bs-target="#generateExamModal"
+                                th:onclick="initExam([[${topicList.get(0).getPaper().getId()}]],[[${topicList.get(0).getPaper().getName()}]],[[${topicList.get(0).getPaper().getCode()}]])">
+                            <svg t="1645557457286" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                 xmlns="http://www.w3.org/2000/svg" p-id="2111" width="16" height="16">
+                                <path d="M702.236444 14.222222a42.666667 42.666667 0 0 1 32.142223 14.677334l208.042666 238.933333a42.666667 42.666667 0 0 1 10.467556 27.989333V967.111111a42.666667 42.666667 0 0 1-42.666667 42.666667H113.777778A42.666667 42.666667 0 0 1 71.111111 967.111111V56.888889A42.666667 42.666667 0 0 1 113.777778 14.222222z m-72.647111 85.333334H156.444444v824.888888h711.111112V336.725333h-195.299556a42.666667 42.666667 0 0 1-42.268444-36.807111l-0.398223-5.802666V99.555556z m-157.013333 189.667555a42.666667 42.666667 0 0 1 77.368889 0l61.155555 131.925333 146.716445 16.611556a42.666667 42.666667 0 0 1 27.989333 69.745778l-4.209778 4.323555-108.373333 97.848889 29.240889 141.710222a42.666667 42.666667 0 0 1-57.173333 48.469334l-5.347556-2.56-128.739555-71.566222-128.625778 71.566222a42.666667 42.666667 0 0 1-63.374222-39.992889l0.796444-5.916445 29.184-141.710222-108.316444-97.848889a42.666667 42.666667 0 0 1 17.92-72.988444l5.916444-1.080889 146.602667-16.611556z m38.684444 119.352889l-32.597333 70.314667a42.666667 42.666667 0 0 1-33.905778 24.462222l-76.515555 8.590222 56.32 50.801778a42.666667 42.666667 0 0 1 13.937778 33.905778l-0.796445 6.371555-15.416889 74.524445 68.266667-37.944889a42.666667 42.666667 0 0 1 35.726222-2.616889l5.688889 2.616889 68.152889 37.888-15.36-74.524445a42.666667 42.666667 0 0 1 8.760889-35.555555l4.437333-4.664889L654.222222 512l-76.458666-8.647111a42.666667 42.666667 0 0 1-30.833778-18.887111l-3.072-5.518222-32.540445-70.314667z m203.662223-272.156444v114.972444h100.067555l-100.067555-114.972444z"
+                                      fill="#515151" p-id="2112"></path>
+                            </svg>
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" title="导出试卷至本地"
+                                th:onclick="toPage([[@{/paper/downPaper/}+${topicList.get(0).getPaper().getCode()}]])">
+                            <svg t="1646642628404" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                 xmlns="http://www.w3.org/2000/svg" p-id="2075" width="20" height="20">
+                                <path d="M293.632 645.248c91.456-86.784 183.552-220.544 346.88-211.584a20.8 20.8 0 0 1 20.224 20.8v59.392a21.376 21.376 0 0 0 34.432 16.64l211.2-171.2a21.376 21.376 0 0 0 0-33.28l-210.24-192a21.952 21.952 0 0 0-35.648 16.64v60.096a20.8 20.8 0 0 1-17.856 20.8c-280.704 61.76-351.36 391.104-348.992 413.696zM192 960a138.176 138.176 0 0 1-129.984-152.512L64 832V192a116.48 116.48 0 0 1 128-128c-108.8 1.024 256 0 256 0a28.224 28.224 0 0 1 29.76 27.84A35.968 35.968 0 0 1 448 128H192a53.12 53.12 0 0 0-64 64c1.536-37.504 0 640 0 640a52.8 52.8 0 0 0 64 64c49.536-0.448 640 0 640 0a52.48 52.48 0 0 0 64-64c-0.64 105.152 0-256 0-256a36.48 36.48 0 0 1 27.264-38.4A33.216 33.216 0 0 1 960 576v256a116.48 116.48 0 0 1-128 128c-50.56-0.448-640 0-640 0z"
+                                      p-id="2076"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <hr style="margin: 0">
+                <div class="right-list" style="padding: 20px 40px;">
+                    <div class="paperInfoDiv" style="text-align: center">
+                        <h5 style="float: left">试卷名称：<b>[[${topicList.get(0).getPaper().getName()}]]</b></h5>
+                        <h5>所属课程：<b>[[${topicList.get(0).getPaper().getCourse().getName()}]]</b></h5>
+                        <h5 style="float: right">总分：<b>[[${topicList.get(0).getPaper().getScore()}]]</b></h5>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(singleChoiceTopics)}" class="paperTopicDiv">
+                        <h6>单选题</h6>
+                        <div th:each="topic:${singleChoiceTopics}" class="topic">
+                            <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
+                            <p th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                               th:text="${opt}"></p>
+                            <p th:text="${'参考答案：'+topic.getTopic().getAnswer()}"></p>
+                            <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
+                            <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>
+                        </div>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(moreChoiceTopics)}" class="paperTopicDiv">
+                        <h6>多选题</h6>
+                        <div th:each="topic:${moreChoiceTopics}" class="topic">
+                            <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
+                            <p th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                               th:text="${opt}"></p>
+                            <p th:text="${'参考答案：'+topic.getTopic().getAnswer()}"></p>
+                            <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
+                            <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>
+                        </div>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(estimateTopics)}" class="paperTopicDiv">
+                        <h6>判断题</h6>
+                        <div th:each="topic:${estimateTopics}" class="topic">
+                            <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
+                            <p th:if="${topic.getTopic().getType().getName()=='判断题'&&topic.getTopic().getAnswer().equals('true')}">
+                                参考答案：
+                                <svg t="1646654981100" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                     xmlns="http://www.w3.org/2000/svg" p-id="792" width="20" height="20">
+                                    <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01" p-id="793"></path>
+                                    <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                          fill="#11AA66" p-id="794"></path>
+                                    <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                          fill="#11AA66" p-id="795"></path>
+                                    <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                          fill="#FFFFFF" p-id="796"></path>
+                                </svg>
+                            </p>
+                            <p th:if="${topic.getTopic().getType().getName()=='判断题'&&topic.getTopic().getAnswer().equals('false')}">
+                                参考答案：
+                                <svg t="1646655051238" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                     xmlns="http://www.w3.org/2000/svg" p-id="1026" width="20" height="20">
+                                    <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                          fill="#D33737" p-id="1027"></path>
+                                </svg>
+                            </p>
+                            <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
+                            <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>
+                        </div>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(fillEmptyTopics)}" class="paperTopicDiv">
+                        <h6>填空题</h6>
+                        <div th:each="topic:${fillEmptyTopics}" class="topic">
+                            <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
+                            <p th:each="answer:${#strings.listSplit(topic.getTopic().getAnswer(), '{{separator}}')}"
+                               th:text="${'参考答案：'+answer}"></p>
+                            <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
+                            <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>
+                        </div>
+                    </div>
+                    <div th:if="${not #lists.isEmpty(subjectiveTopics)}" class="paperTopicDiv">
+                        <h6>主观题</h6>
+                        <div th:each="topic:${subjectiveTopics}" class="topic">
+                            <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
+                            <p>参考答案：</p>
+                            <p th:text="${topic.getTopic().getAnswer()}"></p>
+                            <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
+                            <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--生成考试modal-->
+<div class="modal fade" id="generateExamModal" tabindex="-1" aria-labelledby="generateExamModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generateExamModalLabel">生成考试</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="new_exam_form" name="new_exam_form">
+                    <input type="hidden" name="paperId">
+                    <input type="hidden" name="paperCode">
+                    <div class="mb-3">
+                        <h6>考试名称:</h6>
+                        <input type="text" class="form-control" name="name" readonly disabled>
+                    </div>
+                    <h6>考试班级:</h6>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select" id="add_college" name="college">
+                            <option value="0">请选择学院</option>
+                            <option th:each="college:${collegeList}" th:text="${college.getName()}"
+                                    th:value="${college.getId()}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select" id="add_major" name="major">
+                            <option value="0">请选择专业</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 mb-3obj">
+                        <select class="form-select" id="add_class" name="class">
+                            <option value="0">请选择班级</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <h6>考试时间:</h6>
+                        <input class="form-control" type="datetime-local" name="startTime">
+                    </div>
+                    <div class="mb-3">
+                        <h6>考试时长:</h6>
+                        <input class="form-control" type="number" name="timeLen" placeholder="单位/分钟">
+                    </div>
+                    <div class="mb-3">
+                        <h6>允许迟到:</h6>
+                        <input class="form-control" type="number" name="lateTime" placeholder="单位/分钟（不填或为0则不做迟到限制）">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="generateExam()">生成考试</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    //根据学院异步获取专业、班级
+    $("#add_college").change(function () {
+        document.new_exam_form.major.length = 1;
+        document.new_exam_form.class.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/major/getMajorsByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_major").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+            $.post("[[@{/class/getClassesByCid}]]", {"collegeId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    //根据专业异步获取班级
+    $("#add_major").change(function () {
+        document.new_exam_form.class.length = 1;
+        if (this.value != 0) {
+            $.post("[[@{/class/getClassesByMid}]]", {"majorId": this.value}, function (d) {
+                for (var i = 0; i < d.data.length; i++) {
+                    $("#add_class").append("<option value='" + d.data[i].id + "'>" + d.data[i].name + "</option>");
+                }
+            });
+        }
+    });
+
+    function initExam(id, name, code) {
+        document.new_exam_form.paperId.value = id;
+        document.new_exam_form.name.value = name;
+        document.new_exam_form.paperCode.value = code;
+    }
+
+    function generateExam() {
+        showLoading();
+        var formArray = $("#new_exam_form").serializeArray();
+        console.log(formArray);
+        var obj = {};
+        var isFlag = true;
+        $.each(formArray, function (i, item) {
+            if (item.name === "paperId") {
+                obj.paperId = item.value;
+            } else if (item.name === "paperCode") {
+                obj.code = item.value;
+            } else if (item.name === "college") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请选择学院！");
+                    isFlag = false;
+                    return false;
+                }
+            } else if (item.name === "major") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请选择专业！");
+                    isFlag = false;
+                    return false;
+                }
+            } else if (item.name === "class") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请选择班级！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.classId = item.value;
+            } else if (item.name === "startTime") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("请选择考试时间！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.start = new Date(item.value);
+            } else if (item.name === "timeLen") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("请输入考试时长！");
+                    isFlag = false;
+                    return false;
+                } else {
+                    if (parseInt(item.value) <= 0) {
+                        hideLoading();
+                        alert("考试时长不能为0或负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                obj.time = parseInt(item.value);
+            } else if (item.name === "lateTime") {
+                if (item.value === "") {
+                    obj.lateTime = item.value;
+                } else {
+                    if (parseInt(item.value) < 0) {
+                        hideLoading();
+                        alert("迟到时长不能为负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                    obj.lateTime = parseInt(item.value);
+                }
+            }
+        });
+        console.log(obj);
+        console.log(JSON.stringify(obj));
+        if (isFlag) {
+            $.ajax({
+                type: "post",
+                url: "[[@{/exam/add}]]",
+                data: JSON.stringify(obj),  //转为Json字符串
+                success: function (data, textStatus) {
+                    hideLoading();
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            window.location.reload();
+                        }
+                    }, 300);
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        } else {
+            hideLoading();
+        }
+    }
+</script>
+</body>
+
+</html>
