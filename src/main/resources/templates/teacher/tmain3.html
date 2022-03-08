@@ -416,7 +416,12 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" onclick="addTopic2()">更多题目</button>
-                <button type="button" class="btn btn-primary" onclick="addOnlinePaper()">生成试卷</button>
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">生成试卷</button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addOnlinePaper(1)">生成试卷</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addOnlinePaper(2)">生成试卷并将题目导入题库</a></li>
+                </ul>
             </div>
         </div>
     </div>
@@ -979,9 +984,227 @@
     }
 
     //在线录题生成试卷
-    function addOnlinePaper() {
+    function addOnlinePaper(type) {
+        showLoading();
         var formArray = $("#new_topic_form").serializeArray();
         console.log(formArray);
+        var topicArray = [];
+        var topicObj = {};
+        var opts = "";
+        var dopts = "";
+        var optIndex = 65;
+        var isFlag = true;
+        $.each(formArray, function (i, item) {
+            if(item.name === "course"){
+                if (item.value === "") {
+                    hideLoading();
+                    alert("您未选择该试卷所属课程！");
+                    isFlag = false;
+                    return false;
+                }
+                var value = $('#new_courseListOptions2 [value="' + item.value + '"]').data('value');
+                var id = parseInt(value.substring(0, value.indexOf('&')));
+                topicObj.course = id;
+            }else if(item.name === "name"){
+                if ($.trim(item.value) === "") {
+                    hideLoading();
+                    alert("您未输入试卷名称！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.name = $.trim(item.value);
+            }else if (item.name === "stage") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("您有题目未选择阶段！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.stageId = item.value;
+            } else if (item.name === "type") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("您有题目未选择题型！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.typeId = item.value;
+            } else if (item.name === "level") {
+                if(item.value==="0"){
+                    hideLoading();
+                    alert("您有题目未选择难度！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.levelId = item.value;
+            } else if (item.name === "score") {
+                if (item.value === "") {
+                    hideLoading();
+                    alert("请确认每道题的分数是否输入完整！");
+                    isFlag = false;
+                    return false;
+                } else {
+                    if (parseInt(item.value) <= 0) {
+                        hideLoading();
+                        alert("题目分数不能为0或负数！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                topicObj.score = parseInt(item.value);
+            } else if (item.name === "single_choice_title") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有单选题未输入题目内容！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.title = $.trim(item.value);
+            } else if (item.name === "more_choice_title") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有多选题未输入题目内容！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.title = $.trim(item.value);
+            } else if (item.name === "estimate_title") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有判断题未输入题目内容！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.title = $.trim(item.value);
+                topicObj.estimate = true;
+            }  else if (item.name === "fillEmpty_title") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有填空题未输入题目内容！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.title = $.trim(item.value);
+            }  else if (item.name === "subjective_title") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有主观题未输入题目内容！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.title = $.trim(item.value);
+            } else if (item.name === "single_choice_opt") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有单选题未输入完整的选项内容！");
+                    isFlag = false;
+                    return false;
+                }
+                opts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{separator}}";
+                optIndex += 1;
+            } else if (item.name === "more_choice_opt") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有多选题未输入完整的选项内容！");
+                    isFlag = false;
+                    return false;
+                }
+                dopts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{separator}}";
+                optIndex += 1;
+            } else if (item.name === "single_choice_answer") {
+                topicObj.answer = item.value;
+            } else if (item.name === "more_choice_answer") {
+                if(topicObj.answer===undefined){
+                    topicObj.answer = item.value;
+                }else{
+                    topicObj.answer += item.value;
+                }
+            } else if (item.name === "estimate_answer") {
+                topicObj.answer = item.value;
+            } else if (item.name === "fillEmpty_answer") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有填空题未输入答案！");
+                    isFlag = false;
+                    return false;
+                }
+                if(topicObj.answer===undefined){
+                    topicObj.answer = $.trim(item.value)+"{{separator}}";
+                }else{
+                    topicObj.answer += $.trim(item.value)+"{{separator}}";
+                }
+            } else if (item.name === "subjective_answer") {
+                if($.trim(item.value)===""){
+                    hideLoading();
+                    alert("您有主观题未输入答案！");
+                    isFlag = false;
+                    return false;
+                }
+                topicObj.answer = $.trim(item.value);
+            }  else if(item.name === "analysis") {
+                if(opts!==""){
+                    if(topicObj.answer===undefined){
+                        hideLoading();
+                        alert("您有单选题未输入答案！");
+                        isFlag = false;
+                        return false;
+                    }
+                    topicObj.opts = opts;
+                    opts = "";
+                    optIndex = 65;
+                }
+                if(dopts!==""){
+                    if(topicObj.answer===undefined){
+                        hideLoading();
+                        alert("您有多选题未输入答案！");
+                        isFlag = false;
+                        return false;
+                    }
+                    topicObj.opts = dopts;
+                    dopts = "";
+                    optIndex = 65;
+                }
+                if(topicObj.estimate!==undefined){
+                    if(topicObj.answer===undefined){
+                        hideLoading();
+                        alert("您有判断题未输入答案！");
+                        isFlag = false;
+                        return false;
+                    }
+                }
+                topicObj.analysis = $.trim(item.value);
+                topicArray.push(topicObj);
+                topicObj = {};
+            }
+        });
+        console.log(topicArray);
+        console.log(JSON.stringify(topicArray));
+        if(isFlag){
+            var url = "";
+            if(type===1){
+                url = "[[@{/paper/manuallyGenerate}]]";
+            }else{
+                url = "[[@{/paper/manuallyGeneratePlus}]]";
+            }
+            $.ajax({
+                type: "post",
+                url: url,
+                data: JSON.stringify(topicArray),  //转为Json字符串
+                success: function (data, textStatus) {
+                    hideLoading();
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            getPaperList([[${pageInfo.getPageNum()}]], null);
+                        }
+                    }, 300);
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        }else{
+            hideLoading();
+        }
     }
 
     function getThisPaper(code) {
@@ -1041,6 +1264,8 @@
         console.log(formArray);
         var obj = {};
         var isFlag = true;
+        var timeLen;
+        var lateTime;
         $.each(formArray, function (i, item) {
             if (item.name === "paperId") {
                 obj.paperId = item.value;
@@ -1075,6 +1300,20 @@
                     isFlag = false;
                     return false;
                 }
+                var now = new Date();
+                var startTime = new Date(item.value);
+                if(startTime.getTime()<(now.getTime()+(5*60*1000)) && startTime.getTime()>(now.getTime()-(60000))){
+                    hideLoading();
+                    alert("考试时间太过匆忙，请重新选择时间！");
+                    isFlag = false;
+                    return false;
+                }
+                if(startTime.getTime()<(now.getTime()-(60000))){
+                    hideLoading();
+                    alert("考试时间输入有误！请确认！");
+                    isFlag = false;
+                    return false;
+                }
                 obj.start = new Date(item.value);
             } else if (item.name === "timeLen") {
                 if(item.value===""){
@@ -1102,6 +1341,12 @@
                         return false;
                     }
                     obj.lateTime = parseInt(item.value);
+                    if(obj.lateTime>=obj.time){
+                        hideLoading();
+                        alert("允许迟到时间不符合考试时长，请确认！");
+                        isFlag = false;
+                        return false;
+                    }
                 }
             }
         });

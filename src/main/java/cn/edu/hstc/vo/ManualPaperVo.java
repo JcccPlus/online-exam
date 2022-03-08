@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 public class ManualPaperVo extends Topic {
     @JsonProperty("course")
     private Integer courseId;
-    private Double score;
+    private String name;
 }

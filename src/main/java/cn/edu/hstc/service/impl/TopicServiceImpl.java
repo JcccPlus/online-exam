@@ -38,7 +38,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public boolean insertTopic(Topic topic) {
-        String code = ProjectUtil.getUuid().substring(0, 16);
+        String code = ProjectUtil.getUuid();
         Date date = DateUtils.getNowDate();
         //题目缓存
         TopicCopy topicCopy = new TopicCopy();

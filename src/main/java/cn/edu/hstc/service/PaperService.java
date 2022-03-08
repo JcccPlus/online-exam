@@ -20,7 +20,7 @@ public interface PaperService {
 
     AjaxResult autoGeneratePaper(List<AutomaticPaperVo> vos);
 
-    String downPaper(Paper paper);
+    AjaxResult downPaper(Paper paper);
 
-    AjaxResult manuallyGeneratePaper(List<ManualPaperVo> vos);
+    AjaxResult manuallyGeneratePaper(List<ManualPaperVo> vos, boolean isFlag);
 }

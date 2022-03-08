@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -163,5 +165,22 @@ public class OnlineExamApplicationTests {
         });*/
         System.out.println(topics);
         System.out.println(ServletUtils.getRequest().getServletContext().getRealPath("/exam"));
+        try {
+            System.out.println(ResourceUtils.getURL("classpath:/resources").getPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test11(){
+        String regex = "[{{][separator][}}]";
+        String str = "11{{separator}}22{{separator}}33{{separator}}";
+        String[] split = str.split(regex);
+        System.out.println(Arrays.toString(split));
+        StringTokenizer t = new StringTokenizer(str,"{{separator}}");
+        while(t.hasMoreElements()){
+            System.out.println(t.nextToken());
+        }
     }
 }
