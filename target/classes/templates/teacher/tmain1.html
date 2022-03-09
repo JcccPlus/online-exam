@@ -95,7 +95,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="course:${courseList}">
-                            <th scope="row" th:text="${course.id}"></th>
+                            <th scope="row" th:text="${pageInfo.startRow+courseStat.index}"></th>
                             <td th:text="${course.name}"></td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="First group">

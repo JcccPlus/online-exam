@@ -1,6 +1,7 @@
 package cn.edu.hstc.service.impl;
 
 import cn.edu.hstc.dao.StudentDao;
+import cn.edu.hstc.pojo.Exam;
 import cn.edu.hstc.pojo.Student;
 import cn.edu.hstc.service.StudentService;
 import cn.edu.hstc.util.ProjectUtil;
@@ -55,6 +56,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public boolean deleteStudent(Student student) {
         return studentDao.deleteStudent(student) > 0;
+    }
+
+    @Override
+    public List<Student> selectStudentsOfMissingExam(Exam exam) {
+        return studentDao.selectStudentsOfMissingExam(exam);
     }
 
 }

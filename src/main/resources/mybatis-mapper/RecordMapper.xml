@@ -41,7 +41,7 @@
         insert into tb_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="examId != null">xam_id,</if>
+            <if test="examId != null">exam_id,</if>
             <if test="stuId != null">stu_id,</if>
             <if test="point != null">point,</if>
             <if test="finishTime != null">finish_time,</if>

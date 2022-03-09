@@ -8,6 +8,7 @@ import cn.edu.hstc.framework.util.DateUtils;
 import cn.edu.hstc.framework.util.ServletUtils;
 import cn.edu.hstc.pojo.*;
 import cn.edu.hstc.service.AdminService;
+import cn.edu.hstc.service.ExamService;
 import cn.edu.hstc.util.ProjectUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,6 +87,7 @@ public class OnlineExamApplicationTests {
 
     @Autowired
     private ExamDao examDao;
+
     @Test
     public void test07() {
         Date date = new Date();
@@ -102,23 +104,23 @@ public class OnlineExamApplicationTests {
     }
 
     @Test
-    public void test08(){
+    public void test08() {
         String psw = "12345678a\\-[]啊";
         System.out.println(ProjectUtil.isRightPsw(psw));
     }
 
     @Test
-    public void test09(){
+    public void test09() {
         String psw = "1{{separator}}2{{separator}}3{{separator}}";
         String[] s = psw.split("_");
         System.out.println(Arrays.toString(s));
-        System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
-        System.out.println((psw.substring(0,psw.lastIndexOf("{{separator}}"))).substring(0,(psw.substring(0,psw.lastIndexOf("{{separator}}"))).lastIndexOf("{{separator}}")));
-        System.out.println(psw.substring(0,psw.lastIndexOf("{{separator}}")));
+        System.out.println(psw.substring(0, psw.lastIndexOf("{{separator}}")));
+        System.out.println((psw.substring(0, psw.lastIndexOf("{{separator}}"))).substring(0, (psw.substring(0, psw.lastIndexOf("{{separator}}"))).lastIndexOf("{{separator}}")));
+        System.out.println(psw.substring(0, psw.lastIndexOf("{{separator}}")));
     }
 
     @Test
-    public void test10(){
+    public void test10() {
         List<Topic> topics = new ArrayList<>();
         Topic topic1 = new Topic();
         topic1.setStageId(1);
@@ -173,14 +175,30 @@ public class OnlineExamApplicationTests {
     }
 
     @Test
-    public void test11(){
+    public void test11() {
         String regex = "[{{][separator][}}]";
         String str = "11{{separator}}22{{separator}}33{{separator}}";
         String[] split = str.split(regex);
         System.out.println(Arrays.toString(split));
-        StringTokenizer t = new StringTokenizer(str,"{{separator}}");
-        while(t.hasMoreElements()){
+        StringTokenizer t = new StringTokenizer(str, "{{separator}}");
+        while (t.hasMoreElements()) {
             System.out.println(t.nextToken());
+        }
+    }
+
+    @Autowired
+    ExamService examService;
+
+    @Test
+    public void test12() {
+        Exam exam = new Exam();
+        Paper paper = new Paper();
+        paper.setTeaId(3);
+        exam.setPaper(paper);
+        exam.setSearchValue("Java程序设计语言阿");
+        List<Exam> exams = examService.selectExamList(exam);
+        for (Exam exam1 : exams) {
+            System.out.println(exam1.toString());
         }
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.Cookie;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +37,15 @@ public class PaperController extends BaseController {
 
     @RequestMapping("/list.html")
     public String list(Paper paper, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
-        getRequest().setAttribute("orderBy", "id");
-        Teacher user = (Teacher) getSession().getAttribute("user");
+        getRequest().setAttribute("orderBy", "id desc");
+        Teacher user = null;
+        try {
+            user = (Teacher) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "无权限访问");
+            return "error/404";
+        }
         paper.setTeaId(user.getId());
         Course param = new Course();
         param.setTeaId(user.getId());
@@ -50,7 +56,7 @@ public class PaperController extends BaseController {
         model.addAttribute("typeList", types);
         model.addAttribute("levelList", levels);
         List<College> colleges = collegeService.selectCollegeList(new College());
-        model.addAttribute("collegeList",colleges);
+        model.addAttribute("collegeList", colleges);
         if (!ObjectUtils.isEmpty(searchValue)) {
             paper.setSearchValue(searchValue);
         }
@@ -85,10 +91,16 @@ public class PaperController extends BaseController {
         return paperService.autoGeneratePaper(vos);
     }
 
-    @PostMapping("manuallyGenerate")
+    @PostMapping("/manuallyGenerate")
     @ResponseBody
     public AjaxResult manuallyGeneratePaper(@RequestBody List<ManualPaperVo> vos) {
-        return paperService.manuallyGeneratePaper(vos);
+        return paperService.manuallyGeneratePaper(vos, false);
+    }
+
+    @PostMapping("/manuallyGeneratePlus")
+    @ResponseBody
+    public AjaxResult manuallyGeneratePlus(@RequestBody List<ManualPaperVo> vos) {
+        return paperService.manuallyGeneratePaper(vos, true);
     }
 
     @PostMapping("/edit")
@@ -125,18 +137,21 @@ public class PaperController extends BaseController {
         }
     }
 
-    @GetMapping("/paperInfo.html/{code}")
+    @GetMapping("/list.html/{code}")
     public String toPaperInfoHtml(@PathVariable(value = "code", required = true) String code, Model model) {
         Paper param = new Paper();
         param.setCode(code);
-        try{
+        try {
             Teacher teacher = (Teacher) getSession().getAttribute("user");
             param.setTeaId(teacher.getId());
-        }catch (Exception e){
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
         List<Paper> papers = paperService.selectPaperList(param);
         if (papers.isEmpty()) {
+            model.addAttribute("msg", "数据异常");
             return "error/404";
         }
         TopicOfPaper topicOfPaper = new TopicOfPaper();
@@ -173,24 +188,51 @@ public class PaperController extends BaseController {
         model.addAttribute("fillEmptyTopics", fillEmptyTopics);
         model.addAttribute("subjectiveTopics", subjectiveTopics);
         List<College> colleges = collegeService.selectCollegeList(new College());
-        model.addAttribute("collegeList",colleges);
+        model.addAttribute("collegeList", colleges);
         return "teacher/paperInfo";
     }
 
-    @GetMapping("/downPaper/{code}")
-    public String downPaper(@PathVariable(value = "code", required = true) String code){
+    /*@GetMapping("/downPaper/{code}")
+    @ResponseBody
+    public AjaxResult downPaper(@PathVariable(value = "code", required = true) String code){
         Paper param = new Paper();
         param.setCode(code);
         try{
             Teacher teacher = (Teacher) getSession().getAttribute("user");
             param.setTeaId(teacher.getId());
         }catch (Exception e){
+            return error("无权限访问");
+        }
+        List<Paper> papers = paperService.selectPaperList(param);
+        if (papers.isEmpty()) {
+            return error("数据异常");
+        }
+        return paperService.downPaper(papers.get(0));
+    }*/
+
+    @GetMapping("/downPaper/{code}")
+    public String downPaper(@PathVariable(value = "code", required = true) String code, Model model) {
+        Paper param = new Paper();
+        param.setCode(code);
+        try {
+            Teacher teacher = (Teacher) getSession().getAttribute("user");
+            param.setTeaId(teacher.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "无权限访问");
             return "error/404";
         }
         List<Paper> papers = paperService.selectPaperList(param);
         if (papers.isEmpty()) {
+            model.addAttribute("msg", "数据异常");
             return "error/404";
         }
-        return paperService.downPaper(papers.get(0));
+        AjaxResult ajaxResult = paperService.downPaper(papers.get(0));
+        Object msg = ajaxResult.get("msg");
+        if (msg.equals("程序异常")) {
+            model.addAttribute("msg", "程序异常");
+            return "error/404";
+        }
+        return "redirect:/paper/paperInfo.html/" + code;
     }
 }

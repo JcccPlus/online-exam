@@ -37,7 +37,7 @@ public class PaperController extends BaseController {
 
     @RequestMapping("/list.html")
     public String list(Paper paper, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
-        getRequest().setAttribute("orderBy", "id");
+        getRequest().setAttribute("orderBy", "id desc");
         Teacher user = null;
         try {
             user = (Teacher) getSession().getAttribute("user");
@@ -137,7 +137,7 @@ public class PaperController extends BaseController {
         }
     }
 
-    @GetMapping("/paperInfo.html/{code}")
+    @GetMapping("/list.html/{code}")
     public String toPaperInfoHtml(@PathVariable(value = "code", required = true) String code, Model model) {
         Paper param = new Paper();
         param.setCode(code);
@@ -146,7 +146,7 @@ public class PaperController extends BaseController {
             param.setTeaId(teacher.getId());
         } catch (ClassCastException e) {
             e.printStackTrace();
-            model.addAttribute("msg", "无权限访问");
+            model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
         List<Paper> papers = paperService.selectPaperList(param);

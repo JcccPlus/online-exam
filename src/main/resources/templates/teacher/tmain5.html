@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .menu {
             float: left;
@@ -219,16 +218,8 @@
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    });
-
     $(document).ready(function () {
         $(".menu").hover(
             function () {

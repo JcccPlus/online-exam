@@ -154,7 +154,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="topic:${topicList}">
-                            <th scope="row" th:text="${topic.getId()}"></th>
+                            <th scope="row" th:text="${pageInfo.startRow+topicStat.index}"></th>
                             <td th:text="${#strings.abbreviate(topic.getTitle(),20)}"></td>
                             <td th:text="${topic.getType().getName()}"></td>
                             <td th:text="${topic.getLevel().getName()}"></td>

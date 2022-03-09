@@ -209,6 +209,22 @@ body {
     height: 25px;
 }
 
+.content .content-right .right-con .right-list th {
+    text-align: center;
+}
+
+.content .content-right .right-con .right-list td {
+    text-align: center;
+}
+
+.content .content-right .right-con .right-list tbody th {
+    line-height: 36px;
+}
+
+.content .content-right .right-con .right-list tbody td {
+    line-height: 36px;
+}
+
 .shadow {
     box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, .15) !important;
 }

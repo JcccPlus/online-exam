@@ -24,18 +24,23 @@
     </resultMap>
 
     <select id="selectExamList" parameterType="Exam" resultMap="ExamResult">
-        select * from tb_exam
-        <where>
-            <if test="id != null">and id = #{id}</if>
-            <if test="start != null">and start = #{start}</if>
-            <if test="time != null">and time = #{time}</if>
-            <if test="end != null">and end = #{end}</if>
-            <if test="score != null">and score = #{score}</if>
-            <if test="lateTime != null">and late_time = #{lateTime}</if>
-            <if test="code != null and code != ''">and code = #{code}</if>
-            <if test="paperId != null">and paper_id = #{paperId}</if>
-            <if test="classId != null">and class_id = #{classId}</if>
-        </where>
+        select exam.* from tb_exam exam,tb_paper paper,tb_class class,tb_course course where exam.paper_id = paper.id
+        and
+        exam.class_id = class.id and paper.course_id = course.id
+        <if test="id != null">and exam.id = #{id}</if>
+        <if test="start != null">and exam.start = #{start}</if>
+        <if test="time != null">and exam.time = #{time}</if>
+        <if test="end != null">and exam.end = #{end}</if>
+        <if test="score != null">and exam.score = #{score}</if>
+        <if test="lateTime != null">and exam.late_time = #{lateTime}</if>
+        <if test="code != null and code != ''">and exam.code = #{code}</if>
+        <if test="paperId != null">and exam.paper_id = #{paperId}</if>
+        <if test="classId != null">and exam.class_id = #{classId}</if>
+        <if test="paper != null and paper.teaId != null">and paper.tea_id = #{paper.teaId}</if>
+        <if test="searchValue != null and searchValue != '' and classId == null">and (class.name like "%${searchValue}%" or course.name like
+            "%${searchValue}%")
+        </if>
+        <if test="searchValue != null and searchValue != '' and classId != null">and exam.name like "%${searchValue}%"</if>
     </select>
 
     <select id="selectExamById" parameterType="int" resultMap="ExamResult">

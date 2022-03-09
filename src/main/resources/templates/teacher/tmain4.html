@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -22,6 +21,11 @@
             line-height: 70px;
             margin: 0;
             cursor: pointer;
+        }
+
+        .page-link {
+            padding: 0.3rem 2rem;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -38,9 +42,10 @@
                         <h5 class="title-con">考试列表</h5>
                     </div>
                     <div class="input-group mb-3" style="width:250px;float: right;right: 45px;top:17px;">
-                        <input type="text" class="form-control" placeholder="课程名/试卷名" aria-label="Recipient's username"
-                               aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                        <input type="text" class="form-control" placeholder="班级名/课程名" aria-label="Recipient's username"
+                               aria-describedby="button-addon2" th:value="${searchValue}" id="searchValue">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" title="搜索"
+                                onclick="getExamList(null,this)">
                             <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                  xmlns="http://www.w3.org/2000/svg" p-id="3506"
                                  width="16" height="16">
@@ -52,54 +57,47 @@
                 </div>
                 <hr style="margin: 0">
                 <div class="right-list" style="padding: 0px 40px;">
-                    <!--<div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 340px"
-                         th:if="${#lists.isEmpty(courseList)}">暂无相关课程数据，请<a href="" data-bs-toggle="modal"
-                                                                       data-bs-target="#addModal"
-                                                                       style="color: #53a4f4; text-decoration: none">点击</a>添加...
-                    </div>-->
-                    <table class="table table-hover">
+                    <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 431px"
+                         th:if="${#lists.isEmpty(examList)}">暂无相关考试数据，请前往试卷管理生成...
+                    </div>
+                    <table class="table table-hover" th:if="${not #lists.isEmpty(examList)}">
+                        <caption>
+                            共 [[${pageInfo.getPages()}]] 页 [[${pageInfo.getTotal()}]] 条数据，当前为第
+                            [[${pageInfo.getPageNum()}]]
+                            页
+                        </caption>
                         <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">名称</th>
+                            <th scope="col">试卷名称</th>
+                            <th scope="col">考试时间</th>
+                            <th scope="col">截止时间</th>
+                            <th scope="col">允许迟到</th>
+                            <th scope="col">考试班级</th>
+                            <th scope="col">所属课程</th>
                             <th scope="col">操作</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>1</td>
+                        <tr th:each="exam:${examList}">
+                            <th scope="row" th:text="${pageInfo.startRow+examStat.index}"></th>
+                            <td th:text="${exam.paper.name}"></td>
+                            <td th:text="${#dates.format(exam.start,'yyyy-MM-dd HH:mm:ss')}"></td>
+                            <td th:text="${#dates.format(exam.end,'yyyy-MM-dd HH:mm:ss')}"></td>
+                            <td th:text="${exam.lateTime==0||exam.lateTime==null?'无限制':(exam.lateTime+'分钟')}"></td>
+                            <td th:text="${exam.classes.name}"></td>
+                            <td th:text="${exam.paper.course.name}"></td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="First group">
-                                    <button class="btn btn-outline-secondary" title="查看详情" data-bs-toggle="modal"
+                                    <button class="btn btn-outline-secondary" title="查看考试详情及学生成绩" data-bs-toggle="modal"
                                             data-bs-target="#getModal"
-                                            onclick="getThisCourse()">
-                                        <svg t="1645547346995" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                             xmlns="http://www.w3.org/2000/svg" p-id="3000" width="17" height="21">
-                                            <path d="M262.4 288m-57.6 0a57.6 57.6 0 1 0 115.2 0 57.6 57.6 0 1 0-115.2 0Z"
-                                                  p-id="3001"></path>
-                                            <path d="M262.4 518.4m-57.6 0a57.6 57.6 0 1 0 115.2 0 57.6 57.6 0 1 0-115.2 0Z"
-                                                  p-id="3002"></path>
-                                            <path d="M262.4 748.8m-57.6 0a57.6 57.6 0 1 0 115.2 0 57.6 57.6 0 1 0-115.2 0Z"
-                                                  p-id="3003"></path>
-                                            <path d="M790.656 249.6a38.4 38.4 0 0 1 3.6864 76.6208l-3.6864 0.1792h-378.112a38.4 38.4 0 0 1-3.6864-76.6208l3.6864-0.1792h378.112zM790.656 480a38.4 38.4 0 0 1 3.6864 76.6208l-3.6864 0.1792h-378.112a38.4 38.4 0 0 1-3.6864-76.6208l3.6864-0.1792h378.112zM790.656 710.4a38.4 38.4 0 0 1 3.6864 76.6208l-3.6864 0.1792h-378.112a38.4 38.4 0 0 1-3.6864-76.6208l3.6864-0.1792h378.112z"
-                                                  p-id="3004"></path>
-                                        </svg>
-                                    </button>
-                                    <button class="btn btn-outline-secondary" title="编辑" data-bs-toggle="modal"
-                                            data-bs-target="#editModal"
-                                            onclick="getEditCourse()">
-                                        <svg t="1643124454553" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                             xmlns="http://www.w3.org/2000/svg" p-id="4042"
-                                             width="16" height="16">
-                                            <path d="M76.094377 995.097685c-8.806174 0-17.612348-3.612789-23.93473-9.935171a34.547299 34.547299 0 0 1-9.709371-27.32172l26.192723-267.120618c0.451599-43.579272 18.515546-86.029548 49.450055-116.738258L544.176406 151.285557c13.322161-13.096362 34.547299-13.096362 47.869459 0l296.926131 296.92613a33.847321 33.847321 0 0 1 0 47.86946l-426.76075 423.373759a165.917354 165.917354 0 0 1-115.835061 48.546858l-266.894818 27.095921h-3.38699zM567.885336 223.089746L165.736714 622.077178c-18.741345 18.515546-29.353914 44.25667-29.353914 70.449393 0 1.128997 0 2.257993-0.225799 3.38699l-22.128335 227.379934 227.379934-23.031532c1.128997-0.225799 2.257993-0.225799 3.38699-0.2258 26.418523 0 51.25645-10.16097 69.997795-28.902315L817.167806 471.920617 567.885336 223.089746zM102.5129 692.526571z"
-                                                  fill="#2c2c2c" p-id="4043"></path>
-                                            <path d="M865.037266 506.016318c-9.031974 0-17.612348-3.612789-23.93473-9.935171L544.402205 199.606615a33.644101 33.644101 0 0 1 0-47.86946l93.480926-93.480926a98.267872 98.267872 0 0 1 138.640794 0l204.122602 204.122602c18.967144 18.967144 29.579713 44.25667 29.579713 71.126792s-10.38677 52.159647-29.579713 71.126792l-91.448732 91.448732c-6.548181 6.322381-15.354355 9.935171-24.160529 9.935171zM616.206395 175.671885L864.811466 424.276957l67.514003-67.514002c6.322381-6.322381 9.709372-14.451158 9.709371-23.257332s-3.38699-16.93495-9.709371-23.257332L728.428666 106.125689a30.257111 30.257111 0 0 0-42.676075 0l-69.546196 69.546196z"
-                                                  fill="#2c2c2c" p-id="4044"></path>
+                                            th:onclick="toPage([[@{/exam/list.html/}+${exam.code}]])">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-justify" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
                                         </svg>
                                     </button>
                                     <button class="btn btn-outline-secondary" title="删除"
-                                            onclick="delCourse()">
+                                            th:onclick="delExam([[${exam.id}]],[[${exam.code}]])">
                                         <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                              width="16" height="16">
@@ -116,92 +114,57 @@
                         </tr>
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation example" th:if="${not #lists.isEmpty(examList)}">
+                        <ul class="pagination justify-content-center" style="margin: 0;">
+                            <li th:class="${pageInfo.isHasPreviousPage()?'page-item':'page-item disabled'}"
+                                th:onclick="getExamList([[${pageInfo.getPrePage()}]],this)">
+                                <a class="page-link" href="#">&laquo;</a>
+                            </li>
+                            <li th:class="${pageInfo.isFirstPage?'page-item disabled':'page-item'}"
+                                th:onclick="getExamList([[${pageInfo.getFirstPage()}]],this)">
+                                <a class="page-link" href="#">首页</a>
+                            </li>
+                            <li th:class="${pageInfo.isLastPage?'page-item disabled':'page-item'}"
+                                th:onclick="getExamList([[${pageInfo.getLastPage()}]],this)">
+                                <a class="page-link" href="#">末页</a>
+                            </li>
+                            <li th:class="${pageInfo.isHasNextPage()?'page-item':'page-item disabled'}"
+                                th:onclick="getExamList([[${pageInfo.getNextPage()}]],this)">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- 查看详情Modal -->
-<div class="modal fade" id="getModal" tabindex="-1" aria-labelledby="getModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="getModalLabel">课程详情</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- 添加Modal -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">添加课程</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="new_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="add_name" placeholder="请输入学院名称">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="addCollege()">添加</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- 更新考试Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">编辑课程信息</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit_course_form">
-                    <div class="div">
-                        <label class="div1">课程名称</label>
-                        <div class="div2">
-                            <input type="hidden" id="edit_id" name="id">
-                            <input type="text" id="edit_name" class="form-control" name="name"
-                                   placeholder="请输入学院名称">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="editCollege()">更新</button>
             </div>
         </div>
     </div>
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
+    function getExamList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/exam/search}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/exam/search}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
+
+    function delExam(id, code) {
+        if (confirm("确定取消该考试吗？")) {
+            $.post("[[@{/exam/delete}]]", {"examId": id, "code": code}, function (data) {
+                if (data.code === 0) {
+                    getExamList([[${pageInfo.getPageNum()}]], null);
+                }else{
+                    alert(data.msg);
+                }
+            }, "json");
+        }
+    }
 </script>
 </body>
 

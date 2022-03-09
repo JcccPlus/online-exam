@@ -166,7 +166,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="paper:${paperList}">
-                            <th scope="row" th:text="${paper.id}"></th>
+                            <th scope="row" th:text="${pageInfo.startRow+paperStat.index}"></th>
                             <td th:text="${paper.name}"></td>
                             <td th:text="${paper.score}"></td>
                             <td th:text="${paper.course.name}"></td>
@@ -1208,7 +1208,7 @@
     }
 
     function getThisPaper(code) {
-        window.location.href = "[[@{/paper/paperInfo.html}]]" + "/" + code;
+        window.location.href = "[[@{/paper/list.html}]]" + "/" + code;
     }
 
     function delPaper(id, code) {
