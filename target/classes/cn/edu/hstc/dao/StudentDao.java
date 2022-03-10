@@ -1,5 +1,6 @@
 package cn.edu.hstc.dao;
 
+import cn.edu.hstc.pojo.Exam;
 import cn.edu.hstc.pojo.Student;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,5 +21,10 @@ public interface StudentDao {
     int updateStudent(Student student);
 
     int deleteStudent(Student student);
+
+    /**
+     * 查找某个考试缺考的学生
+     */
+    List<Student> selectStudentsOfMissingExam(Exam exam);
 
 }

@@ -97,4 +97,8 @@
         where id = #{id} and code = #{code}
     </delete>
 
+    <select id="selectStudentsOfMissingExam" parameterType="Exam" resultMap="StudentResult">
+        select * from tb_student s where s.class_id = #{classId} and NOT EXISTS(select 1 from tb_record r where r.stu_id=s.id and r.exam_id = #{id})
+    </select>
+
 </mapper>

@@ -201,12 +201,30 @@ body {
 }
 
 .content .content-right .right-con .right-list .row .col {
-    margin-bottom: 10px;
-    width: 280px;
+    /*margin-bottom: 10px;
+    width: 280px;*/
+    margin: 0 auto;
+    width: auto;
 }
 
 .content .content-right .right-con .right-list .row .col li {
     height: 25px;
+}
+
+.content .content-right .right-con .right-list th {
+    text-align: center;
+}
+
+.content .content-right .right-con .right-list td {
+    text-align: center;
+}
+
+.content .content-right .right-con .right-list tbody th {
+    line-height: 36px;
+}
+
+.content .content-right .right-con .right-list tbody td {
+    line-height: 36px;
 }
 
 .shadow {

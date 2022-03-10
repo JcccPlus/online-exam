@@ -35,4 +35,8 @@ public class BaseEntity {
      * 备注
      */
     private String remark;
+    /**
+     * 排序
+     */
+    private String orderBy;
 }

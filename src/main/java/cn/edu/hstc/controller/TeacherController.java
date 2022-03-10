@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
@@ -91,11 +92,19 @@ public class TeacherController extends BaseController {
     }
 
     @RequestMapping("/self.html")
-    public String self() {
+    public String self(Model model) {
+        Teacher currentTeacher = null;
+        try{
+            currentTeacher = (Teacher) getSession().getAttribute("user");
+        }catch (ClassCastException e){
+            e.printStackTrace();
+            model.addAttribute("无访问权限");
+            return "error/404";
+        }
         return "teacher/tmain5";
     }
 
-    @RequestMapping("/updateSex")
+    @PostMapping("/updateSex")
     @ResponseBody
     public AjaxResult updateSex(Integer user_id, String user_code, String user_gender) {
         if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
@@ -119,7 +128,7 @@ public class TeacherController extends BaseController {
         return error();
     }
 
-    @RequestMapping("/updatePhone")
+    @PostMapping("/updatePhone")
     @ResponseBody
     public AjaxResult updatePhone(Integer user_id, String user_code, String user_phone) {
         if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
@@ -144,7 +153,7 @@ public class TeacherController extends BaseController {
         return error();
     }
 
-    @RequestMapping("/updatePsw")
+    @PostMapping("/updatePsw")
     @ResponseBody
     public AjaxResult updatePsw(Integer user_id, String user_code, String oldPsw, String newPsw, String confirmPsw) {
         if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
@@ -187,5 +196,21 @@ public class TeacherController extends BaseController {
             return success("密码修改成功");
         }
         return error();
+    }
+
+    @PostMapping("/updateHeadPic")
+    @ResponseBody
+    public AjaxResult updateHeadPic(@RequestParam("headPicFile") MultipartFile file) {
+        if (ObjectUtils.isEmpty(file)) {
+            return error("数据异常");
+        }
+        Teacher currentTeacher = null;
+        try {
+            currentTeacher = (Teacher) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return error("无访问权限");
+        }
+        return teacherService.updateHeadPic(currentTeacher, file);
     }
 }

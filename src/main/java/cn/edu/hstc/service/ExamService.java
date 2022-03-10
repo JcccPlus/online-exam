@@ -14,4 +14,9 @@ public interface ExamService {
     boolean updateExam(Exam exam);
 
     boolean deleteExam(Exam exam);
+
+    /**
+     * 查找某个班级下，指定学生未考的考试
+     */
+    List<Exam> selectCurrentExam(Exam exam, Integer stuId);
 }

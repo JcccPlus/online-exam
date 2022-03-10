@@ -1,6 +1,8 @@
 package cn.edu.hstc.service;
 
+import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.Teacher;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,5 +19,7 @@ public interface TeacherService {
     boolean updateTeacher(Teacher teacher);
 
     boolean deleteTeacher(Teacher teacher);
+
+    AjaxResult updateHeadPic(Teacher teacher, MultipartFile file);
 
 }

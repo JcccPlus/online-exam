@@ -69,4 +69,9 @@ public class RecordServiceImpl implements RecordService {
         }
         return true;
     }
+
+    @Override
+    public List<Record> selectStudentRecordList(Record record) {
+        return recordDao.selectStudentRecordList(record);
+    }
 }

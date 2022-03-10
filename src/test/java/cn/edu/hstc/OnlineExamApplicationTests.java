@@ -201,4 +201,15 @@ public class OnlineExamApplicationTests {
             System.out.println(exam1.toString());
         }
     }
+
+    @Test
+    public void test13() {
+        Exam exam = new Exam();
+        exam.setClassId(3);
+        exam.setSearchValue("Java");
+        List<Exam> exams = examService.selectCurrentExam(exam,1);
+        for (Exam exam1 : exams) {
+            System.out.println(exam1.toString());
+        }
+    }
 }

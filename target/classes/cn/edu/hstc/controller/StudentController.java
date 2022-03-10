@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -88,15 +89,27 @@ public class StudentController extends BaseController {
     }
 
     @RequestMapping("/self.html")
-    public String self(Student student) {
+    public String self(Model model) {
+        Student currentStudent = null;
+        try{
+            currentStudent = (Student) getSession().getAttribute("user");
+        }catch (ClassCastException e){
+            e.printStackTrace();
+            model.addAttribute("无访问权限");
+            return "error/404";
+        }
         return "student/smain3";
     }
 
     @RequestMapping("/updateSex")
     @ResponseBody
-    public AjaxResult updateSex(Integer user_id, String user_code, String user_gender) {
-        if(ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)){
-            return error("系统错误，请稍后重试");
+    public AjaxResult updateSex(String user_gender) {
+        Student currentStudent = null;
+        try{
+            currentStudent = (Student) getSession().getAttribute("user");
+        }catch (ClassCastException e){
+            e.printStackTrace();
+            return error("无访问权限");
         }
         if (ObjectUtils.isEmpty(user_gender)) {
             return error();
@@ -105,11 +118,11 @@ public class StudentController extends BaseController {
             return error();
         }
         Student student = new Student();
-        student.setId(user_id);
-        student.setCode(user_code);
+        student.setId(currentStudent.getId());
+        student.setCode(currentStudent.getCode());
         student.setGender(user_gender);
         if (studentService.updateStudent(student)) {
-            Student currentStudent = studentService.selectStudentById(user_id);
+            currentStudent.setGender(user_gender);
             getSession().setAttribute("user", currentStudent);
             return success("性别修改成功");
         }
@@ -118,9 +131,13 @@ public class StudentController extends BaseController {
 
     @RequestMapping("/updatePhone")
     @ResponseBody
-    public AjaxResult updatePhone(Integer user_id, String user_code, String user_phone) {
-        if(ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)){
-            return error("系统错误，请稍后重试");
+    public AjaxResult updatePhone(String user_phone) {
+        Student currentStudent = null;
+        try{
+            currentStudent = (Student) getSession().getAttribute("user");
+        }catch (ClassCastException e){
+            e.printStackTrace();
+            return error("无访问权限");
         }
         if (ObjectUtils.isEmpty(user_phone)) {
             return error("请输入手机号码");
@@ -130,11 +147,11 @@ public class StudentController extends BaseController {
             }
         }
         Student student = new Student();
-        student.setId(user_id);
-        student.setCode(user_code);
+        student.setId(currentStudent.getId());
+        student.setCode(currentStudent.getCode());
         student.setPhone(user_phone);
         if (studentService.updateStudent(student)) {
-            Student currentStudent = studentService.selectStudentById(user_id);
+            currentStudent.setPhone(user_phone);
             getSession().setAttribute("user", currentStudent);
             return success("手机号码更新成功");
         }
@@ -143,9 +160,13 @@ public class StudentController extends BaseController {
 
     @RequestMapping("/updatePsw")
     @ResponseBody
-    public AjaxResult updatePsw(Integer user_id, String user_code, String oldPsw, String newPsw, String confirmPsw) {
-        if(ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)){
-            return error("系统错误，请稍后重试");
+    public AjaxResult updatePsw(String oldPsw, String newPsw, String confirmPsw) {
+        Student currentStudent = null;
+        try{
+            currentStudent = (Student) getSession().getAttribute("user");
+        }catch (ClassCastException e){
+            e.printStackTrace();
+            return error("无访问权限");
         }
         if (ObjectUtils.isEmpty(oldPsw)) {
             return error("请输入旧密码");
@@ -167,12 +188,30 @@ public class StudentController extends BaseController {
             }
         }
         Student student = new Student();
-        student.setId(user_id);
-        student.setCode(user_code);
+        student.setId(currentStudent.getId());
+        student.setCode(currentStudent.getCode());
         student.setPassword(newPsw);
         if (studentService.updateStudent(student)) {
+            currentStudent.setPassword(newPsw);
+            getSession().setAttribute("user", currentStudent);
             return success("密码修改成功");
         }
         return error("系统错误，修改失败");
+    }
+
+    @PostMapping("/updateHeadPic")
+    @ResponseBody
+    public AjaxResult updateHeadPic(@RequestParam("headPicFile") MultipartFile file) {
+        if (ObjectUtils.isEmpty(file)) {
+            return error("数据异常");
+        }
+        Student currentStudent = null;
+        try {
+            currentStudent = (Student) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return error("无访问权限");
+        }
+        return studentService.updateHeadPic(currentStudent, file);
     }
 }

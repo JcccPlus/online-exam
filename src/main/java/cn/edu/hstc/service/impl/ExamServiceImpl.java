@@ -50,4 +50,9 @@ public class ExamServiceImpl implements ExamService {
         return examDao.deleteExam(exam) > 0;
     }
 
+    @Override
+    public List<Exam> selectCurrentExam(Exam exam, Integer stuId) {
+        return examDao.selectCurrentExam(exam, stuId);
+    }
+
 }

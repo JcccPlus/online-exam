@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -22,6 +21,14 @@
             line-height: 70px;
             margin: 0;
             cursor: pointer;
+        }
+
+        .empty-message {
+            color: #b2b2b2;
+            margin: 55px auto;
+            font-size: 23px;
+            width: 340px;
+            text-align: center;
         }
     </style>
 </head>
@@ -36,121 +43,175 @@
                 <div class="title">
                     <h5 class="title-con">当前考试列表</h5>
                 </div>
-                <div class="input-group mb-3" style="width:250px;float: right;right: 45px;top:17px;">
-                    <input type="text" class="form-control" placeholder="搜索当前考试" aria-label="Recipient's username"
-                           aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
-                        <svg t="1642870685872" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                             xmlns="http://www.w3.org/2000/svg" p-id="3506"
-                             width="16" height="16">
-                            <path d="M976.948381 946.888761 749.532905 719.473285c28.916587-32.756031 52.169173-69.64622 69.236897-109.999276 21.116947-49.925063 31.823799-102.94358 31.823799-157.581991s-10.706853-107.657952-31.823799-157.581991c-20.390399-48.208978-49.575092-91.498924-86.745666-128.668475s-80.46052-66.355267-128.668475-86.745666C553.430598 57.778938 500.413104 47.072085 445.773669 47.072085c-54.639434 0-107.657952 10.706853-157.581991 31.823799-48.207955 20.390399-91.498924 49.576115-128.668475 86.745666-37.169551 37.169551-66.355267 80.459496-86.745666 128.668475C51.66059 344.234065 40.953737 397.252583 40.953737 451.892017S51.66059 559.548946 72.777537 609.474009c20.390399 48.207955 49.576115 91.498924 86.745666 128.668475 37.169551 37.169551 80.46052 66.35629 128.668475 86.74669 49.925063 21.116947 102.94358 31.823799 157.581991 31.823799 54.639434 0 107.657952-10.706853 157.583015-31.823799 40.352033-17.067724 77.242222-40.320311 109.998253-69.236897l227.415476 227.415476c4.995781 4.995781 11.541871 7.492648 18.090007 7.492648s13.094226-2.496867 18.090007-7.492648C986.938919 973.07619 986.938919 956.878277 976.948381 946.888761zM445.773669 805.546639c-94.464465 0-183.275163-36.786835-250.071476-103.58417-66.796312-66.795289-103.583147-155.605987-103.583147-250.071476 0-94.464465 36.786835-183.275163 103.583147-250.071476 66.796312-66.796312 155.60701-103.583147 250.071476-103.583147s183.275163 36.786835 250.071476 103.583147c66.796312 66.796312 103.583147 155.60701 103.583147 250.071476 0 92.640933-35.400255 179.829691-99.768261 246.163469-1.515516 0.974188-2.953262 2.118244-4.278443 3.444449-1.325182 1.325182-2.469238 2.762927-3.443425 4.27742C625.602338 770.145361 538.41358 805.546639 445.773669 805.546639z"
-                                  p-id="3507"></path>
+                <div class="input-group mb-3" style="width:280px;float: right;right: 45px;top:17px;">
+                    <input type="text" class="form-control" placeholder="搜索当前考试(课程名/考试名)"
+                           aria-label="Recipient's username"
+                           aria-describedby="button-addon2" th:text="${searchValue}" id="searchValue">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                            onclick="getCurrentExamList(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                         </svg>
                     </button>
                 </div>
             </div>
             <hr style="margin: 0">
             <div class="right-list">
-                <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-                    <div class="col">
+                <div class="empty-message" th:if="${#lists.isEmpty(examList)}">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg width="370px" height="199px" viewBox="0 0 370 199" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+                        <title>暂无数据</title>
+                        <desc>Created with Sketch.</desc>
+                        <defs>
+                            <linearGradient x1="-47.0190124%" y1="-185.963888%" x2="68.8688465%" y2="100%"
+                                            id="linearGradient-1">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="118.999979%" y1="-110.864112%" x2="54.5018665%" y2="55.5871768%"
+                                            id="linearGradient-2">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="50%" y1="-221.156912%" x2="50%" y2="100%" id="linearGradient-3">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="100.080959%" y1="-97.780461%" x2="38.826306%" y2="104.736078%"
+                                            id="linearGradient-4">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="50%" y1="-230.116303%" x2="50%" y2="100%" id="linearGradient-5">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="50%" y1="-169.203289%" x2="50%" y2="100%" id="linearGradient-6">
+                                <stop stop-color="#D2D2D2" offset="0%"></stop>
+                                <stop stop-color="#D2D2D2" stop-opacity="0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="50.0240964%" y1="7.13818556%" x2="50.0240964%" y2="84.6398206%"
+                                            id="linearGradient-7">
+                                <stop stop-color="#D7D7D7" offset="0%"></stop>
+                                <stop stop-color="#E4E4E4" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="50.0761761%" y1="1.21891189%" x2="49.5911007%" y2="95.1595134%"
+                                            id="linearGradient-8">
+                                <stop stop-color="#F4F4F4" offset="0%"></stop>
+                                <stop stop-color="#DDDDDE" offset="96%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="49.9999958%" y1="91.2695941%" x2="49.9999958%" y2="6.71649538%"
+                                            id="linearGradient-9">
+                                <stop stop-color="#EAEAEA" offset="0%"></stop>
+                                <stop stop-color="#EFEFF0" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="-10.1491474%" y1="-62.5738212%" x2="110.880563%" y2="95.2905165%"
+                                            id="linearGradient-10">
+                                <stop stop-color="#FFFFFF" offset="0%"></stop>
+                                <stop stop-color="#478FFC" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="130.853945%" y1="-35.095306%" x2="130.853945%" y2="116.960465%"
+                                            id="linearGradient-11">
+                                <stop stop-color="#FFFFFF" offset="0%"></stop>
+                                <stop stop-color="#478FFC" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="130.853945%" y1="-89.3870885%" x2="130.853945%" y2="100%"
+                                            id="linearGradient-12">
+                                <stop stop-color="#FFFFFF" offset="0%"></stop>
+                                <stop stop-color="#478FFC" offset="100%"></stop>
+                            </linearGradient>
+                            <linearGradient x1="90.2907886%" y1="-178.691094%" x2="74.5709548%" y2="116.960465%"
+                                            id="linearGradient-13">
+                                <stop stop-color="#FFFFFF" offset="0%"></stop>
+                                <stop stop-color="#478FFC" offset="100%"></stop>
+                            </linearGradient>
+                        </defs>
+                        <g id="设计规范" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="08-缺省页规范" transform="translate(-280.000000, -750.000000)">
+                                <g id="暂无数据" transform="translate(280.000000, 750.000000)">
+                                    <g id="编组-2备份-6" fill-rule="nonzero">
+                                        <path d="M73.2592593,159.554082 C65.345679,155.973835 56.7654321,146.368897 59.1975309,137.331859 C60.4139859,137.020515 61.693852,137.516587 62.382716,138.566427 C62.382716,138.566427 76.1111111,160.010872 72.2592593,140.282477 C70.4444444,131.010872 67.3209877,122.047909 67.0740741,112.467662 C66.6666667,95.0602545 82.6419753,90.233094 87.2345679,109.467662 C87.8395062,112.010872 90.1604938,132.689884 95.4444444,130.319514 C96.1250336,129.961557 96.6773282,129.400632 97.0246914,128.714576 C99.7037037,124.319514 100.506173,117.862724 105.419753,116.368897 C109.728395,115.010872 113.975309,118.751613 116.296296,122.61581 C121,130.467662 127.296296,149.98618 117.666667,156.603464 C108.037037,163.220748 83.7407407,164.270131 73.345679,159.640501 L73.2592593,159.554082 Z"
+                                              id="路径" fill="url(#linearGradient-1)"></path>
+                                        <path d="M273.185185,180.430625 C269.703704,172.467662 269.790123,159.591119 277.691358,154.504699 C278.808047,155.104911 279.411159,156.355993 279.185185,157.603464 C279.185185,157.603464 274.975309,182.726921 285.358025,165.504699 C290.296296,157.393588 294,148.665193 300.17284,141.393588 C311.518519,128.134329 326.641975,135.331859 317.148148,152.677538 C315.91358,154.973835 303.740741,171.862724 309.246914,173.665193 C309.992355,173.848515 310.775891,173.801158 311.493827,173.52939 C316.432099,172.0726 321.37037,167.825687 326.037037,169.973835 C330.135802,171.862724 330.777778,177.467662 329.91358,181.899761 C328.135802,190.875069 319.421721,200.91212 307.841474,199.356564 C296.014314,197.751626 277.777778,190.924452 273.222222,180.517045 L273.185185,180.430625 Z"
+                                              id="路径" fill="url(#linearGradient-2)"></path>
+                                        <path d="M370.518519,199.356551 C323.962963,167.418279 258.17284,147.504699 185.259259,147.504699 C112.345679,147.504699 46.5555556,167.418279 0,199.356551 L370.518519,199.356551 Z"
+                                              id="路径" fill="url(#linearGradient-3)"></path>
+                                        <path d="M293.469136,103.060255 C290.518519,106.763958 288.62963,112.010872 290.395062,116.70223 C291.617284,119.936798 295.296296,119.961489 295.037037,124.455316 C294.783185,126.699169 294.014206,128.854 292.790123,130.751613 C290.704251,134.400024 288.14732,137.758071 285.185185,140.739267 C287.654305,142.665262 288.910389,145.760781 288.481481,148.862724 C287.997231,151.941616 286.539107,154.784309 284.320988,156.973835 C283.667879,157.772484 282.816415,158.385539 281.851852,158.751613 C280.917648,158.967389 279.94655,158.967389 279.012346,158.751613 C274.419062,157.972041 269.959209,156.546384 265.765432,154.517045 C263.148148,153.270131 260.481481,151.566427 259.592593,148.850378 C258.574074,145.733094 260.19348,144.742546 261.961179,143.765863 L262.41743,143.513691 C263.3302,143.004636 264.22575,142.451348 264.765432,141.566427 C266.061728,139.442971 266.098765,136.603464 266.555556,134.233094 C267.222222,130.739267 266.234568,124.368897 270.604938,122.998526 C272.296296,122.467662 274.135802,122.591119 275.82716,122.047909 C279.501372,120.878499 281.022443,117.422242 282.495104,113.927564 L282.762795,113.292245 C283.611763,111.282231 284.486968,109.304653 285.790123,107.78865 C287.641975,105.628156 292.234568,104.566427 293.469136,103.060255 Z M282.802469,123.78865 C282.802469,123.78865 269.506173,139.294822 269.938272,153.628156 L274.234568,153.628156 C274.234568,153.628156 275.790123,136.344205 282.802469,123.78865 Z"
+                                              id="形状结合" fill="url(#linearGradient-4)"></path>
+                                        <path d="M104.135802,22.0108718 L104.135802,22.0108718 C104.204481,17.2252075 100.786222,13.0986863 96.0713857,12.2755097 C91.3565496,11.4523331 86.7422233,14.1764226 85.1851852,18.7022298 C82.2145965,18.6439999 79.4492011,20.2121758 77.9742152,22.7913626 C76.4992294,25.3705494 76.5499916,28.54923 78.1065814,31.0800038 C79.6631712,33.6107776 82.4772299,35.0898519 85.4444444,34.9367977 L103.333333,34.9367977 C106.729866,34.891492 109.517593,32.2362321 109.72807,28.8459242 C109.938548,25.4556163 107.50065,22.4759385 104.135802,22.0108718 L104.135802,22.0108718 Z"
+                                              id="路径" fill="url(#linearGradient-5)"></path>
+                                        <path d="M178.074074,12.2084027 L178.074074,12.1466743 C178.066799,6.23154854 173.804253,1.17965438 167.974706,0.177082054 C162.14516,-0.825490268 156.439779,2.51210807 154.45679,8.08494589 C148.848713,8.17358419 144.374325,12.7916841 144.462963,18.3997607 C144.551601,24.0078373 149.169701,28.4822262 154.777778,28.3935879 L177,28.3935879 C181.281476,28.4012178 184.829217,25.075029 185.097306,20.8019475 C185.365395,16.528866 182.261202,12.7853409 178.012346,12.2577854 L178.074074,12.2084027 Z"
+                                              id="路径" fill="url(#linearGradient-6)"></path>
+                                    </g>
+                                    <g id="资源-1" transform="translate(117.000000, 54.000000)" fill-rule="nonzero">
+                                        <path d="M97.0144578,12 L119.756627,12 C120.069668,12 119.9955,12.2263142 120.214082,12.4299234 C120.474988,12.6729566 120.459968,12.9426782 120.459968,13.3411023 L122,45 L97,45 L97,12.0092497 L97.0144578,12 Z"
+                                              id="路径" fill="url(#linearGradient-7)"></path>
+                                        <path d="M13,18.2153255 L13,132 L84.5012949,132 C93.8559415,131.998291 101.438538,123.843513 101.438538,113.784675 L101.438538,24.8523007 C101.438538,18.5030824 104.98794,12.9707227 110.886912,12.785073 C113.802418,12.6888114 115.629803,13.8668173 117.723824,16.0502563 C119.817845,18.2336953 121,21.236251 121,24.3727057 L121,18.2153255 C121,8.155279 115.41565,0 106.059879,0 L29.9401209,0 C20.5843504,0 13,8.155279 13,18.2153255 Z"
+                                              id="路径" fill="url(#linearGradient-8)"></path>
+                                        <path d="M90.8967774,121.532856 C84.9971163,121.342884 80.4522775,115.771411 80.4522775,109.387107 L80.4522775,102 L0,102 L0,115.354095 C0,124.547375 6.8835267,132 15.3747872,132 L86.6280807,132 C95.1182178,131.99828 102,124.546159 102,115.354095 L102,109.857365 C102.003679,113.015547 100.824551,116.040411 98.7320403,118.240773 C96.6395294,120.441135 93.8124449,121.62897 90.8967774,121.532856 L90.8967774,121.532856 Z"
+                                              id="路径" fill="url(#linearGradient-9)"></path>
+                                        <rect id="矩形" fill="#FFFFFF" x="27" y="23" width="59" height="6" rx="2"></rect>
+                                        <rect id="矩形" fill="#FFFFFF" x="27" y="42" width="59" height="6" rx="2"></rect>
+                                        <rect id="矩形" fill="#FFFFFF" x="27" y="61" width="59" height="6" rx="2"></rect>
+                                        <rect id="矩形" fill="#FFFFFF" x="27" y="80" width="37" height="6" rx="2"></rect>
+                                    </g>
+                                    <g id="编组-3" transform="translate(193.000000, 117.000000)">
+                                        <ellipse id="椭圆形" stroke="url(#linearGradient-10)" stroke-width="7"
+                                                 cx="25.8395062" cy="26.308642" rx="25.8395062"
+                                                 ry="26.308642"></ellipse>
+                                        <circle id="椭圆形" fill="url(#linearGradient-11)" fill-rule="nonzero"
+                                                opacity="0.400320871" cx="25.8395062" cy="26.308642"
+                                                r="23.382716"></circle>
+                                        <circle id="椭圆形" fill="#FFFFFF" fill-rule="nonzero" opacity="0.400320871"
+                                                cx="25.8395062" cy="26.308642" r="23.382716"></circle>
+                                        <path d="M12.3184494,29.4197531 L12.3184494,29.4197531 C9.7234446,29.4197531 7.61652311,27.320245 7.60493827,24.7227689 C7.60493827,23.9434486 7.7206718,16.9822232 12.6866925,12.0114237 C15.7273281,8.97839358 19.9358202,7.43028444 24.9018409,7.41975309 C27.5166626,7.43720201 29.622263,9.5731188 29.6049383,12.1904568 C29.5873987,14.8077947 27.4535353,16.9154212 24.8387135,16.8979723 C20.5250091,16.8979723 19.0204731,18.8252102 18.2313809,20.2995999 C17.5387183,21.6759576 17.1443306,23.1832507 17.0740455,24.7227689 C17.0395059,27.3270299 14.9204361,29.4199826 12.3184494,29.4197531 Z"
+                                              id="路径" fill="#FFFFFF" fill-rule="nonzero"></path>
+                                        <polygon id="矩形" fill="url(#linearGradient-12)" fill-rule="nonzero"
+                                                 transform="translate(58.814345, 60.387376) rotate(-46.860000) translate(-58.814345, -60.387376) "
+                                                 points="52.7279255 47.8935493 64.900765 47.8935493 64.900765 72.8812037 52.7279255 72.8812037"></polygon>
+                                        <polygon id="矩形" fill="url(#linearGradient-13)" fill-rule="nonzero"
+                                                 transform="translate(47.971660, 50.221548) rotate(-46.860000) translate(-47.971660, -50.221548) "
+                                                 points="45.4161047 45.5857455 50.5272159 45.5857455 50.5272159 54.8573505 45.4161047 54.8573505"></polygon>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                    暂无考试数据
+                </div>
+                <div class="row row-cols-1 row-cols-md-3 mb-3 text-center" th:if="${not #lists.isEmpty(examList)}">
+                    <div th:each="exam:${examList}" class="col">
                         <div class="card mb-4 rounded-3 shadow-sm">
                             <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/22</h5>
+                                <h5 class="my-0 fw-normal" th:text="${#dates.format(exam.start,'yyyy/MM/dd')}"></h5>
                             </div>
                             <div class="card-body">
-                                <h4 class="card-title pricing-card-title">JAVA期末考试</h4>
+                                <h4 class="card-title pricing-card-title" th:text="${exam.paper.name}"></h4>
                                 <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
+                                    <li th:text="${'考试科目：'+exam.paper.course.name}"></li>
+                                    <li th:text="${'考试总分：'+exam.score+'分'}"></li>
+                                    <li th:text="${'考试时间：'+exam.start.hours+':'+exam.start.minutes+':00'+'-'+exam.end.hours+':'+exam.end.minutes+':00'}">
+                                        考试时间：17:30:00-18:30:00
+                                    </li>
+                                    <li th:text="${'允许迟到：'+exam.lateTime+'分钟'}"></li>
+                                    <li th:text="${'监考老师：'+exam.paper.course.teacher.name}"></li>
                                 </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/23</h5>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title pricing-card-title">SSM框架期中测验</h4>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
-                                </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/24</h5>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title pricing-card-title">大数据随堂测试</h4>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
-                                </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/25</h5>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title pricing-card-title">信息安全随堂测试</h4>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
-                                </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/26</h5>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title pricing-card-title">Web开发测验</h4>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
-                                </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card mb-4 rounded-3 shadow-sm">
-                            <div class="card-header py-3">
-                                <h5 class="my-0 fw-normal">2022/01/27</h5>
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title pricing-card-title">Go语言基础测验</h4>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li>考试总分：100分</li>
-                                    <li>考试时间：17:30:00-18:30:00</li>
-                                    <li>允许迟到：10分钟</li>
-                                    <li>监考老师：张三</li>
-                                </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">进入考试</button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and (exam.start.getTime()+(exam.lateTime*60*1000))>#dates.createNow().getTime()}">
+                                    进入考试
+                                </button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:if="${exam.start.getTime()>#dates.createNow().getTime()}" disabled>考试未开始
+                                </button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and (exam.start.getTime()+(exam.lateTime*60*1000))<#dates.createNow().getTime()}"
+                                        disabled>已迟到
+                                </button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:if="${exam.end.getTime()<#dates.createNow().getTime()}" disabled>考试已结束
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -161,15 +222,9 @@
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
+
 </script>
 </body>
 

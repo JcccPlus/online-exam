@@ -201,8 +201,10 @@ body {
 }
 
 .content .content-right .right-con .right-list .row .col {
-    margin-bottom: 10px;
-    width: 280px;
+    /*margin-bottom: 10px;
+    width: 280px;*/
+    margin: 0 auto;
+    width: auto;
 }
 
 .content .content-right .right-con .right-list .row .col li {

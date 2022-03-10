@@ -59,4 +59,19 @@
         </trim>
     </insert>
 
+    <select id="selectStudentRecordList" parameterType="Record" resultMap="RecordResult">
+        select r.* from tb_record r,tb_exam e,tb_paper p,tb_course c where r.exam_id=e.id and e.paper_id=p.id and
+        p.course_id=c.id
+        <if test="id != null">and r.id = #{id}</if>
+        <if test="examId != null">and r.exam_id = #{examId}</if>
+        <if test="stuId != null">and r.stu_id = #{stuId}</if>
+        <if test="point != null">and r.point = #{point}</if>
+        <if test="finishTime != null">and r.finish_time = #{finishTime}</if>
+        <if test="state != null and state != ''">and r.state = #{state}</if>
+        <if test="code != null and code != ''">and r.code = #{code}</if>
+        <if test="searchValue != null and searchValue != ''">
+            and (p.name like "%${searchValue}%" or c.name like "%${searchValue}%")
+        </if>
+    </select>
+
 </mapper>

@@ -16,4 +16,9 @@ public interface RecordService {
      * 检查考试是否过期，过期的话是否有缺考学生，有缺考学生需要新增缺考学生的考试记录
      */
     boolean hasStudentMissingExam(Exam exam);
+
+    /**
+     * 查找某个学生的所有的考试记录
+     */
+    List<Record> selectStudentRecordList(Record record);
 }

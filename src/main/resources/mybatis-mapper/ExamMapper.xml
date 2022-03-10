@@ -37,10 +37,14 @@
         <if test="paperId != null">and exam.paper_id = #{paperId}</if>
         <if test="classId != null">and exam.class_id = #{classId}</if>
         <if test="paper != null and paper.teaId != null">and paper.tea_id = #{paper.teaId}</if>
-        <if test="searchValue != null and searchValue != '' and classId == null">and (class.name like "%${searchValue}%" or course.name like
+        <if test="searchValue != null and searchValue != ''">
+            and (class.name like "%${searchValue}%"
+            or course.name like
             "%${searchValue}%")
         </if>
-        <if test="searchValue != null and searchValue != '' and classId != null">and exam.name like "%${searchValue}%"</if>
+        <!--<if test="searchValue != null and searchValue != '' and classId != null">
+            and paper.name like "%${searchValue}%"
+        </if>-->
     </select>
 
     <select id="selectExamById" parameterType="int" resultMap="ExamResult">
@@ -106,5 +110,13 @@
         where id = #{id}
           and code = #{code}
     </delete>
+
+    <select id="selectCurrentExam" resultMap="ExamResult">
+        select exam.* from tb_exam exam,tb_paper paper,tb_course course where exam.paper_id=paper.id and paper.course_id = course.id and exam.class_id = #{exam.classId}
+        and not exists(select 1 from tb_record record where exam.id=record.exam_id and record.stu_id = #{stuId})
+        <if test="exam.searchValue!=null and exam.searchValue!=''">
+            and (paper.name like "%${exam.searchValue}%" or course.name like "%${exam.searchValue}%")
+        </if>
+    </select>
 
 </mapper>

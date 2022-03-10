@@ -1,10 +1,7 @@
 package cn.edu.hstc.controller;
 
 import cn.edu.hstc.framework.AjaxResult;
-import cn.edu.hstc.pojo.Exam;
-import cn.edu.hstc.pojo.Paper;
-import cn.edu.hstc.pojo.Record;
-import cn.edu.hstc.pojo.Teacher;
+import cn.edu.hstc.pojo.*;
 import cn.edu.hstc.service.ExamService;
 import cn.edu.hstc.service.PaperService;
 import cn.edu.hstc.service.RecordService;
@@ -47,7 +44,6 @@ public class ExamController extends BaseController {
         if (!ObjectUtils.isEmpty(searchValue)) {
             exam.setSearchValue(searchValue);
         }
-        PageHelper.orderBy("id desc");
         if (ObjectUtils.isEmpty(pageNum)) {
             startPage(null);
         } else {
@@ -70,14 +66,61 @@ public class ExamController extends BaseController {
 
     @RequestMapping("/current.html")
     public String getCurrentExam(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
-
+        Student currentStudent = null;
+        try {
+            currentStudent = (Student) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            model.addAttribute("无访问权限");
+            return "error/404";
+        }
+        if (!ObjectUtils.isEmpty(searchValue)) {
+            exam.setSearchValue(searchValue);
+        }
+        exam.setClassId(currentStudent.getClassId());
+        PageHelper.orderBy("start");
+        List<Exam> exams = examService.selectCurrentExam(exam, currentStudent.getId());
+        model.addAttribute("examList", exams);
+        model.addAttribute("searchValue", searchValue);
         return "student/smain1";
     }
 
-    @RequestMapping("/previous.html")
-    public String getPreviousExam(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
+    @RequestMapping("/searchCurrentExam")
+    public String searchCurrentExam(String searchValue, Integer pageNum, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("pageNum", pageNum);
+        redirectAttributes.addFlashAttribute("searchValue", searchValue);
+        return "redirect:/exam/current.html";
+    }
 
+    @RequestMapping("/previous.html")
+    public String getPreviousExam(Record record, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
+        Student currentStudent = null;
+        try {
+            currentStudent = (Student) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            model.addAttribute("无访问权限");
+            return "error/404";
+        }
+        if (!ObjectUtils.isEmpty(searchValue)) {
+            record.setSearchValue(searchValue);
+        }
+        if (ObjectUtils.isEmpty(pageNum)) {
+            pageNum = "1";
+        }
+        PageHelper.startPage(Integer.parseInt(pageNum), 12, "id desc");
+        //record.setOrderBy("finish_time desc");
+        record.setStuId(currentStudent.getId());
+        List<Record> records = recordService.selectStudentRecordList(record);
+        model.addAttribute("recordList", records);
+        model.addAttribute("searchValue", searchValue);
+        model.addAttribute("pageInfo", new PageInfo<Record>(records));
         return "student/smain2";
+    }
+
+    @RequestMapping("/searchPreviousExam")
+    public String searchPreviousExam(String searchValue, Integer pageNum, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("pageNum", pageNum);
+        redirectAttributes.addFlashAttribute("searchValue", searchValue);
+        return "redirect:/exam/previous.html";
     }
 
     @PostMapping("/add")
@@ -155,7 +198,7 @@ public class ExamController extends BaseController {
             return "error/404";
         }
         Exam exam = exams.get(0);
-        if(!recordService.hasStudentMissingExam(exam)){
+        if (!recordService.hasStudentMissingExam(exam)) {
             model.addAttribute("msg", "程序异常");
             return "error/404";
         }

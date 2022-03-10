@@ -14,4 +14,9 @@ public interface RecordDao {
 
     int insertRecord(Record record);
 
+    /**
+     * 查找某个学生的所有的考试记录
+     */
+    List<Record> selectStudentRecordList(Record record);
+
 }
