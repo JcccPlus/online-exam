@@ -117,6 +117,7 @@
         <if test="exam.searchValue!=null and exam.searchValue!=''">
             and (paper.name like "%${exam.searchValue}%" or course.name like "%${exam.searchValue}%")
         </if>
+        <if test="exam.code != null and exam.code != ''">and exam.code = #{exam.code}</if>
     </select>
 
 </mapper>

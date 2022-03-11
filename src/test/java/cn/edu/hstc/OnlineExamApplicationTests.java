@@ -176,13 +176,18 @@ public class OnlineExamApplicationTests {
 
     @Test
     public void test11() {
-        String regex = "[{{][separator][}}]";
+        /*String regex = "[{{][separator][}}]";
         String str = "11{{separator}}22{{separator}}33{{separator}}";
         String[] split = str.split(regex);
         System.out.println(Arrays.toString(split));
         StringTokenizer t = new StringTokenizer(str, "{{separator}}");
         while (t.hasMoreElements()) {
             System.out.println(t.nextToken());
+        }*/
+        String s = "{{separator}}1{{separator}}{{separator}}";
+        StringTokenizer stringTokenizer = new StringTokenizer(s, "{{separator}}");
+        while (stringTokenizer.hasMoreElements()) {
+            System.out.println(1+stringTokenizer.nextToken());
         }
     }
 

@@ -27,6 +27,14 @@
             padding: 0.3rem 2rem;
             font-size: 16px;
         }
+
+        .empty-message {
+            color: #b2b2b2;
+            margin: 55px auto;
+            font-size: 23px;
+            width: 340px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -43,10 +51,11 @@
                 <div class="input-group mb-3" style="width:280px;float: right;right: 45px;top:17px;">
                     <input type="text" class="form-control" placeholder="搜索历史考试(课程名/考试名)"
                            aria-label="Recipient's username"
-                           aria-describedby="button-addon2" th:text="${searchValue}" id="searchValue">
+                           aria-describedby="button-addon2" th:value="${searchValue}" id="searchValue">
                     <button class="btn btn-outline-secondary" type="button" id="button-addon2"
                             onclick="getPreviousExamList(null,this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-search" viewBox="0 0 16 16">
                             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                         </svg>
                     </button>
@@ -237,7 +246,16 @@
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/js/common.js}"></script>
 <script>
-
+    function getPreviousExamList(pageNum, obj) {
+        if (!$(obj).hasClass('disabled')) {
+            var searchValue = $("#searchValue").val();
+            if (pageNum == null) {
+                window.location.href = "[[@{/exam/searchPreviousExam}]]" + "?searchValue=" + searchValue;
+            } else {
+                window.location.href = "[[@{/exam/searchPreviousExam}]]" + "?searchValue=" + searchValue + "&pageNum=" + pageNum;
+            }
+        }
+    }
 </script>
 </body>
 

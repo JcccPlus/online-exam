@@ -5,6 +5,7 @@ import cn.edu.hstc.pojo.*;
 import cn.edu.hstc.service.ExamService;
 import cn.edu.hstc.service.PaperService;
 import cn.edu.hstc.service.RecordService;
+import cn.edu.hstc.service.TopicOfPaperService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +28,8 @@ public class ExamController extends BaseController {
     private PaperService paperService;
     @Autowired
     private RecordService recordService;
+    @Autowired
+    private TopicOfPaperService topicOfPaperService;
 
     @RequestMapping("/list.html")
     public String list(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
@@ -121,6 +125,67 @@ public class ExamController extends BaseController {
         redirectAttributes.addFlashAttribute("pageNum", pageNum);
         redirectAttributes.addFlashAttribute("searchValue", searchValue);
         return "redirect:/exam/previous.html";
+    }
+
+    @GetMapping("/current/exam.html/{code}")
+    public String enterExam(@PathVariable(value = "code", required = true) String examCode, Model model) {
+        Student currentStudent = null;
+        try {
+            currentStudent = (Student) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
+        Exam param = new Exam();
+        param.setCode(examCode);  //考试唯一码
+        param.setClassId(currentStudent.getClassId());  //考试班级   //考试学生
+        List<Exam> exams = examService.selectCurrentExam(param, currentStudent.getId());
+        if (exams.isEmpty()) {
+            //判断访问者是否非法
+            model.addAttribute("msg", "非法访问");
+            return "error/404";
+        }
+        Exam currentExam = exams.get(0);
+        //判断考试是否开始
+        //判断考试是否过期
+        //判断考试是否迟到
+        model.addAttribute("currentExam", currentExam);
+        //获取该试卷所有题目
+        TopicOfPaper topicOfPaper = new TopicOfPaper();
+        topicOfPaper.setPaperId(currentExam.getPaper().getId());
+        List<TopicOfPaper> topics = topicOfPaperService.selectTopicOfPaperList(topicOfPaper);
+        //将题目按题型分配
+        List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+        List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+        List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+        List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+        List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+        for (TopicOfPaper topic : topics) {
+            switch (topic.getTopic().getType().getName()) {
+                case "单选题":
+                    singleChoiceTopics.add(topic);
+                    break;
+                case "多选题":
+                    moreChoiceTopics.add(topic);
+                    break;
+                case "判断题":
+                    estimateTopics.add(topic);
+                    break;
+                case "填空题":
+                    fillEmptyTopics.add(topic);
+                    break;
+                case "主观题":
+                    subjectiveTopics.add(topic);
+                    break;
+            }
+        }
+        model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+        model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+        model.addAttribute("estimateTopics", estimateTopics);
+        model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+        model.addAttribute("subjectiveTopics", subjectiveTopics);
+        return "student/onlineExam";
     }
 
     @PostMapping("/add")
