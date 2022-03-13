@@ -208,7 +208,8 @@ body {
 }
 
 .content .content-right .right-con .right-list .row .col li {
-    height: 25px;
+    height: 28px;
+    font-size: 17px;
 }
 
 .content .content-right .right-con .right-list th {

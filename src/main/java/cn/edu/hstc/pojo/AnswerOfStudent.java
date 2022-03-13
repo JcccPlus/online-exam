@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswerOfStudent {
+public class AnswerOfStudent extends BaseEntity {
     /** 主键 */
     private Integer id;
     /** 考试记录号 */
@@ -23,6 +23,8 @@ public class AnswerOfStudent {
     private String answer;
     /** 是否正确 */
     private String isRight;
+    /** 该题得分 */
+    private Double score;
     /** 考试记录实体 */
     private Record record;
     /** 试卷题目实体 */

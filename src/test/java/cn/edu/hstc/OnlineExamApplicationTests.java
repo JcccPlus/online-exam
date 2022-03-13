@@ -184,11 +184,14 @@ public class OnlineExamApplicationTests {
         while (t.hasMoreElements()) {
             System.out.println(t.nextToken());
         }*/
-        String s = "{{separator}}1{{separator}}{{separator}}";
-        StringTokenizer stringTokenizer = new StringTokenizer(s, "{{separator}}");
+        String s = "true{{|}}false{{|}}{{null}}{{|}}{2}{{|}}8{{|}}";
+        /*StringTokenizer stringTokenizer = new StringTokenizer(s, "A[0-9]{3}");
         while (stringTokenizer.hasMoreElements()) {
-            System.out.println(1+stringTokenizer.nextToken());
-        }
+            System.out.println(stringTokenizer.nextToken());
+        }*/
+        String regex = "[{]{2}[|][}]{2}";
+        String[] split = s.split(regex);
+        System.out.println(Arrays.toString(split));
     }
 
     @Autowired
@@ -216,5 +219,13 @@ public class OnlineExamApplicationTests {
         for (Exam exam1 : exams) {
             System.out.println(exam1.toString());
         }
+    }
+
+    @Test
+    public void test14() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("hhhh");
+        System.out.println(stringBuilder);
+        System.out.println(stringBuilder.toString());
     }
 }

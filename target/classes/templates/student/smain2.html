@@ -205,8 +205,9 @@
                                         record.exam.start.hours+':'+ record.exam.start.minutes+':00'+'-'+
                                         record.exam.end.hours+':'+record.exam.end.minutes+':00'}]]
                                     </li>
+                                    <li>考试状态：[[${record.state}]]</li>
                                 </ul>
-                                <button type="button" class="w-100 btn btn-lg btn-outline-primary">考试详情</button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary" th:onclick="toPage([[@{/exam/record.html?code=}+${record.code}]])">考试详情</button>
                             </div>
                         </div>
                     </div>

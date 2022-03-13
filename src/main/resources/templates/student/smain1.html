@@ -196,25 +196,31 @@
                                     <li th:text="${'考试时间：'+exam.start.hours+':'+exam.start.minutes+':00'+'-'+exam.end.hours+':'+exam.end.minutes+':00'}">
                                         考试时间：17:30:00-18:30:00
                                     </li>
-                                    <li th:text="${'允许迟到：'+exam.lateTime+'分钟'}"></li>
+                                    <li th:text="${exam.lateTime!=0?('允许迟到：'+exam.lateTime+'分钟'):'允许迟到：不做要求'}"></li>
                                     <li th:text="${'监考老师：'+exam.paper.course.teacher.name}"></li>
                                 </ul>
-                                <!--<button type="button" class="w-100 btn btn-lg btn-outline-primary" th:onclick="enterExam([[${exam.code}]])"
-                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and (exam.start.getTime()+(exam.lateTime*60*1000))>#dates.createNow().getTime()}">
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:onclick="enterExam([[${exam.code}]],[[${exam.start.getTime()}]],[[$exam.end.getTime}]],[[${exam.lateTime}]])"
+                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and exam.lateTime!=0 and (exam.start.getTime()+(exam.lateTime*60*1000))>#dates.createNow().getTime()}">
+                                    进入考试
+                                </button>
+                                <button type="button" class="w-100 btn btn-lg btn-outline-primary"
+                                        th:onclick="enterExam([[${exam.code}]],[[${exam.start.getTime()}]],[[$exam.end.getTime}]],[[${exam.lateTime}]])"
+                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and exam.lateTime==0}">
                                     进入考试
                                 </button>
                                 <button type="button" class="w-100 btn btn-lg btn-outline-primary"
                                         th:if="${exam.start.getTime()>#dates.createNow().getTime()}" disabled>考试未开始
                                 </button>
                                 <button type="button" class="w-100 btn btn-lg btn-outline-primary"
-                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and (exam.start.getTime()+(exam.lateTime*60*1000))<#dates.createNow().getTime()}"
+                                        th:if="${exam.start.getTime()<#dates.createNow().getTime() and exam.end.getTime()>#dates.createNow().getTime() and exam.lateTime!=0 and (exam.start.getTime()+(exam.lateTime*60*1000))<#dates.createNow().getTime()}"
                                         disabled>已迟到
                                 </button>
                                 <button type="button" class="w-100 btn btn-lg btn-outline-primary"
                                         th:if="${exam.end.getTime()<#dates.createNow().getTime()}" disabled>考试已结束
-                                </button>-->
+                                </button>
                                 <button type="button" class="w-100 btn btn-lg btn-outline-primary"
-                                        th:onclick="enterExam([[${exam.code}]])">
+                                        th:onclick="enterExam([[${exam.code}]],[[${exam.start.getTime()}]],[[$exam.end.getTime}]],[[${exam.lateTime}]])">
                                     进入考试
                                 </button>
                             </div>
@@ -236,8 +242,23 @@
         }
     }
 
-    function enterExam(code) {
-        window.location.href = "[[@{/exam/current/exam.html/}]]" + code;
+    function enterExam(code, startTime, endTime, lateTime) {
+        var now = new Date();
+        if (lateTime === 0) {
+            if (now.getTime() > endTime) {
+                alert("考试已结束！");
+            } else if (now.getTime() < endTime && now.getTime() > startTime) {
+                window.location.href = "[[@{/exam/current/exam.html/}]]" + code;
+            }
+        } else {
+            if (now.getTime() > (startTime + lateTime) && now.getTime() < endTime) {
+                alert("您已迟到！");
+            } else if (now.getTime() > endTime) {
+                alert("考试已结束！");
+            } else if (now.getTime() < (startTime + lateTime) && now.getTime() > startTime) {
+                window.location.href = "[[@{/exam/current/exam.html/}]]" + code;
+            }
+        }
     }
 </script>
 </body>

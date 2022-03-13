@@ -2,10 +2,8 @@ package cn.edu.hstc.controller;
 
 import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.*;
-import cn.edu.hstc.service.ExamService;
-import cn.edu.hstc.service.PaperService;
-import cn.edu.hstc.service.RecordService;
-import cn.edu.hstc.service.TopicOfPaperService;
+import cn.edu.hstc.service.*;
+import cn.edu.hstc.vo.ExamAnswerVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ public class ExamController extends BaseController {
     private RecordService recordService;
     @Autowired
     private TopicOfPaperService topicOfPaperService;
+    @Autowired
+    private AnswerOfStudentService answerOfStudentService;
 
     @RequestMapping("/list.html")
     public String list(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
@@ -127,67 +127,6 @@ public class ExamController extends BaseController {
         return "redirect:/exam/previous.html";
     }
 
-    @GetMapping("/current/exam.html/{code}")
-    public String enterExam(@PathVariable(value = "code", required = true) String examCode, Model model) {
-        Student currentStudent = null;
-        try {
-            currentStudent = (Student) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            model.addAttribute("msg", "无访问权限");
-            return "error/404";
-        }
-        Exam param = new Exam();
-        param.setCode(examCode);  //考试唯一码
-        param.setClassId(currentStudent.getClassId());  //考试班级   //考试学生
-        List<Exam> exams = examService.selectCurrentExam(param, currentStudent.getId());
-        if (exams.isEmpty()) {
-            //判断访问者是否非法
-            model.addAttribute("msg", "非法访问");
-            return "error/404";
-        }
-        Exam currentExam = exams.get(0);
-        //判断考试是否开始
-        //判断考试是否过期
-        //判断考试是否迟到
-        model.addAttribute("currentExam", currentExam);
-        //获取该试卷所有题目
-        TopicOfPaper topicOfPaper = new TopicOfPaper();
-        topicOfPaper.setPaperId(currentExam.getPaper().getId());
-        List<TopicOfPaper> topics = topicOfPaperService.selectTopicOfPaperList(topicOfPaper);
-        //将题目按题型分配
-        List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
-        List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
-        List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
-        List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
-        List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
-        for (TopicOfPaper topic : topics) {
-            switch (topic.getTopic().getType().getName()) {
-                case "单选题":
-                    singleChoiceTopics.add(topic);
-                    break;
-                case "多选题":
-                    moreChoiceTopics.add(topic);
-                    break;
-                case "判断题":
-                    estimateTopics.add(topic);
-                    break;
-                case "填空题":
-                    fillEmptyTopics.add(topic);
-                    break;
-                case "主观题":
-                    subjectiveTopics.add(topic);
-                    break;
-            }
-        }
-        model.addAttribute("singleChoiceTopics", singleChoiceTopics);
-        model.addAttribute("moreChoiceTopics", moreChoiceTopics);
-        model.addAttribute("estimateTopics", estimateTopics);
-        model.addAttribute("fillEmptyTopics", fillEmptyTopics);
-        model.addAttribute("subjectiveTopics", subjectiveTopics);
-        return "student/onlineExam";
-    }
-
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult add(@RequestBody Exam exam) {
@@ -210,6 +149,9 @@ public class ExamController extends BaseController {
             return error("数据异常");
         }
         exam.setScore(papers.get(0).getScore());
+        if (exam.getLateTime() == null) {
+            exam.setLateTime(0);
+        }
         if (examService.insertExam(exam)) {
             return success("考试创建成功！");
         }
@@ -283,5 +225,193 @@ public class ExamController extends BaseController {
             model.addAttribute("msg", "已结束");
         }
         return "teacher/examInfo";
+    }
+
+    @GetMapping("/current/exam.html/{code}")
+    public String enterExam(@PathVariable(value = "code", required = true) String examCode, Model model) {
+        Student currentStudent = null;
+        try {
+            currentStudent = (Student) getSession().getAttribute("user");
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
+        Exam param = new Exam();
+        param.setCode(examCode);  //考试唯一码
+        param.setClassId(currentStudent.getClassId());  //考试班级   //考试学生
+        List<Exam> exams = examService.selectCurrentExam(param, currentStudent.getId());
+        if (exams.isEmpty()) {
+            //判断访问者是否非法
+            model.addAttribute("msg", "非法访问");
+            return "error/404";
+        }
+        Exam currentExam = exams.get(0);
+        Date now = new Date();
+        Date start = currentExam.getStart();
+        Date end = currentExam.getEnd();
+        //判断考试是否开始
+        if (now.getTime() < start.getTime()) {
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
+        //判断考试是否过期
+        if (now.getTime() > end.getTime()) {
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
+        //判断考试是否迟到（待完善，逻辑存在bug）
+        model.addAttribute("currentExam", currentExam);
+        //获取该试卷所有题目
+        TopicOfPaper topicOfPaper = new TopicOfPaper();
+        topicOfPaper.setPaperId(currentExam.getPaper().getId());
+        List<TopicOfPaper> topics = topicOfPaperService.selectTopicOfPaperList(topicOfPaper);
+        //将题目按题型分配
+        List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+        List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+        List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+        List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+        List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+        for (TopicOfPaper topic : topics) {
+            switch (topic.getTopic().getType().getName()) {
+                case "单选题":
+                    singleChoiceTopics.add(topic);
+                    break;
+                case "多选题":
+                    moreChoiceTopics.add(topic);
+                    break;
+                case "判断题":
+                    estimateTopics.add(topic);
+                    break;
+                case "填空题":
+                    fillEmptyTopics.add(topic);
+                    break;
+                case "主观题":
+                    subjectiveTopics.add(topic);
+                    break;
+            }
+        }
+        model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+        model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+        model.addAttribute("estimateTopics", estimateTopics);
+        model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+        model.addAttribute("subjectiveTopics", subjectiveTopics);
+        return "student/onlineExam";
+    }
+
+    @PostMapping("/submitExam")
+    @ResponseBody
+    public AjaxResult submitExam(@RequestBody(required = true) List<ExamAnswerVo> vos, @RequestParam(value = "code", required = true) String code) {
+        return examService.submitExam(code, vos);
+    }
+
+    @GetMapping("/record.html")
+    public String toStudentRecordHtml(String code, Model model) {
+        if(ObjectUtils.isEmpty(code)){
+            return "error/404";
+        }
+        Object user = getSession().getAttribute("user");
+        Record param = new Record();
+        param.setCode(code);
+        if (user instanceof Teacher) {
+            List<Record> records = recordService.selectRecordList(param);
+            if(records.isEmpty()){
+                return "error/404";
+            }
+            Record record = records.get(0);
+            if(!record.getExam().getPaper().getCourse().getTeacher().getId().equals(((Teacher) user).getId())){
+                return "error/404";
+            }
+            model.addAttribute("currentRecord", record);
+            AnswerOfStudent an = new AnswerOfStudent();
+            an.setRecordId(record.getId());
+            an.setOrderBy("pt_id");
+            List<AnswerOfStudent> answerList = answerOfStudentService.selectAnswerOfStudentList(an);
+            if(answerList.isEmpty()){
+                return "error/404";
+            }
+            //将题目按题型分配
+            List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+            List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+            List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+            List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+            List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+            for (AnswerOfStudent answerOfStudent : answerList) {
+                switch (answerOfStudent.getTopic().getTopic().getType().getName()) {
+                    case "单选题":
+                        singleChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "多选题":
+                        moreChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "判断题":
+                        estimateTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "填空题":
+                        fillEmptyTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "主观题":
+                        subjectiveTopics.add(answerOfStudent.getTopic());
+                        break;
+                }
+            }
+            model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+            model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+            model.addAttribute("estimateTopics", estimateTopics);
+            model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+            model.addAttribute("subjectiveTopics", subjectiveTopics);
+            model.addAttribute("answerList", answerList);
+            return "teacher/stu-record";
+        } else if (user instanceof Student) {
+            param.setStuId(((Student) user).getId());
+            List<Record> records = recordService.selectRecordList(param);
+            if(records.isEmpty()){
+                return "error/404";
+            }
+            model.addAttribute("currentRecord", records.get(0));
+            AnswerOfStudent an = new AnswerOfStudent();
+            an.setRecordId(records.get(0).getId());
+            an.setOrderBy("pt_id");
+            List<AnswerOfStudent> answerList = answerOfStudentService.selectAnswerOfStudentList(an);
+            if(answerList.isEmpty()){
+                if(!records.get(0).getState().equals("缺考")){
+                    return "error/404";
+                }
+            }
+            //将题目按题型分配
+            List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+            List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+            List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+            List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+            List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+            for (AnswerOfStudent answerOfStudent : answerList) {
+                switch (answerOfStudent.getTopic().getTopic().getType().getName()) {
+                    case "单选题":
+                        singleChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "多选题":
+                        moreChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "判断题":
+                        estimateTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "填空题":
+                        fillEmptyTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "主观题":
+                        subjectiveTopics.add(answerOfStudent.getTopic());
+                        break;
+                }
+            }
+            model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+            model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+            model.addAttribute("estimateTopics", estimateTopics);
+            model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+            model.addAttribute("subjectiveTopics", subjectiveTopics);
+            model.addAttribute("answerList", answerList);
+            return "student/record";
+        } else {
+            return "error/404";
+        }
     }
 }

@@ -1,6 +1,8 @@
 package cn.edu.hstc.service;
 
+import cn.edu.hstc.framework.AjaxResult;
 import cn.edu.hstc.pojo.Exam;
+import cn.edu.hstc.vo.ExamAnswerVo;
 
 import java.util.List;
 
@@ -19,4 +21,9 @@ public interface ExamService {
      * 查找某个班级下，指定学生未考的考试
      */
     List<Exam> selectCurrentExam(Exam exam, Integer stuId);
+
+    /**
+     * 学生交卷业务
+     */
+    AjaxResult submitExam(String code, List<ExamAnswerVo> vos);
 }
