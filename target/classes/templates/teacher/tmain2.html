@@ -938,7 +938,7 @@
                     isFlag = false;
                     return false;
                 }
-                opts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{separator}}";
+                opts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{|}}";
                 optIndex += 1;
             } else if (item.name === "more_choice_opt") {
                 if($.trim(item.value)===""){
@@ -947,7 +947,7 @@
                     isFlag = false;
                     return false;
                 }
-                dopts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{separator}}";
+                dopts += String.fromCharCode(optIndex) + "." + $.trim(item.value) + "{{|}}";
                 optIndex += 1;
             } else if (item.name === "single_choice_answer") {
                 topicObj.answer = item.value;
@@ -967,9 +967,9 @@
                     return false;
                 }
                 if(topicObj.answer===undefined){
-                    topicObj.answer = $.trim(item.value)+"{{separator}}";
+                    topicObj.answer = $.trim(item.value)+"{{|}}";
                 }else{
-                    topicObj.answer += $.trim(item.value)+"{{separator}}";
+                    topicObj.answer += $.trim(item.value)+"{{|}}";
                 }
             } else if (item.name === "subjective_answer") {
                 if($.trim(item.value)===""){
@@ -1058,7 +1058,7 @@
                 var topicObj = data.data[0];
                 $("#topicInfoDiv").html("<hr><h6 align='center'><b>题目内容</b></h6><hr><p>"+topicObj.title+"</p>");
                 if(topicObj.typeId===1 || topicObj.typeId===2){
-                    var optArray = topicObj.opts.split("{{separator}}");
+                    var optArray = topicObj.opts.split("{{|}}");
                     for(var i=0; i<optArray.length-1; i++){
                         $("#topicInfoDiv").append("<p>"+optArray[i]+"</p>");
                     }
@@ -1066,7 +1066,7 @@
                 }else if(topicObj.typeId===3){
                     $("#topicInfoDiv").append("<hr><h6 align='center'><b>参考答案</b></h6><hr><p align='center'>"+(topicObj.answer==="true"?"<svg t=\"1646507567217\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" p-id=\"6372\" width=\"20\" height=\"20\"><path d=\"M0 0h1024v1024H0V0z\" fill=\"#202425\" opacity=\".01\" p-id=\"6373\"></path><path d=\"M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z\" fill=\"#11AA66\" p-id=\"6374\"></path><path d=\"M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z\" fill=\"#11AA66\" p-id=\"6375\"></path><path d=\"M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z\" fill=\"#FFFFFF\" p-id=\"6376\"></path></svg>":"<svg t=\"1646507637031\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" p-id=\"8832\" width=\"20\" height=\"20\"><path d=\"M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z\" fill=\"#D33737\" p-id=\"8833\"></path></svg>")+"</p>");
                 }else if(topicObj.typeId===4){
-                    var answerArray = topicObj.answer.split("{{separator}}");
+                    var answerArray = topicObj.answer.split("{{|}}");
                     for(var i=0; i<answerArray.length-1; i++){
                         $("#topicInfoDiv").append("<hr><h6 align='center'><b>参考答案</b></h6><hr><p align='center'>"+answerArray[i]+"</p>");
                     }

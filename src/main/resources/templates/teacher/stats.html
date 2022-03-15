@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线考试云平台</title>
+    <link rel="icon" th:href="@{/images/logo.png}">
+    <!-- Bootstrap core CSS -->
+    <link type="text/css" th:href="@{/bootstrapv5/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/public.css}" rel="stylesheet">
+    <style>
+
+        .header .space-unit h4 {
+            margin-left: 20px;
+        }
+
+        .content .content-right {
+            margin-left: 0;
+            width: 100%;
+            min-width: 1280px;
+        }
+
+        .content .content-right .right-con {
+            min-width: 1390px;
+        }
+
+        .content .content-right .right-con .right-list {
+            padding: 25px 40px;
+        }
+
+        .exam-info li {
+            font-size: 16px;
+        }
+
+        .stats-div {
+            width: 100%;
+        }
+
+        #score-stats {
+            width: 30%;
+            height: 400px;
+            display: inline-block;
+        }
+
+        #area-stats {
+            width: 38%;
+            height: 400px;
+            display: inline-block;
+        }
+
+        #num-stats {
+            width: 31.3%;
+            height: 400px;
+            display: inline-block;
+        }
+
+        #record-stats {
+            height: 400px;
+        }
+
+        .warn-div{
+            color: #b2b2b2;
+            margin: 55px auto;
+            font-size: 25px;
+            width: 250px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{common/tcommon::header(title='考试云-考试分析')}"></div>
+<div class="content">
+    <div class="content-right">
+        <div class="right-con">
+            <div class="right-list">
+                <div class="col text-center">
+                    <div class="card mb-5 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">[[${#dates.format(currentExam.start,'yyyy/MM/dd')+'
+                                '+currentExam.start.hours+':'+currentExam.start.minutes+':00'+'-'+currentExam.end.hours+':'+currentExam.end.minutes+':00'}]]</h5>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title pricing-card-title">[[${currentExam.paper.name}]]</h3>
+                            <ul class="list-unstyled mt-3 mb-4 exam-info">
+                                <li style="float: left">所属课程：[[${currentExam.paper.course.name}]]</li>
+                                <li style="position: absolute;left: 30%">考试总分：[[${currentExam.score}]]分</li>
+                                <li style="position: absolute;left: 60%">考试班级：[[${currentExam.classes.name}]]</li>
+                                <li style="float: right">班级人数：[[${studentTotal}]]人</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="warn-div" th:if="${warn!=null}">
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <!-- Generator: Adobe Illustrator 23.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+                    <svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                         viewBox="0 0 1024 1024" style="enable-background:new 0 0 1024 1024;" xml:space="preserve">
+<style type="text/css">
+	.st0 {
+        fill: url(#SVGID_1_);
+    }
+
+    .st1 {
+        fill: #B1EEF5;
+    }
+
+    .st2 {
+        fill: #99E0E9;
+    }
+
+    .st3 {
+        fill: #87CED7;
+    }
+
+    .st4 {
+        fill: #7BB9C1;
+    }
+
+    .st5 {
+        fill: #39828C;
+    }
+
+    .st6 {
+        fill: #FFFFFF;
+    }
+
+    .st7 {
+        clip-path: url(#SVGID_3_);
+    }
+
+    .st8 {
+        fill: #D0E7EA;
+        fill-opacity: 0.49;
+    }
+
+    .st9 {
+        fill: #DFEEF0;
+    }
+</style>
+                        <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="512" y1="47" x2="512" y2="977">
+	<stop offset="0" style="stop-color:#CCE2E5"/>
+                            <stop offset="1" style="stop-color:#EDFAFC"/>
+</linearGradient>
+                        <circle class="st0" cx="512" cy="512" r="465"/>
+                        <path class="st1"
+                              d="M581.19,264.48C438.05,224.13,289.3,307.47,248.96,450.6l259.18,73.05L581.19,264.48z"/>
+                        <path class="st2"
+                              d="M356.16,268.41c-164.22,104.85-212.35,322.96-107.5,487.18L546,565.75L356.16,268.41z"/>
+                        <path class="st3"
+                              d="M237.7,355.12c-94.69,170.27-33.42,385.07,136.86,479.76l171.45-308.31L237.7,355.12z"/>
+                        <path class="st4" d="M512,159.23V512H159.23c0,194.83,157.94,352.77,352.77,352.77S864.77,706.83,864.77,512
+	S706.83,159.23,512,159.23z"/>
+                        <g>
+	<circle class="st5" cx="512" cy="512" r="106.52"/>
+                            <circle class="st6" cx="512" cy="512" r="42.61"/>
+</g>
+                        <g>
+	<defs>
+		<circle id="SVGID_2_" cx="512" cy="512" r="465"/>
+	</defs>
+                            <clipPath id="SVGID_3_">
+		<use xlink:href="#SVGID_2_" style="overflow:visible;"/>
+	</clipPath>
+                            <g class="st7">
+		<g>
+			<path class="st8" d="M1088.32,1135.19H631.55c-13.68,0-24.77-11.09-24.77-24.77V446.16c0-13.68,11.09-24.77,24.77-24.77h456.77
+				c13.68,0,24.77,11.09,24.77,24.77v664.26C1113.1,1124.1,1102.01,1135.19,1088.32,1135.19z"/>
+            <path class="st6" d="M571.16,469.39c-13.68,0-24.77,11.09-24.77,24.77v599.71l460.37-624.49H571.16z"/>
+            <path class="st9" d="M571.16,1183.19h456.77c13.68,0,24.77-11.09,24.77-24.77V494.16c0-13.68-11.09-24.77-24.77-24.77h-21.18
+				l-460.37,634.49v54.54C546.39,1172.1,557.48,1183.19,571.16,1183.19z"/>
+            <path class="st4" d="M898.65,611.84H652.45c-13.2,0-24-10.8-24-24v0c0-13.2,10.8-24,24-24h246.19c13.2,0,24,10.8,24,24v0
+				C922.65,601.04,911.85,611.84,898.65,611.84z"/>
+            <path class="st4" d="M781.35,727.97H655.94c-13.2,0-24-10.8-24-24v0c0-13.2,10.8-24,24-24h125.42c13.2,0,24,10.8,24,24v0
+				C805.35,717.17,794.55,727.97,781.35,727.97z"/>
+		</g>
+	</g>
+</g>
+                        <circle class="st5" cx="933.39" cy="149.23" r="44.61"/>
+                        <circle class="st5" cx="94.35" cy="713.13" r="44.61"/>
+                        <g>
+	<polygon class="st5"
+             points="627.86,230.09 623.62,225.85 701.76,147.71 963.39,147.71 963.39,153.71 704.24,153.71 	"/>
+</g>
+                        <g>
+	<polygon class="st5" points="393.88,632.4 398.12,636.64 319.98,714.78 58.35,714.78 58.35,708.78 317.5,708.78 	"/>
+</g>
+</svg>
+                    <div>[[${warn}]]</div>
+                </div>
+                <div class="stats-div" th:if="${warn==null}">
+                    <div id="score-stats"></div>
+                    <div id="area-stats"></div>
+                    <div id="num-stats"></div>
+                    <div id="record-stats"></div>
+                </div>
+                <div id="paper">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/echarts.min.js}"></script>
+<script th:src="@{/js/macarons.js}"></script>
+<script th:inline="javascript">
+    var scoreChart = echarts.init(document.getElementById("score-stats"));
+    var slow = [[${currentStats.sLow}]];
+    var stop = [[${currentStats.sTop}]];
+    var sAver = [[${currentStats.sAverage}]];
+    var sMed = [[${currentStats.sMedian}]];
+    var scoreChartData = [slow, sMed, sAver, stop];
+    scoreChart.setOption({
+        title: {
+            text: '学生成绩分析'
+        },
+        tooltip: {},
+        legend: {
+            data: ['成绩分析']
+        },
+        xAxis: {
+            data: ['最低分', '中位数', '平均分', '最高分'],
+            name: '类别'
+        },
+        yAxis: {
+            type: 'value',
+            name: '分数'
+        },
+        series: {
+            name: '成绩分析',
+            type: 'bar',
+            data: scoreChartData,
+            label: {
+                show: true,
+                position: 'top'
+            }
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}, //导出图片
+                dataView: {}, //数据视图
+                restore: {}, //重置
+                magicType: {    //动态图表类型切换
+                    type: ['bar', 'line']
+                }
+            }
+        }
+    });
+
+    var areaChart = echarts.init(document.getElementById("area-stats"), 'macarons');
+    var good = [[${currentStats.good}]];
+    var med = [[${currentStats.med}]];
+    var nor = [[${currentStats.nor}]];
+    var bad = [[${currentStats.bad}]];
+    var absence = [[${currentStats.absence}]];
+    var turnout = [[${currentStats.turnout}]];
+    var score = [[${currentExam.score}]]
+    var goodArea = score * 0.9;
+    var medArea = score * 0.8;
+    var norArea = score * 0.6;
+    var goodName = goodArea+"分以上";
+    var medName = medArea+"分~"+goodArea+"分";
+    var norName = norArea+"分~"+medArea+"分";
+    var notPassName = norArea+"分以下";
+    areaChart.setOption({
+        aria: {
+            enabled: true
+        },
+        title: {
+            text: '各分数段占比统计',
+            left: 'center',
+            top: 20
+        },
+        series: [
+            {
+                name: '人数',
+                type: 'pie',
+                data: [
+                    {value: good, name: goodName},
+                    {value: med, name: medName},
+                    {value: nor, name: norName},
+                    {value: bad, name: notPassName}
+                ],
+                label: {
+                    show: true,
+                    formatter: function (arg) {
+                        return arg.name + "  " +arg.value + "人\n" + arg.percent + "%";
+                    }
+                },
+                radius: '50%',
+                selectedMode: 'single'
+            }
+        ],
+        toolbox: {
+            feature: {
+                saveAsImage: {}, //导出图片
+                dataView: {}, //数据视图
+                restore: {} //重置
+                }
+            }
+        });
+
+    var numChart = echarts.init(document.getElementById("num-stats"));
+    var now = new Date();
+    var start = new Date([[${currentExam.start.getTime()}]]);
+    var end = new Date([[${currentExam.end.getTime()}]]);
+    var name1 = "";
+    var name2 = "";
+    if(now.getTime() > end.getTime()+30000){
+        name1 = "缺考";
+        name2 = "完成";
+        console.log("考试已结束");
+    }else if(now.getTime() > start.getTime() && now.getTime() < end.getTime()+30000){
+        name1 = "正在考试";
+        name2 = "已交卷";
+        console.log("考试正在进行中");
+    }
+    numChart.setOption({
+        aria: {
+            enabled: true
+        },
+        title: {
+            text: '完成情况统计',
+            left: 'center',
+            top: 40
+        },
+        series: [
+            {
+                name: '人数',
+                type: 'pie',
+                data: [
+                    {value: absence, name: name1},
+                    {value: turnout, name: name2}
+                ],
+                label: {
+                    show: true,
+                    formatter: function (arg) {
+                        return arg.value + "人" + arg.name + "\n" + arg.percent + "%";
+                    }
+                },
+                radius: '50%',
+                selectedMode: 'single'
+            }
+        ],
+        toolbox: {
+            feature: {
+                saveAsImage: {}, //导出图片
+                dataView: {}, //数据视图
+                restore: {} //重置
+            }
+        }
+    });
+
+    var xData = [
+        [# th:each="record:${recordList}"]
+    [[${record.student.name}]],
+        [/]
+        ];
+    var yData = [
+        [# th:each="record:${recordList}"]
+    [[${record.point}]],
+    [/]
+    ];
+    var recordChart = echarts.init(document.getElementById("record-stats"), 'macarons');
+    recordChart.setOption({
+        title: {
+            text: '学生成绩分布图',
+            left: 60
+        },
+        tooltip: {},
+        legend: {
+            data: ['成绩']
+        },
+        xAxis: {
+            data: xData,
+            axisLabel:{
+                interval:0,
+                formatter:function (val) {
+                    return val.split("").join("\n");
+                }
+            },
+            name: '学生'
+        },
+        yAxis: {
+            type: 'value',
+            name: '分数'
+        },
+        series: {
+            name: '成绩',
+            type: 'bar',
+            data: yData,
+            label: {
+                show: true,
+                position: 'inside'
+            },
+            markPoint: {
+                data: [{type: 'max', name: '最高分'}, {type: 'min', name: '最低分'},]
+            },
+            markLine: {
+                data: [{type: 'average', name: '平均值'}, {type: 'median', name: "中位数"}]
+            }
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}, //导出图片
+                dataView: {}, //数据视图
+                restore: {}, //重置
+                dataZoom: {},  //区域缩放
+                magicType: {    //动态图表类型切换
+                    type: ['bar', 'line', 'graph']
+                }
+            },
+            right: 50
+        }
+    });
+
+</script>
+</body>
+
+</html>

@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Record extends BaseEntity {
+public class Record extends BaseEntity implements Comparable {
     /** 主键 */
     private Integer id;
     /** 所属考试 */
@@ -33,4 +33,14 @@ public class Record extends BaseEntity {
     private Exam exam;
     /** 学生实体 */
     private Student student;
+
+    @Override
+    public int compareTo(Object o) {
+        //按照学生学号升序排序
+        if(o instanceof Record){
+            Record record = (Record) o;
+            return this.student.getStuNum().compareTo(record.student.getStuNum());
+        }
+        throw new RuntimeException("参数类型不一致！");
+    }
 }

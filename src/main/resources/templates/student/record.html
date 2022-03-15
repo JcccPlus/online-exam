@@ -32,6 +32,7 @@
         }
 
         .answer-div {
+            padding-top: 0 !important;
             padding: 25px 10px;
         }
 
@@ -91,6 +92,10 @@
 <div th:replace="~{common/scommon::header}"></div>
 <div class="content">
     <div class="content-left bg-light shadow" style="width: 260px;overflow: auto;">
+        <div class="text-center mb-4 mt-5">
+            <h5 th:text="${'考试得分：'+currentRecord.point+'分'}"></h5>
+            <h6 th:text="${'考试状态：'+currentRecord.state}"></h6>
+        </div>
         <div class="answer-div">
             <h5 style="text-align: center;">
                 <svg t="1647006845864" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -106,10 +111,13 @@
                 <div>单选题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${singleChoiceTopics}"
-                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
-                                th:href="${'#seq'+topic.getSxh()}"
-                                th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${!answerList.isEmpty()}" th:each="topic:${singleChoiceTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${answerList.isEmpty()}" th:each="topic:${singleChoiceTopics}" class="red">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -117,10 +125,13 @@
                 <div>多选题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${moreChoiceTopics}"
+                        <li th:if="${!answerList.isEmpty()}" th:each="topic:${moreChoiceTopics}"
                             th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
                                 th:href="${'#seq'+topic.getSxh()}"
                                 th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${answerList.isEmpty()}" th:each="topic:${moreChoiceTopics}" class="red">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -128,10 +139,13 @@
                 <div>判断题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${estimateTopics}"
+                        <li th:if="${!answerList.isEmpty()}" th:each="topic:${estimateTopics}"
                             th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
                                 th:href="${'#seq'+topic.getSxh()}"
                                 th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${answerList.isEmpty()}" th:each="topic:${estimateTopics}" class="red">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -139,10 +153,13 @@
                 <div>填空题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${fillEmptyTopics}"
+                        <li th:if="${!answerList.isEmpty()}" th:each="topic:${fillEmptyTopics}"
                             th:class="${answerList.get(topic.getSxh()-1).isRight.contains('true')?'green':'red'}"><a
                                 th:href="${'#seq'+topic.getSxh()}"
                                 th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${answerList.isEmpty()}" th:each="topic:${fillEmptyTopics}" class="red">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -150,8 +167,14 @@
                 <div>主观题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${subjectiveTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                   th:text="${topic.getSxh()}"></a></li>
+                        <li th:if="${!answerList.isEmpty()}" th:each="topic:${subjectiveTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).score==null?'':(answerList.get(topic.getSxh()-1).score==0?'red':'green')}">
+                            <a th:href="${'#seq'+topic.getSxh()}" th:text="${topic.getSxh()}"></a>
+                        </li>
+                        <li th:if="${answerList.isEmpty()}" th:each="topic:${subjectiveTopics}" class="red">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -175,11 +198,11 @@
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                     <ul class="list-unstyled mt-3 mb-2">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
-                                <div class="card-header py-3">
+                                <div class="card-header py-3" th:if="${!answerList.isEmpty()}">
                                     <p th:text="${'正确答案：'+topic.topic.answer}"></p>
                                     <p>
                                         [[${'您的答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'未作答':answerList.get(topic.getSxh()-1).answer)}]]
@@ -197,6 +220,18 @@
                                         </svg>
                                         <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
                                              t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
+                                <div class="card-header py-3" th:if="${answerList.isEmpty()}">
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        您的答案：
+                                        <svg t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                              xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
                                             <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
                                                   fill="#D33737" p-id="1143"></path>
@@ -215,11 +250,11 @@
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                     <ul class="list-unstyled mt-3 mb-2">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
-                                <div class="card-header py-3">
+                                <div class="card-header py-3" th:if="${!answerList.isEmpty()}">
                                     <p th:text="${'正确答案：'+topic.topic.answer}"></p>
                                     <p>
                                         [[${'您的答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'未作答':answerList.get(topic.getSxh()-1).answer)}]]
@@ -244,6 +279,18 @@
                                     </p>
                                     <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
+                                <div class="card-header py-3" th:if="${answerList.isEmpty()}">
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        您的答案：
+                                        <svg t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -255,7 +302,7 @@
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
-                                <div class="card-header py-3">
+                                <div class="card-header py-3" th:if="${!answerList.isEmpty()}">
                                     <p th:text="${'正确答案：'+(topic.topic.answer.equals('true')?'正确':'错误')}"></p>
                                     <p>
                                         [[${'您的答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'未作答':(answerList.get(topic.getSxh()-1).answer.equals('true')?'正确':'错误'))}]]
@@ -280,6 +327,18 @@
                                     </p>
                                     <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
+                                <div class="card-header py-3" th:if="${answerList.isEmpty()}">
+                                    <p th:text="${'正确答案：'+(topic.topic.answer.equals('true')?'正确':'错误')}"></p>
+                                    <p>
+                                        您的答案：
+                                        <svg t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -291,9 +350,11 @@
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
-                                <div class="card-header py-3" th:with="rightArray=${#strings.listSplit(answerList.get(topic.getSxh()-1).isRight, '、')}">
-                                    <p th:each="answer:${#strings.listSplit(topic.getTopic().getAnswer(), '{{separator}}')}" th:text="${'正确答案：'+answer}"></p>
-                                    <p th:each="answer:${#strings.listSplit(answerList.get(topic.getSxh()-1).answer, '{{separator}}')}">
+                                <div class="card-header py-3" th:if="${!answerList.isEmpty()}"
+                                     th:with="rightArray=${#strings.listSplit(answerList.get(topic.getSxh()-1).isRight, '、')}">
+                                    <p th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
+                                       th:text="${'正确答案：'+answer}"></p>
+                                    <p th:each="answer:${answerList.get(topic.getSxh()-1).answer.split('[{]{2}[|][}]{2}')}">
                                         [[${'您的答案：'+(answer.equals('{{null}}')?'未作答':answer)}]]
                                         <svg th:if="${rightArray.get(answerStat.index).equals('true')}"
                                              t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -316,6 +377,19 @@
                                     </p>
                                     <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
+                                <div class="card-header py-3" th:if="${answerList.isEmpty()}">
+                                    <p th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
+                                       th:text="${'正确答案：'+answer}"></p>
+                                    <p>
+                                        您的答案：
+                                        <svg t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -327,9 +401,36 @@
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
-                                <div class="card-header py-3">
-                                    <textarea class="form-control" th:name="${'subjective_answer'+topicStat.index}"
-                                              th:onblur="relateCard([[${topic.sxh}]],this,2)"></textarea>
+                                <div class="card-header py-3" th:if="${!answerList.isEmpty()}">
+                                    <p>您的答案：</p>
+                                    <textarea rows="10" class="form-control mb-3" readonly disabled>[[${#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'未作答':answerList.get(topic.getSxh()-1).answer}]]</textarea>
+                                    <input th:if="${currentRecord.getState().equals('待评卷')}" class="form-control mb-3"
+                                           style="color:#c47575;width: 200px;text-align: center"
+                                           value="等待老师批改" type="text" disabled readonly>
+                                    <input th:if="${currentRecord.getState().equals('完成')}" class="form-control mb-3"
+                                           style="color:#c47575;width: 200px;text-align: center"
+                                           th:value="${'得分：'+answerList.get(topic.getSxh()-1).score+'分'}" type="text"
+                                           disabled readonly>
+                                    <div th:if="${currentRecord.getState().equals('完成')}">
+                                        <p>参考答案：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnswer())?'无':topic.getTopic().getAnswer()}"></p>
+                                        <p>题目解析：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'无':topic.getTopic().getAnalysis()}"></p>
+                                    </div>
+                                </div>
+                                <div class="card-header py-3" th:if="${answerList.isEmpty()}">
+                                    <p>
+                                        您的答案：
+                                        <svg t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p>参考答案：</p>
+                                    <p th:text="${#strings.isEmpty(topic.getTopic().getAnswer())?'无':topic.getTopic().getAnswer()}"></p>
+                                    <p>题目解析：</p>
+                                    <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'无':topic.getTopic().getAnalysis()}"></p>
                                 </div>
                             </div>
                         </div>
@@ -343,15 +444,6 @@
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/js/common.js}"></script>
 <script>
-
-    $(".check-one").click(function () {
-        var length = $(this).parent().parent().find("input").length;
-        for (var i = 0; i < length; i++) {
-            if ($(this).val() !== $(this).parent().parent().find("input:eq(" + i + ")").attr("value")) {
-                $(this).parent().parent().find("input:eq(" + i + ")").prop("checked", false);
-            }
-        }
-    });
 
 </script>
 </body>

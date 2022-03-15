@@ -92,7 +92,7 @@
                         <h6>单选题</h6>
                         <div th:each="topic:${singleChoiceTopics}" class="topic">
                             <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
-                            <p th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                            <p th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                th:text="${opt}"></p>
                             <p th:text="${'参考答案：'+topic.getTopic().getAnswer()}"></p>
                             <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
@@ -103,7 +103,7 @@
                         <h6>多选题</h6>
                         <div th:each="topic:${moreChoiceTopics}" class="topic">
                             <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
-                            <p th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                            <p th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                th:text="${opt}"></p>
                             <p th:text="${'参考答案：'+topic.getTopic().getAnswer()}"></p>
                             <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
@@ -143,7 +143,7 @@
                         <h6>填空题</h6>
                         <div th:each="topic:${fillEmptyTopics}" class="topic">
                             <p th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></p>
-                            <p th:each="answer:${#strings.listSplit(topic.getTopic().getAnswer(), '{{separator}}')}"
+                            <p th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
                                th:text="${'参考答案：'+answer}"></p>
                             <p th:if="${not #strings.isEmpty(topic.getTopic().getAnalysis())}">题目解析：</p>
                             <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'题目解析：无':topic.getTopic().getAnalysis()}"></p>

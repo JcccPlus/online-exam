@@ -34,16 +34,14 @@ public class ExamController extends BaseController {
     @RequestMapping("/list.html")
     public String list(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
         getRequest().setAttribute("orderBy", "id desc");
-        Teacher user = null;
-        try {
-            user = (Teacher) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            model.addAttribute("msg", "无权限访问");
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Teacher)) {
+            model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
+        Teacher teacher = (Teacher) user;
         Paper paper = new Paper();
-        paper.setTeaId(user.getId());
+        paper.setTeaId(teacher.getId());  //获得访问老师所布置的所有考试
         exam.setPaper(paper);
         if (!ObjectUtils.isEmpty(searchValue)) {
             exam.setSearchValue(searchValue);
@@ -70,13 +68,12 @@ public class ExamController extends BaseController {
 
     @RequestMapping("/current.html")
     public String getCurrentExam(Exam exam, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
-        Student currentStudent = null;
-        try {
-            currentStudent = (Student) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            model.addAttribute("无访问权限");
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Student)) {
+            model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
+        Student currentStudent = (Student) user;
         if (!ObjectUtils.isEmpty(searchValue)) {
             exam.setSearchValue(searchValue);
         }
@@ -97,20 +94,19 @@ public class ExamController extends BaseController {
 
     @RequestMapping("/previous.html")
     public String getPreviousExam(Record record, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
-        Student currentStudent = null;
-        try {
-            currentStudent = (Student) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            model.addAttribute("无访问权限");
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Student)) {
+            model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
+        Student currentStudent = (Student) user;
         if (!ObjectUtils.isEmpty(searchValue)) {
             record.setSearchValue(searchValue);
         }
         if (ObjectUtils.isEmpty(pageNum)) {
             pageNum = "1";
         }
-        PageHelper.startPage(Integer.parseInt(pageNum), 12, "id desc");
+        PageHelper.startPage(Integer.parseInt(pageNum), 10, "id desc");
         //record.setOrderBy("finish_time desc");
         record.setStuId(currentStudent.getId());
         List<Record> records = recordService.selectStudentRecordList(record);
@@ -130,20 +126,18 @@ public class ExamController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult add(@RequestBody Exam exam) {
-        if (ObjectUtils.isEmpty(exam.getCode()) || ObjectUtils.isEmpty(exam.getPaperId())) {
+        if (ObjectUtils.isEmpty(exam) || ObjectUtils.isEmpty(exam.getCode()) || ObjectUtils.isEmpty(exam.getPaperId())) {
             return error("数据异常");
         }
-        Teacher user = null;
-        try {
-            user = (Teacher) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            return error("无权限访问");
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Teacher)) {
+            return error("无访问权限");
         }
+        Teacher teacher = (Teacher) user;
         Paper param = new Paper();
         param.setId(exam.getPaperId());
         param.setCode(exam.getCode());
-        param.setTeaId(user.getId());
+        param.setTeaId(teacher.getId());
         List<Paper> papers = paperService.selectPaperList(param);
         if (papers.isEmpty()) {
             return error("数据异常");
@@ -163,6 +157,10 @@ public class ExamController extends BaseController {
     public AjaxResult delete(@RequestParam("examId") Integer id, @RequestParam("code") String code) {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Teacher)) {
+            return error("无访问权限");
         }
         Exam exam = new Exam();
         exam.setId(id);
@@ -186,26 +184,25 @@ public class ExamController extends BaseController {
     }
 
     @GetMapping("/list.html/{code}")
-    public String toExamInfoHtml(@PathVariable(value = "code", required = true) String code, Model model) {
-        Exam param = new Exam();
-        param.setCode(code);
-        try {
-            Teacher teacher = (Teacher) getSession().getAttribute("user");
-            Paper paper = new Paper();
-            paper.setTeaId(teacher.getId());
-            param.setPaper(paper);
-        } catch (ClassCastException e) {
-            e.printStackTrace();
+    public String toExamInfoHtml(@PathVariable(value = "code", required = true) String code, Model model, @ModelAttribute("exportMsg") String exportMsg) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Teacher)) {
             model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
+        Exam param = new Exam();
+        param.setCode(code);
+        Teacher teacher = (Teacher) user;
+        Paper paper = new Paper();
+        paper.setTeaId(teacher.getId());   //判断是不是访问老师所布置的考试
+        param.setPaper(paper);
         List<Exam> exams = examService.selectExamList(param);
         if (exams.isEmpty()) {
             model.addAttribute("msg", "数据异常");
             return "error/404";
         }
         Exam exam = exams.get(0);
-        if (!recordService.hasStudentMissingExam(exam)) {
+        if ("error".equals(recordService.hasStudentMissingExam(exam))) {
             model.addAttribute("msg", "程序异常");
             return "error/404";
         }
@@ -224,19 +221,20 @@ public class ExamController extends BaseController {
         } else if (exam.getEnd().getTime() < now.getTime()) {
             model.addAttribute("msg", "已结束");
         }
+        if (!ObjectUtils.isEmpty(exportMsg)) {
+            model.addAttribute("exportMsg", exportMsg);
+        }
         return "teacher/examInfo";
     }
 
     @GetMapping("/current/exam.html/{code}")
     public String enterExam(@PathVariable(value = "code", required = true) String examCode, Model model) {
-        Student currentStudent = null;
-        try {
-            currentStudent = (Student) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Student)) {
             model.addAttribute("msg", "无访问权限");
             return "error/404";
         }
+        Student currentStudent = (Student) user;
         Exam param = new Exam();
         param.setCode(examCode);  //考试唯一码
         param.setClassId(currentStudent.getClassId());  //考试班级   //考试学生
@@ -252,12 +250,12 @@ public class ExamController extends BaseController {
         Date end = currentExam.getEnd();
         //判断考试是否开始
         if (now.getTime() < start.getTime()) {
-            model.addAttribute("msg", "无访问权限");
+            model.addAttribute("msg", "非法访问");
             return "error/404";
         }
         //判断考试是否过期
         if (now.getTime() > end.getTime()) {
-            model.addAttribute("msg", "无访问权限");
+            model.addAttribute("msg", "非法访问");
             return "error/404";
         }
         //判断考试是否迟到（待完善，逻辑存在bug）
@@ -307,19 +305,24 @@ public class ExamController extends BaseController {
 
     @GetMapping("/record.html")
     public String toStudentRecordHtml(String code, Model model) {
-        if(ObjectUtils.isEmpty(code)){
+        if (ObjectUtils.isEmpty(code)) {
             return "error/404";
         }
         Object user = getSession().getAttribute("user");
         Record param = new Record();
         param.setCode(code);
-        if (user instanceof Teacher) {
+        if (user instanceof Teacher) {  //如果是老师访问
             List<Record> records = recordService.selectRecordList(param);
-            if(records.isEmpty()){
+            if (records.isEmpty()) {
                 return "error/404";
             }
             Record record = records.get(0);
-            if(!record.getExam().getPaper().getCourse().getTeacher().getId().equals(((Teacher) user).getId())){
+            if (!record.getExam().getPaper().getCourse().getTeacher().getId().equals(((Teacher) user).getId())) {
+                //不是该老师布置的考试
+                return "error/404";
+            }
+            if (!record.getState().equals("完成")) {
+                //不是已经完成的考试
                 return "error/404";
             }
             model.addAttribute("currentRecord", record);
@@ -327,7 +330,7 @@ public class ExamController extends BaseController {
             an.setRecordId(record.getId());
             an.setOrderBy("pt_id");
             List<AnswerOfStudent> answerList = answerOfStudentService.selectAnswerOfStudentList(an);
-            if(answerList.isEmpty()){
+            if (answerList.isEmpty()) {
                 return "error/404";
             }
             //将题目按题型分配
@@ -362,10 +365,10 @@ public class ExamController extends BaseController {
             model.addAttribute("subjectiveTopics", subjectiveTopics);
             model.addAttribute("answerList", answerList);
             return "teacher/stu-record";
-        } else if (user instanceof Student) {
+        } else if (user instanceof Student) {  //如果是学生访问
             param.setStuId(((Student) user).getId());
             List<Record> records = recordService.selectRecordList(param);
-            if(records.isEmpty()){
+            if (records.isEmpty()) {
                 return "error/404";
             }
             model.addAttribute("currentRecord", records.get(0));
@@ -373,9 +376,47 @@ public class ExamController extends BaseController {
             an.setRecordId(records.get(0).getId());
             an.setOrderBy("pt_id");
             List<AnswerOfStudent> answerList = answerOfStudentService.selectAnswerOfStudentList(an);
-            if(answerList.isEmpty()){
-                if(!records.get(0).getState().equals("缺考")){
+            if (answerList.isEmpty()) {
+                if (!records.get(0).getState().equals("缺考")) {
                     return "error/404";
+                } else {
+                    //缺考考生查看的考试详情
+                    //获取该试卷所有题目
+                    TopicOfPaper topicOfPaper = new TopicOfPaper();
+                    topicOfPaper.setPaperId(records.get(0).getExam().getPaper().getId());
+                    List<TopicOfPaper> topics = topicOfPaperService.selectTopicOfPaperList(topicOfPaper);
+                    //将题目按题型分配
+                    List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+                    List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+                    List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+                    List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+                    List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+                    for (TopicOfPaper topic : topics) {
+                        switch (topic.getTopic().getType().getName()) {
+                            case "单选题":
+                                singleChoiceTopics.add(topic);
+                                break;
+                            case "多选题":
+                                moreChoiceTopics.add(topic);
+                                break;
+                            case "判断题":
+                                estimateTopics.add(topic);
+                                break;
+                            case "填空题":
+                                fillEmptyTopics.add(topic);
+                                break;
+                            case "主观题":
+                                subjectiveTopics.add(topic);
+                                break;
+                        }
+                    }
+                    model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+                    model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+                    model.addAttribute("estimateTopics", estimateTopics);
+                    model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+                    model.addAttribute("subjectiveTopics", subjectiveTopics);
+                    model.addAttribute("answerList", answerList);
+                    return "student/record";
                 }
             }
             //将题目按题型分配
@@ -411,7 +452,110 @@ public class ExamController extends BaseController {
             model.addAttribute("answerList", answerList);
             return "student/record";
         } else {
+            model.addAttribute("msg","无访问权限");
             return "error/404";
         }
+    }
+
+    /**
+     * 评卷页面
+     */
+    @GetMapping("/check.html")
+    public String toCheckStudentRecord(String code, Model model) {
+        if (ObjectUtils.isEmpty(code)) {
+            return "error/404";
+        }
+        Object user = getSession().getAttribute("user");
+        Record param = new Record();
+        param.setCode(code);
+        if (user instanceof Teacher) {   //必须是老师访问
+            List<Record> records = recordService.selectRecordList(param);
+            if (records.isEmpty()) {
+                return "error/404";
+            }
+            Record record = records.get(0);
+            if (!record.getExam().getPaper().getCourse().getTeacher().getId().equals(((Teacher) user).getId())) {
+                //不是该老师布置的考试
+                return "error/404";
+            }
+            if (!record.getState().equals("待评卷")) {
+                //该记录不为’待评卷‘状态
+                return "error/404";
+            }
+            model.addAttribute("currentRecord", record);
+            AnswerOfStudent an = new AnswerOfStudent();
+            an.setRecordId(record.getId());
+            an.setOrderBy("pt_id");
+            List<AnswerOfStudent> answerList = answerOfStudentService.selectAnswerOfStudentList(an);
+            if (answerList.isEmpty()) {
+                return "error/404";
+            }
+            //将题目按题型分配
+            List<TopicOfPaper> singleChoiceTopics = new ArrayList<>();  //记录单选题
+            List<TopicOfPaper> moreChoiceTopics = new ArrayList<>();  //记录多选题
+            List<TopicOfPaper> estimateTopics = new ArrayList<>();   //记录判断题
+            List<TopicOfPaper> fillEmptyTopics = new ArrayList<>();   //记录填空题
+            List<TopicOfPaper> subjectiveTopics = new ArrayList<>();  //记录主观题
+            for (AnswerOfStudent answerOfStudent : answerList) {
+                switch (answerOfStudent.getTopic().getTopic().getType().getName()) {
+                    case "单选题":
+                        singleChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "多选题":
+                        moreChoiceTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "判断题":
+                        estimateTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "填空题":
+                        fillEmptyTopics.add(answerOfStudent.getTopic());
+                        break;
+                    case "主观题":
+                        subjectiveTopics.add(answerOfStudent.getTopic());
+                        break;
+                }
+            }
+            model.addAttribute("singleChoiceTopics", singleChoiceTopics);
+            model.addAttribute("moreChoiceTopics", moreChoiceTopics);
+            model.addAttribute("estimateTopics", estimateTopics);
+            model.addAttribute("fillEmptyTopics", fillEmptyTopics);
+            model.addAttribute("subjectiveTopics", subjectiveTopics);
+            model.addAttribute("answerList", answerList);
+        } else {
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
+        return "teacher/check-record";
+    }
+
+    /**
+     * 老师提交评卷接口
+     */
+    @PostMapping("/markExam")
+    @ResponseBody
+    public AjaxResult markExam(@RequestBody Double[] score, @RequestParam("code") String recordCode) {
+        if (ObjectUtils.isEmpty(score) || ObjectUtils.isEmpty(recordCode)) {
+            return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Teacher)) {
+            //权限控制
+            return error("无访问权限");
+        }
+        Record param = new Record();
+        param.setCode(recordCode);
+        List<Record> records = recordService.selectRecordList(param);
+        if (records.isEmpty()) {
+            return error("数据异常");
+        }
+        Record record = records.get(0);
+        if (!record.getExam().getPaper().getCourse().getTeacher().getId().equals(((Teacher) user).getId())) {
+            //评分人是否合法
+            return error("无访问权限");
+        }
+        if (!"待评卷".equals(record.getState())) {
+            return error("请勿重复评分！");
+        }
+        return examService.markExam(record, score);
     }
 }

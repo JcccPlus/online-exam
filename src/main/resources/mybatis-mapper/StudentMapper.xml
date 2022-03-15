@@ -36,12 +36,12 @@
         <if test="id != null">and id = #{id}</if>
         <if test="stuNum != null and stuNum != ''">and stu_num = #{stuNum}</if>
         <if test="name != null and name != ''">and name = #{name}</if>
-        <if test="password != null and password != ''">and password = #{password},</if>
-        <if test="gender != null and gender != ''">and gender = #{gender},</if>
-        <if test="phone != null and phone != ''">and phone = #{phone},</if>
-        <if test="head_pic != null and head_pic != ''">and head_pic = #{head_pic},</if>
-        <if test="code != null and code != ''">and code = #{code},</if>
-        <if test="classId != null">and class_id = #{classId},</if>
+        <if test="password != null and password != ''">and password = #{password}</if>
+        <if test="gender != null and gender != ''">and gender = #{gender,</if>
+        <if test="phone != null and phone != ''">and phone = #{phone}</if>
+        <if test="head_pic != null and head_pic != ''">and head_pic = #{head_pic}</if>
+        <if test="code != null and code != ''">and code = #{code}</if>
+        <if test="classId != null">and class_id = #{classId}</if>
         <if test="searchValue != null and searchValue != ''">
             and
             (s.stu_num like "%${searchValue}%" or

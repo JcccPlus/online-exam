@@ -111,12 +111,12 @@ public class OnlineExamApplicationTests {
 
     @Test
     public void test09() {
-        String psw = "1{{separator}}2{{separator}}3{{separator}}";
+        String psw = "1{{|}}2{{|}}3{{|}}";
         String[] s = psw.split("_");
         System.out.println(Arrays.toString(s));
-        System.out.println(psw.substring(0, psw.lastIndexOf("{{separator}}")));
-        System.out.println((psw.substring(0, psw.lastIndexOf("{{separator}}"))).substring(0, (psw.substring(0, psw.lastIndexOf("{{separator}}"))).lastIndexOf("{{separator}}")));
-        System.out.println(psw.substring(0, psw.lastIndexOf("{{separator}}")));
+        System.out.println(psw.substring(0, psw.lastIndexOf("{{|}}")));
+        System.out.println((psw.substring(0, psw.lastIndexOf("{{|}}"))).substring(0, (psw.substring(0, psw.lastIndexOf("{{|}}"))).lastIndexOf("{{|}}")));
+        System.out.println(psw.substring(0, psw.lastIndexOf("{{|}}")));
     }
 
     @Test
@@ -177,10 +177,10 @@ public class OnlineExamApplicationTests {
     @Test
     public void test11() {
         /*String regex = "[{{][separator][}}]";
-        String str = "11{{separator}}22{{separator}}33{{separator}}";
+        String str = "11{{|}}22{{|}}33{{|}}";
         String[] split = str.split(regex);
         System.out.println(Arrays.toString(split));
-        StringTokenizer t = new StringTokenizer(str, "{{separator}}");
+        StringTokenizer t = new StringTokenizer(str, "{{|}}");
         while (t.hasMoreElements()) {
             System.out.println(t.nextToken());
         }*/
@@ -190,7 +190,7 @@ public class OnlineExamApplicationTests {
             System.out.println(stringTokenizer.nextToken());
         }*/
         String regex = "[{]{2}[|][}]{2}";
-        String[] split = s.split(regex);
+        String[] split = s.split("[{]{2}[|][}]{2}");
         System.out.println(Arrays.toString(split));
     }
 

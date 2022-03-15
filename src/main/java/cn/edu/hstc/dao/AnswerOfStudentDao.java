@@ -17,4 +17,9 @@ public interface AnswerOfStudentDao {
 
     int updateAnswerOfStudent(AnswerOfStudent answerOfStudent);
 
+    /**
+     * 获取指定‘待评卷’考试记录的所有主观题答题数据
+     */
+    List<AnswerOfStudent> selectSubjectiveAnswerList(Integer recordId);
+
 }

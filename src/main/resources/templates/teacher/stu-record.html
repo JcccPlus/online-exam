@@ -31,13 +31,8 @@
             padding: 25px 40px;
         }
 
-        .submit-div {
-            width: 220px;
-            text-align: right;
-            padding-right: 40px;
-        }
-
         .answer-div {
+            padding-top: 0 !important;
             padding: 25px 10px;
         }
 
@@ -58,8 +53,12 @@
             cursor: pointer;
         }
 
-        .answer-div .turn {
+        .answer-div .green {
             background-color: #64b649;
+        }
+
+        .answer-div .red {
+            background-color: #ef5151;
         }
 
         .answer-div li a {
@@ -82,13 +81,22 @@
         .list-unstyled li {
             font-size: 18px;
         }
+
+        .card-header p {
+            margin-bottom: 0.1rem;
+        }
     </style>
 </head>
 
 <body>
-<div th:replace="~{common/tcommon::header}"></div>
+<div th:replace="~{common/tcommon::header(title='考试云-学生考试详情')}"></div>
 <div class="content">
     <div class="content-left bg-light shadow" style="width: 260px;overflow: auto;">
+        <div class="text-center mb-4 mt-5">
+            <h5 th:text="${'学生：'+currentRecord.student.name}"></h5>
+            <h6 th:text="${'考试得分：'+currentRecord.point+'分'}"></h6>
+            <h6 th:text="${'考试状态：'+currentRecord.state}"></h6>
+        </div>
         <div class="answer-div">
             <h5 style="text-align: center;">
                 <svg t="1647006845864" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -104,8 +112,10 @@
                 <div>单选题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${singleChoiceTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                     th:text="${topic.getSxh()}"></a></li>
+                        <li th:each="topic:${singleChoiceTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -113,8 +123,10 @@
                 <div>多选题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${moreChoiceTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                   th:text="${topic.getSxh()}"></a></li>
+                        <li th:each="topic:${moreChoiceTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -122,8 +134,10 @@
                 <div>判断题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${estimateTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                 th:text="${topic.getSxh()}"></a></li>
+                        <li th:each="topic:${estimateTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -131,8 +145,10 @@
                 <div>填空题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${fillEmptyTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                  th:text="${topic.getSxh()}"></a></li>
+                        <li th:each="topic:${fillEmptyTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.contains('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -140,8 +156,10 @@
                 <div>主观题</div>
                 <div class="answer-seq">
                     <ul>
-                        <li th:each="topic:${subjectiveTopics}"><a th:href="${'#seq'+topic.getSxh()}"
-                                                                   th:text="${topic.getSxh()}"></a></li>
+                        <li th:each="topic:${subjectiveTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).score==0?'red':'green'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
                     </ul>
                 </div>
             </div>
@@ -151,7 +169,7 @@
         <div class="right-con">
             <div class="right-operation">
                 <div class="title">
-                    <h4 class="title-con" th:text="${currentExam.paper.name}"></h4>
+                    <h4 class="title-con" th:text="${currentRecord.exam.paper.name}"></h4>
                 </div>
             </div>
             <hr style="margin: 0">
@@ -160,27 +178,39 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(singleChoiceTopics)}">
                         <h4 class="topicType">单选题</h4>
                         <div class="col" th:each="topic:${singleChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
-                                    <ul class="list-unstyled mt-3 mb-4">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
                                 <div class="card-header py-3">
-                                    <div class="form-check form-check-inline"
-                                         th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}">
-                                        <input class="form-check-input check-one" type="checkbox"
-                                               th:id="${'inlineCheckbox'+topic.sxh+optStat.index}"
-                                               th:value="${opt.subSequence(0,1)}"
-                                               th:name="${'single_choice_answer'+topicStat.index}"
-                                               th:onclick="relateCard([[${topic.sxh}]],this,1)">
-                                        <label class="form-check-label"
-                                               th:for="${'inlineCheckbox'+topic.sxh+optStat.index}"
-                                               th:text="${opt.subSequence(0,1)}"></label>
-                                    </div>
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer)}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
                             </div>
                         </div>
@@ -188,27 +218,39 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(moreChoiceTopics)}">
                         <h4 class="topicType">多选题</h4>
                         <div class="col" th:each="topic:${moreChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
-                                    <ul class="list-unstyled mt-3 mb-4">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
                                 <div class="card-header py-3">
-                                    <div class="form-check form-check-inline"
-                                         th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}">
-                                        <input class="form-check-input" type="checkbox"
-                                               th:id="${'inlineCheckbox'+topic.sxh+optStat.index}"
-                                               th:value="${opt.subSequence(0,1)}"
-                                               th:name="${'more_choice_answer'+topicStat.index}"
-                                               th:onclick="relateCard([[${topic.sxh}]],this,1)">
-                                        <label class="form-check-label"
-                                               th:for="${'inlineCheckbox'+topic.sxh+optStat.index}"
-                                               th:text="${opt.subSequence(0,1)}"></label>
-                                    </div>
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer)}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
                             </div>
                         </div>
@@ -216,28 +258,35 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(estimateTopics)}">
                         <h4 class="topicType">判断题</h4>
                         <div class="col" th:each="topic:${estimateTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
                                 <div class="card-header py-3">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input check-one" type="checkbox" value="true"
-                                               th:id="${'inlineCheckbox'+topic.sxh+1}"
-                                               th:name="${'estimate_answer'+topicStat.index}"
-                                               th:onclick="relateCard([[${topic.sxh}]],this,1)">
-                                        <label class="form-check-label"
-                                               th:for="${'inlineCheckbox'+topic.sxh+1}">正确</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input check-one" type="checkbox" value="false"
-                                               th:id="${'inlineCheckbox'+topic.sxh+2}"
-                                               th:name="${'estimate_answer'+topicStat.index}"
-                                               th:onclick="relateCard([[${topic.sxh}]],this,1)">
-                                        <label class="form-check-label"
-                                               th:for="${'inlineCheckbox'+topic.sxh+2}">错误</label>
-                                    </div>
+                                    <p th:text="${'正确答案：'+(topic.topic.answer.equals('true')?'正确':'错误')}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':(answerList.get(topic.getSxh()-1).answer.equals('true')?'正确':'错误'))}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
                             </div>
                         </div>
@@ -245,16 +294,37 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(fillEmptyTopics)}">
                         <h4 class="topicType">填空题</h4>
                         <div class="col" th:each="topic:${fillEmptyTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
-                                <div class="card-header py-3">
-                                    <input class="form-control" type="text"
-                                           th:name="${'fillEmpty_answer'+topicStat.index}"
-                                           th:each="answer:${#strings.listSplit(topic.getTopic().getAnswer(), '{{separator}}')}"
-                                           th:onblur="relateFillEmptyCard([[${topic.sxh}]],this)">
+                                <div class="card-header py-3"
+                                     th:with="rightArray=${#strings.listSplit(answerList.get(topic.getSxh()-1).isRight, '、')}">
+                                    <p th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
+                                       th:text="${'正确答案：'+answer}"></p>
+                                    <p th:each="answer:${answerList.get(topic.getSxh()-1).answer.split('[{]{2}[|][}]{2}')}">
+                                        [[${'学生答案：'+(answer.equals('{{null}}')?'学生未作答':answer)}]]
+                                        <svg th:if="${rightArray.get(answerStat.index).equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${rightArray.get(answerStat.index).equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
                                 </div>
                             </div>
                         </div>
@@ -262,14 +332,24 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(subjectiveTopics)}">
                         <h4 class="topicType">主观题</h4>
                         <div class="col" th:each="topic:${subjectiveTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
                                 </div>
                                 <div class="card-header py-3">
-                                    <textarea class="form-control" th:name="${'subjective_answer'+topicStat.index}"
-                                              th:onblur="relateCard([[${topic.sxh}]],this,2)"></textarea>
+                                    <p>学生答案：</p>
+                                    <textarea rows="10" class="form-control mb-3" readonly disabled>[[${#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer}]]</textarea>
+                                    <input th:if="${currentRecord.getState().equals('完成')}" class="form-control mb-3"
+                                           style="color:#c47575;width: 200px;text-align: center"
+                                           th:value="${'得分：'+answerList.get(topic.getSxh()-1).score+'分'}" type="text"
+                                           disabled readonly>
+                                    <div th:if="${currentRecord.getState().equals('完成')}">
+                                        <p>参考答案：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnswer())?'无':topic.getTopic().getAnswer()}"></p>
+                                        <p>题目解析：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'无':topic.getTopic().getAnalysis()}"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -284,211 +364,6 @@
 <script th:src="@{/js/common.js}"></script>
 <script>
 
-    function showTimeClock() {
-        var end = new Date([[${currentExam.end.getTime()}]]);
-        var now = new Date();
-        var hour = end.getHours() - now.getHours();
-        var minute = end.getMinutes() - now.getMinutes();
-        var second = end.getSeconds() - now.getSeconds();
-        if (now.getTime() < end.getTime()) {
-            $("#time-clock").text(hour + "小时" + minute + "分钟" + second + "秒");
-            setTimeout("showTimeClock()", 1000);
-        } else {
-            $("#time-clock").text("考试已结束");
-        }
-    }
-
-    $(".check-one").click(function () {
-        var length = $(this).parent().parent().find("input").length;
-        for (var i = 0; i < length; i++) {
-            if ($(this).val() !== $(this).parent().parent().find("input:eq(" + i + ")").attr("value")) {
-                $(this).parent().parent().find("input:eq(" + i + ")").prop("checked", false);
-            }
-        }
-    });
-
-    $("#hand-in-btn").click(function () {
-        var formArray = $("#exam_topic_form").serializeArray();
-        console.log(formArray);
-        var singleChoiceLen = [[${singleChoiceTopics.size()}]];
-        var moreChoiceLen = [[${moreChoiceTopics.size()}]];
-        var estimateLen = [[${estimateTopics.size()}]];
-        var fillEmptyLen = [[${fillEmptyTopics.size()}]];
-        var subjectiveLen = [[${subjectiveTopics.size()}]];
-        var totalLen = singleChoiceLen + moreChoiceLen + estimateLen + fillEmptyLen + subjectiveLen;
-        var isFlag = true;
-        for (var i = 0; i < totalLen; i++) {
-            if ($("li:eq(" + i + ")").attr("class") !== "turn") {
-                isFlag = false;
-                break;
-            }
-        }
-        if (isFlag) {
-            if (confirm("请确认是否交卷？")) {
-                submitExam();
-            }
-        } else {
-            if (confirm("您有题目未完成，是否继续交卷？")) {
-                submitExam();
-            }
-        }
-
-        function submitExam() {
-            showLoading();
-            console.log("正在提交考试答案中...");
-            //alert(document.getElementsByName("subjective_answer").length);
-            //alert($(":input[ name = 'subjective_answer' ]:eq(0)").val());
-            var obj = {};
-            var objArray = [];
-            //单选题
-            for (var i = 0; i < singleChoiceLen; i++) {
-                obj.type = "single_choice";
-                var flag = false;
-                var sca = $(":input[ name = 'single_choice_answer" + i + "' ]");
-                for (var j = 0; j < sca.length; j++) {
-                    if (sca[j].checked === true) {
-                        flag = true;
-                        obj.answer = sca[j].value;
-                        break;
-                    }
-                }
-                if (!flag) {
-                    obj.answer = "";
-                }
-                objArray.push(obj);
-                obj = {};
-            }
-            //多选题
-            for (var i = 0; i < moreChoiceLen; i++) {
-                obj.type = "more_choice";
-                obj.answer = "";
-                var flag = false;
-                var mca = $(":input[ name = 'more_choice_answer" + i + "' ]");
-                for (var j = 0; j < mca.length; j++) {
-                    if (mca[j].checked === true) {
-                        flag = true;
-                        obj.answer += mca[j].value;
-                    }
-                }
-                if (!flag) {
-                    obj.answer = "";
-                }
-                objArray.push(obj);
-                obj = {};
-            }
-            //判断题
-            for (var i = 0; i < estimateLen; i++) {
-                obj.type = "estimate";
-                var flag = false;
-                var ea = $(":input[ name = 'estimate_answer" + i + "' ]");
-                for (var j = 0; j < ea.length; j++) {
-                    if (ea[j].checked === true) {
-                        flag = true;
-                        obj.answer = ea[j].value;
-                        break;
-                    }
-                }
-                if (!flag) {
-                    obj.answer = "";
-                }
-                objArray.push(obj);
-                obj = {};
-            }
-            //填空题
-            for (var i = 0; i < fillEmptyLen; i++) {
-                obj.type = "fillEmpty";
-                var fa = $(":input[ name = 'fillEmpty_answer" + i + "' ]");
-                for (var j = 0; j < fa.length; j++) {
-                    if (obj.answer1 === undefined) {
-                        obj.answer1 = $.trim(fa[j].value);
-                    } else if (obj.answer2 === undefined) {
-                        obj.answer2 = $.trim(fa[j].value);
-                    } else if (obj.answer3 === undefined) {
-                        obj.answer3 = $.trim(fa[j].value);
-                    } else if (obj.answer4 === undefined) {
-                        obj.answer4 = $.trim(fa[j].value);
-                    } else if (obj.answer5 === undefined) {
-                        obj.answer5 = $.trim(fa[j].value);
-                    }
-                }
-                objArray.push(obj);
-                obj = {};
-            }
-            //主观题
-            for (var i = 0; i < subjectiveLen; i++) {
-                obj.type = "subjective";
-                obj.answer = $.trim($(":input[ name = 'subjective_answer" + i + "' ]:eq(0)").val());
-                objArray.push(obj);
-                obj = {};
-            }
-            console.log(objArray);
-            $.ajax({
-                url: "[[@{/exam/submitExam?code=}]]" + "[[${currentExam.code}]]",
-                data: JSON.stringify(objArray),
-                contentType: "application/json",
-                type: "POST",
-                dataType: "json",
-                success: function (data) {
-                    hideLoading();
-                    setTimeout(function () {
-                        alert(data.msg);
-                        if (data.code === 0) {
-                            window.location.href = "[[@{/exam/current.html}]]";
-                        }
-                    }, 300);
-                },
-                error: function (xhr) {
-                    hideLoading();
-                    setTimeout(function () {
-                        if (xhr.status === 500) {
-                            alert("程序异常\n\nHTTP响应码：" + xhr.status);
-                        } else if (xhr.status === 405) {
-                            alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
-                            window.location.href = "[[@{/login.html}]]";
-                        }
-                    }, 300);
-                }
-            });
-        }
-    });
-
-    function relateCard(sxh, obj, type) {
-        var isFlag = false;
-        if (type === 1) {
-            var length = $(obj).parent().parent().find("input").length;
-            for (var i = 0; i < length; i++) {
-                if ($(obj).parent().parent().find("input:eq(" + i + ")").is(":checked")) {
-                    isFlag = true;
-                    break;
-                }
-            }
-        } else {
-            if ($.trim($(obj).val()) !== "") {
-                isFlag = true;
-            }
-        }
-        if (isFlag) {
-            $("li:eq(" + (sxh - 1) + ")").addClass("turn");
-        } else {
-            $("li:eq(" + (sxh - 1) + ")").removeClass("turn");
-        }
-    }
-
-    function relateFillEmptyCard(sxh, obj) {
-        var length = $(obj).parent().find("input").length;
-        var isFlag = true;
-        for (var i = 0; i < length; i++) {
-            if ($.trim($(obj).parent().find("input:eq(" + i + ")").val()) === "") {
-                isFlag = false;
-                break;
-            }
-        }
-        if (isFlag) {
-            $("li:eq(" + (sxh - 1) + ")").addClass("turn");
-        } else {
-            $("li:eq(" + (sxh - 1) + ")").removeClass("turn");
-        }
-    }
 </script>
 </body>
 

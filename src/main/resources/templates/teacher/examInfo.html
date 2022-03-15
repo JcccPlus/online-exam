@@ -40,7 +40,7 @@
                     <h5 class="title-con">考试管理->学生成绩单</h5>
                 </div>
                 <div class="btn-group" role="group" style="float: right;margin: 16px 40px 16px 0px;">
-                    <button class="btn btn-outline-secondary" type="button" title="统计分析学生成绩" th:onclick="">
+                    <button class="btn btn-success" type="button" title="统计分析学生成绩" th:onclick="toPage([[@{/exam/stats/stats.html?code=}+${currentExam.code}]])">
                         <svg t="1646850291274" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="4743" width="20" height="20" fill="currentColor">
                             <path d="M993 1024H32.2c-17.7 0-32-14.3-32-32V35c0-17.7 14.3-32 32-32s32 14.3 32 32v925H993c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
@@ -49,8 +49,8 @@
                                   p-id="4745"></path>
                         </svg>
                     </button>
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2" title="导出成绩单至本地"
-                            th:onclick="toPage()">
+                    <button class="btn btn-success" type="button" id="button-addon2" title="导出成绩单至本地"
+                            th:onclick="toPage([[@{/record/export?code=}+${currentExam.code}]])">
                         <svg t="1646642628404" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="2075" width="20" height="20" fill="currentColor">
                             <path d="M293.632 645.248c91.456-86.784 183.552-220.544 346.88-211.584a20.8 20.8 0 0 1 20.224 20.8v59.392a21.376 21.376 0 0 0 34.432 16.64l211.2-171.2a21.376 21.376 0 0 0 0-33.28l-210.24-192a21.952 21.952 0 0 0-35.648 16.64v60.096a20.8 20.8 0 0 1-17.856 20.8c-280.704 61.76-351.36 391.104-348.992 413.696zM192 960a138.176 138.176 0 0 1-129.984-152.512L64 832V192a116.48 116.48 0 0 1 128-128c-108.8 1.024 256 0 256 0a28.224 28.224 0 0 1 29.76 27.84A35.968 35.968 0 0 1 448 128H192a53.12 53.12 0 0 0-64 64c1.536-37.504 0 640 0 640a52.8 52.8 0 0 0 64 64c49.536-0.448 640 0 640 0a52.48 52.48 0 0 0 64-64c-0.64 105.152 0-256 0-256a36.48 36.48 0 0 1 27.264-38.4A33.216 33.216 0 0 1 960 576v256a116.48 116.48 0 0 1-128 128c-50.56-0.448-640 0-640 0z"
@@ -124,11 +124,11 @@
                                                     class="btn btn-outline-secondary"
                                                     title="答题情况" data-bs-toggle="modal"
                                                     data-bs-target="#getModal"
-                                                    onclick="">答题情况
+                                                    th:onclick="toPage([[@{/exam/record.html?code=}+${record.code}]])">答题情况
                                             </button>
                                             <button th:if="${record.state.equals('待评卷')}"
-                                                    class="btn btn-outline-secondary"
-                                                    title="评卷" onclick="">评卷
+                                                    class="btn btn-success"
+                                                    title="评卷" th:onclick="toPage([[@{/exam/check.html?code=}+${record.code}]])">评卷
                                             </button>
                                         </div>
                                     </td>
@@ -146,7 +146,14 @@
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/js/common.js}"></script>
 <script>
-
+    $(function (){
+        var msg = "[[${exportMsg}]]";
+        if(msg!==""){
+            setTimeout(function (){
+                alert(msg);
+            },500);
+        }
+    })
 </script>
 </body>
 

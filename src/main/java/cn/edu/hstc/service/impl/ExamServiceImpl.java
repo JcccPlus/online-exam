@@ -77,13 +77,11 @@ public class ExamServiceImpl implements ExamService {
         if (ObjectUtils.isEmpty(code) || ObjectUtils.isEmpty(vos)) {
             return AjaxResult.error("数据异常");
         }
-        Student currentStudent = null;
-        try {
-            currentStudent = (Student) ServletUtils.getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
+        Object user = ServletUtils.getSession().getAttribute("user");
+        if (!(user instanceof Student)) {
             return AjaxResult.error("无访问权限");
         }
+        Student currentStudent = (Student) user;
         Date finishTime = new Date(); //记录学生交卷时间
         Exam param = new Exam();
         param.setCode(code);  //考试唯一码
@@ -142,8 +140,9 @@ public class ExamServiceImpl implements ExamService {
                     } else {
                         //填空题需按空格给分
                         String fillEmptyRightAnswer = topicOfPaper.getTopic().getAnswer();
-                        StringTokenizer stringTokenizer = new StringTokenizer(fillEmptyRightAnswer, "{{separator}}");
-                        int answerCount = stringTokenizer.countTokens();  //填空题空格数
+                        String regex = "[{]{2}[|][}]{2}";
+                        String[] rightAnswers = fillEmptyRightAnswer.split(regex);
+                        int answerCount = rightAnswers.length;  //填空题空格数
                         double answerScore = topicOfPaper.getScore() / answerCount;  //填空题每个空的分数，平均分配
                         StringBuilder studentFillEmptyAnswer = new StringBuilder();   //记录学生当前填空题所有答案
                         StringBuilder studentAnswerIsRight = new StringBuilder(90);    //记录学生当前填空题每个空格是否正确
@@ -151,72 +150,72 @@ public class ExamServiceImpl implements ExamService {
                         for (int j = 0; j < answerCount; j++) {
                             //按空格顺序遍历各个空的答案和学生填空答案
                             if (j == 0) {
-                                if (examAnswers.getAnswer1().equals(stringTokenizer.nextToken())) {
+                                if (examAnswers.getAnswer1().equals(rightAnswers[j])) {
                                     point += answerScore;
-                                    studentFillEmptyAnswer.append(examAnswers.getAnswer1()).append("{{separator}}");
+                                    studentFillEmptyAnswer.append(examAnswers.getAnswer1()).append("{{|}}");
                                     studentAnswerIsRight.append("true、");
                                     totalScore += answerScore;
                                 } else {
                                     if (!ObjectUtils.isEmpty(examAnswers.getAnswer1())) {
-                                        studentFillEmptyAnswer.append(examAnswers.getAnswer1()).append("{{separator}}");
+                                        studentFillEmptyAnswer.append(examAnswers.getAnswer1()).append("{{|}}");
                                     } else {
-                                        studentFillEmptyAnswer.append("{{null}}{{separator}}");
+                                        studentFillEmptyAnswer.append("{{null}}{{|}}");
                                     }
                                     studentAnswerIsRight.append("false、");
                                 }
                             } else if (j == 1) {
-                                if (examAnswers.getAnswer2().equals(stringTokenizer.nextToken())) {
+                                if (examAnswers.getAnswer2().equals(rightAnswers[j])) {
                                     point += answerScore;
-                                    studentFillEmptyAnswer.append(examAnswers.getAnswer2()).append("{{separator}}");
+                                    studentFillEmptyAnswer.append(examAnswers.getAnswer2()).append("{{|}}");
                                     studentAnswerIsRight.append("true、");
                                     totalScore += answerScore;
                                 } else {
                                     if (!ObjectUtils.isEmpty(examAnswers.getAnswer2())) {
-                                        studentFillEmptyAnswer.append(examAnswers.getAnswer2()).append("{{separator}}");
+                                        studentFillEmptyAnswer.append(examAnswers.getAnswer2()).append("{{|}}");
                                     } else {
-                                        studentFillEmptyAnswer.append("{{null}}{{separator}}");
+                                        studentFillEmptyAnswer.append("{{null}}{{|}}");
                                     }
                                     studentAnswerIsRight.append("false、}");
                                 }
                             } else if (j == 2) {
-                                if (examAnswers.getAnswer3().equals(stringTokenizer.nextToken())) {
+                                if (examAnswers.getAnswer3().equals(rightAnswers[j])) {
                                     point += answerScore;
-                                    studentFillEmptyAnswer.append(examAnswers.getAnswer3()).append("{{separator}}");
+                                    studentFillEmptyAnswer.append(examAnswers.getAnswer3()).append("{{|}}");
                                     studentAnswerIsRight.append("true、");
                                     totalScore += answerScore;
                                 } else {
                                     if (!ObjectUtils.isEmpty(examAnswers.getAnswer3())) {
-                                        studentFillEmptyAnswer.append(examAnswers.getAnswer3()).append("{{separator}}");
+                                        studentFillEmptyAnswer.append(examAnswers.getAnswer3()).append("{{|}}");
                                     } else {
-                                        studentFillEmptyAnswer.append("{{null}}{{separator}}");
+                                        studentFillEmptyAnswer.append("{{null}}{{|}}");
                                     }
                                     studentAnswerIsRight.append("false、}");
                                 }
                             } else if (j == 3) {
-                                if (examAnswers.getAnswer4().equals(stringTokenizer.nextToken())) {
+                                if (examAnswers.getAnswer4().equals(rightAnswers[j])) {
                                     point += answerScore;
-                                    studentFillEmptyAnswer.append(examAnswers.getAnswer4()).append("{{separator}}");
+                                    studentFillEmptyAnswer.append(examAnswers.getAnswer4()).append("{{|}}");
                                     studentAnswerIsRight.append("true、");
                                     totalScore += answerScore;
                                 } else {
                                     if (!ObjectUtils.isEmpty(examAnswers.getAnswer4())) {
-                                        studentFillEmptyAnswer.append(examAnswers.getAnswer4()).append("{{separator}}");
+                                        studentFillEmptyAnswer.append(examAnswers.getAnswer4()).append("{{|}}");
                                     } else {
-                                        studentFillEmptyAnswer.append("{{null}}{{separator}}");
+                                        studentFillEmptyAnswer.append("{{null}}{{|}}");
                                     }
                                     studentAnswerIsRight.append("false、");
                                 }
                             } else {
-                                if (examAnswers.getAnswer5().equals(stringTokenizer.nextToken())) {
+                                if (examAnswers.getAnswer5().equals(rightAnswers[j])) {
                                     point += answerScore;
-                                    studentFillEmptyAnswer.append(examAnswers.getAnswer5()).append("{{separator}}");
+                                    studentFillEmptyAnswer.append(examAnswers.getAnswer5()).append("{{|}}");
                                     studentAnswerIsRight.append("true、");
                                     totalScore += answerScore;
                                 } else {
                                     if (!ObjectUtils.isEmpty(examAnswers.getAnswer5())) {
-                                        studentFillEmptyAnswer.append(examAnswers.getAnswer5()).append("{{separator}}");
+                                        studentFillEmptyAnswer.append(examAnswers.getAnswer5()).append("{{|}}");
                                     } else {
-                                        studentFillEmptyAnswer.append("{{null}}{{separator}}");
+                                        studentFillEmptyAnswer.append("{{null}}{{|}}");
                                     }
                                     studentAnswerIsRight.append("false、");
                                 }
@@ -264,5 +263,57 @@ public class ExamServiceImpl implements ExamService {
             return AjaxResult.error("交卷程序发生异常，请稍后重试");
         }
         return AjaxResult.success("交卷成功！");
+    }
+
+    /**
+     * 主观题老师评分业务
+     */
+    @Override
+    @Transactional
+    public AjaxResult markExam(Record record, Double[] score){
+        List<AnswerOfStudent> answerList = answerOfStudentDao.selectSubjectiveAnswerList(record.getId());
+        if(answerList.isEmpty()){
+            return AjaxResult.error("数据异常");
+        }
+        if(score.length!=answerList.size()){
+            return AjaxResult.error("数据异常");
+        }
+        String error = "";
+        double subjectiveTotalPoint = 0.0;   //记录主观题总得分
+        for (int i = 0; i < answerList.size(); i++) {
+            AnswerOfStudent answerOfStudent = answerList.get(i);
+            //判断前端输入的每道主观题分数是否合法，即比较每道主观题的分数和前端分数大小
+            if(answerOfStudent.getTopic().getScore() < score[i]){
+                error = "评分分数不能大于题目分数！";
+                break;
+            }else{
+                if(score[i]<0){
+                    //判断分数是否为负数
+                    error = "评分不能为负数！";
+                    break;
+                }else {
+                    //更新学生答案数据
+                    answerOfStudent.setScore(score[i]);
+                    if(answerOfStudentDao.updateAnswerOfStudent(answerOfStudent)==0){
+                        error = "评卷程序发生异常！请稍后重试！";
+                        break;
+                    }
+                    subjectiveTotalPoint+=score[i];
+                }
+            }
+        }
+        if(!"".equals(error)){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return AjaxResult.error(error);
+        }
+        //更新学生考试总分和考试状态
+        record.setState("完成");
+        double point = record.getPoint()+subjectiveTotalPoint;   //得到评卷后的考试总分
+        record.setPoint(point);
+        if(recordDao.updateRecord(record)==0){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return AjaxResult.error("评卷程序发生异常！请稍后重试！");
+        }
+        return AjaxResult.success("已完成评卷！");
     }
 }

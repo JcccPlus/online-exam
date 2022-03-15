@@ -1,10 +1,11 @@
 package cn.edu.hstc.controller;
 
 import cn.edu.hstc.framework.AjaxResult;
-import cn.edu.hstc.pojo.College;
-import cn.edu.hstc.pojo.Major;
+import cn.edu.hstc.pojo.*;
+import cn.edu.hstc.service.ClassesService;
 import cn.edu.hstc.service.CollegeService;
 import cn.edu.hstc.service.MajorService;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,9 +23,16 @@ public class MajorController extends BaseController {
     private MajorService majorService;
     @Autowired
     private CollegeService collegeService;
+    @Autowired
+    private ClassesService classesService;
 
     @RequestMapping("/list.html")
     public String list(Major major, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
         getRequest().setAttribute("orderBy", "id");
         if (!ObjectUtils.isEmpty(searchValue)) {
             major.setSearchValue(searchValue);
@@ -53,6 +61,16 @@ public class MajorController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult add(Major major) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        if (ObjectUtils.isEmpty(major.getName())) {
+            return error("专业名称不为空且不能与已有专业名称重复");
+        }
+        if (ObjectUtils.isEmpty(major.getCollegeId()) || major.getCollegeId() == 0) {
+            return error("请选择学院");
+        }
         if (majorService.insertMajor(major)) {
             return success("添加专业成功");
         } else {
@@ -63,6 +81,16 @@ public class MajorController extends BaseController {
     @PostMapping("/edit")
     @ResponseBody
     public AjaxResult edit(Major major) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        if (ObjectUtils.isEmpty(major.getName())) {
+            return error("专业名称不为空且不能与已有专业名称重复");
+        }
+        if (ObjectUtils.isEmpty(major.getCollegeId())) {
+            return error("请选择学院");
+        }
         if (majorService.updateMajor(major)) {
             return success("更新成功");
         } else {
@@ -76,6 +104,17 @@ public class MajorController extends BaseController {
         if (ObjectUtils.isEmpty(id)) {
             return error("数据异常");
         }
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        Classes param = new Classes();
+        param.setMajorId(id);
+        PageHelper.startPage(1, 1);
+        List<Classes> classes = classesService.selectClassesList(param);
+        if (!classes.isEmpty()) {
+            return error("该专业数据关联较多，不建议删除！");
+        }
         if (majorService.deleteMajor(id)) {
             return success("删除成功");
         } else {
@@ -86,6 +125,13 @@ public class MajorController extends BaseController {
     @PostMapping("/getMajorsByCid")
     @ResponseBody
     public AjaxResult getMajorsByCid(Integer collegeId, Major major) {
+        Object user = getSession().getAttribute("user");
+        if (user instanceof Student) {
+            return error("无访问权限");
+        }
+        if (ObjectUtils.isEmpty(collegeId)) {
+            return error();
+        }
         major.setCollegeId(collegeId);
         List<Major> majors = majorService.selectMajorList(major);
         return AjaxResult.success("操作成功", majors);

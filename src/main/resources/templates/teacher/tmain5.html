@@ -325,8 +325,12 @@
                     }
                 },
                 error: function (xhr) {
-                    alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
-                    window.location.href = "login.html";
+                    if (xhr.status === 405) {
+                        alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
+                        window.location.href = "[[@{/login.html}]]";
+                    } else {
+                        alert("程序异常\n\nHTTP响应码：" + xhr.status);
+                    }
                 }
             });
         }

@@ -28,7 +28,12 @@ public class CourseController extends BaseController {
     @RequestMapping("/list.html")
     public String list(Course course, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
         getRequest().setAttribute("orderBy", "id");
-        course.setTeaId(((Teacher) getSession().getAttribute("user")).getId());
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            model.addAttribute("msg","无访问权限");
+            return "error/404";
+        }
+        course.setTeaId(((Teacher) user).getId());
         if (!ObjectUtils.isEmpty(searchValue)) {
             course.setSearchValue(searchValue);
         }
@@ -54,12 +59,20 @@ public class CourseController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult add(@RequestBody List<Course> courses, HttpSession session) {
+        Object user = session.getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         return courseService.insertMoreCourse(courses, session);
     }
 
     @PostMapping("/edit")
     @ResponseBody
     public AjaxResult edit(Course course) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         if (ObjectUtils.isEmpty(course.getId()) || ObjectUtils.isEmpty(course.getCode())) {
             return error("数据异常");
         }
@@ -76,6 +89,10 @@ public class CourseController extends BaseController {
     @PostMapping("/delete")
     @ResponseBody
     public AjaxResult delete(@RequestParam("courseId") Integer id, @RequestParam("code") String code) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
         }

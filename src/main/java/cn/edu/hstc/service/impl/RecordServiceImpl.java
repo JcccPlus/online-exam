@@ -45,9 +45,10 @@ public class RecordServiceImpl implements RecordService {
      */
     @Override
     @Transactional
-    public boolean hasStudentMissingExam(Exam exam) {
+    public String hasStudentMissingExam(Exam exam) {
         Date now = new Date();
         Date end = exam.getEnd();
+        String message = "false";
         if (now.getTime() > end.getTime()) {
             //考试已过期，是否有缺考学生
             List<Student> students = studentDao.selectStudentsOfMissingExam(exam);
@@ -62,12 +63,15 @@ public class RecordServiceImpl implements RecordService {
                     record.setPoint(0.0);
                     if (recordDao.insertRecord(record) == 0) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return false;
+                        message = "error";
+                        break;
+                    }else{
+                        message = "true";
                     }
                 }
             }
         }
-        return true;
+        return message;
     }
 
     @Override

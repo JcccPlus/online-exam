@@ -17,6 +17,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
+/**
+ * 登录/退出控制器
+ */
 @Controller
 public class LoginController {
     @Autowired

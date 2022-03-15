@@ -58,7 +58,11 @@
             <if test="isRight != null and isRight !=''">is_right = #{isRight},</if>
             <if test="score != null">score = #{score},</if>
         </trim>
-        where id = #{id} and code = #{code}
+        where id = #{id}
     </update>
+
+    <select id="selectSubjectiveAnswerList" parameterType="int" resultMap="AnswerOfStudentResult">
+        SELECT * FROM tb_answer where record_id=#{recordId} and ISNULL(score) AND ISNULL(is_right) ORDER BY pt_id
+    </select>
 
 </mapper>

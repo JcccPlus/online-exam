@@ -314,9 +314,10 @@ public class PaperServiceImpl implements PaperService {
                 bw.write("\n\n单选题\n");
                 for (TopicOfPaper topic : singleChoiceTopics) {
                     bw.write(topic.getSxh() + "." + topic.getTopic().getTitle() + "(" + topic.getScore() + "分)\n");
-                    StringTokenizer opts = new StringTokenizer(topic.getTopic().getOpts(), "{{separator}}");     //按照{{separator}}分隔选项
-                    while (opts.hasMoreElements()) {
-                        bw.write(opts.nextToken() + "\n");
+                    String regex = "[{]{2}[|][}]{2}";         //按照{{|}}分隔选项
+                    String[] opts = topic.getTopic().getOpts().split(regex);
+                    for (String opt: opts) {
+                        bw.write(opt + "\n");
                     }
                     bw.write("参考答案：" + topic.getTopic().getAnswer());
                     if (topic.getTopic().getAnalysis() == null) {
@@ -331,9 +332,10 @@ public class PaperServiceImpl implements PaperService {
                 bw.write("\n\n多选题\n");
                 for (TopicOfPaper topic : moreChoiceTopics) {
                     bw.write(topic.getSxh() + "." + topic.getTopic().getTitle() + "(" + topic.getScore() + "分)\n");
-                    StringTokenizer opts = new StringTokenizer(topic.getTopic().getOpts(), "{{separator}}");     //按照{{separator}}分隔选项
-                    while (opts.hasMoreElements()) {
-                        bw.write(opts.nextToken() + "\n");
+                    String regex = "[{]{2}[|][}]{2}";         //按照{{|}}分隔选项
+                    String[] opts = topic.getTopic().getOpts().split(regex);
+                    for (String opt: opts) {
+                        bw.write(opt + "\n");
                     }
                     bw.write("参考答案：" + topic.getTopic().getAnswer());
                     if (topic.getTopic().getAnalysis() == null) {
@@ -359,9 +361,10 @@ public class PaperServiceImpl implements PaperService {
                 bw.write("\n\n填空题\n");
                 for (TopicOfPaper topic : fillEmptyTopics) {
                     bw.write(topic.getSxh() + "." + topic.getTopic().getTitle() + "(" + topic.getScore() + "分)\n");
-                    StringTokenizer answers = new StringTokenizer(topic.getTopic().getAnswer(), "{{separator}}");     //按照{{separator}}分隔选项
-                    while (answers.hasMoreElements()) {
-                        bw.write("参考答案：" + answers.nextToken() + "\n");
+                    String regex = "[{]{2}[|][}]{2}";
+                    String[] answers = topic.getTopic().getAnswer().split(regex);     //按照{{|}}分隔答案
+                    for (String answer : answers) {
+                        bw.write("参考答案：" + answer + "\n");
                     }
                     if (topic.getTopic().getAnalysis() == null) {
                         bw.write("题目解析：无\n\n");

@@ -1,13 +1,12 @@
 package cn.edu.hstc.controller;
 
 import cn.edu.hstc.framework.AjaxResult;
-import cn.edu.hstc.pojo.College;
-import cn.edu.hstc.pojo.Major;
-import cn.edu.hstc.pojo.Student;
-import cn.edu.hstc.pojo.Teacher;
+import cn.edu.hstc.pojo.*;
 import cn.edu.hstc.service.CollegeService;
+import cn.edu.hstc.service.CourseService;
 import cn.edu.hstc.service.TeacherService;
 import cn.edu.hstc.util.ProjectUtil;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,9 +26,16 @@ public class TeacherController extends BaseController {
     private TeacherService teacherService;
     @Autowired
     private CollegeService collegeService;
+    @Autowired
+    private CourseService courseService;
 
     @RequestMapping("/list.html")
     public String list(Teacher teacher, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            model.addAttribute("msg", "无访问权限");
+            return "error/404";
+        }
         getRequest().setAttribute("orderBy", "id");
         if (!ObjectUtils.isEmpty(searchValue)) {
             teacher.setSearchValue(searchValue);
@@ -58,6 +64,26 @@ public class TeacherController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult add(Teacher teacher) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        if (ObjectUtils.isEmpty(teacher.getCollegeId()) || teacher.getCollegeId() == 0) {
+            return error("请选择学院");
+        }
+        if (ObjectUtils.isEmpty(teacher.getTeaNum())) {
+            return error("工号不为空且不能与已有工号重复");
+        }
+        if (ObjectUtils.isEmpty(teacher.getName())) {
+            return error("姓名不为空");
+        }
+        if (ObjectUtils.isEmpty(teacher.getGender())) {
+            return error("性别不为空");
+        } else {
+            if (!teacher.getGender().equals("男") && !teacher.getGender().equals("女")) {
+                return error("性别数据出错");
+            }
+        }
         if (teacherService.insertTeacher(teacher)) {
             return success("添加教师成功");
         } else {
@@ -68,6 +94,26 @@ public class TeacherController extends BaseController {
     @PostMapping("/edit")
     @ResponseBody
     public AjaxResult edit(Teacher teacher) {
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        if (ObjectUtils.isEmpty(teacher.getCollegeId()) || teacher.getCollegeId() == 0) {
+            return error("请选择学院");
+        }
+        if (ObjectUtils.isEmpty(teacher.getTeaNum())) {
+            return error("工号不为空且不能与已有工号重复");
+        }
+        if (ObjectUtils.isEmpty(teacher.getName())) {
+            return error("姓名不为空");
+        }
+        if (ObjectUtils.isEmpty(teacher.getGender())) {
+            return error("性别不为空");
+        } else {
+            if (!teacher.getGender().equals("男") && !teacher.getGender().equals("女")) {
+                return error("性别数据出错");
+            }
+        }
         if (teacherService.updateTeacher(teacher)) {
             return success("更新成功");
         } else {
@@ -81,6 +127,17 @@ public class TeacherController extends BaseController {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
         }
+        Object user = getSession().getAttribute("user");
+        if (!(user instanceof Admin)) {
+            return error("无访问权限");
+        }
+        Course course = new Course();
+        course.setTeaId(id);
+        PageHelper.startPage(1, 1);
+        List<Course> courses = courseService.selectCourseList(course);
+        if(!courses.isEmpty()){
+            return error("该教师关联数据较多，不建议删除");
+        }
         Teacher param = new Teacher();
         param.setId(id);
         param.setCode(code);
@@ -93,12 +150,8 @@ public class TeacherController extends BaseController {
 
     @RequestMapping("/self.html")
     public String self(Model model) {
-        Teacher currentTeacher = null;
-        try{
-            currentTeacher = (Teacher) getSession().getAttribute("user");
-        }catch (ClassCastException e){
-            e.printStackTrace();
-            model.addAttribute("无访问权限");
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
             return "error/404";
         }
         return "teacher/tmain5";
@@ -204,13 +257,11 @@ public class TeacherController extends BaseController {
         if (ObjectUtils.isEmpty(file)) {
             return error("数据异常");
         }
-        Teacher currentTeacher = null;
-        try {
-            currentTeacher = (Teacher) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
             return error("无访问权限");
         }
+        Teacher currentTeacher = (Teacher) user;
         return teacherService.updateHeadPic(currentTeacher, file);
     }
 }

@@ -177,18 +177,18 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(singleChoiceTopics)}">
                         <h4 class="topicType">单选题</h4>
                         <div class="col" th:each="topic:${singleChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
-                                    <ul class="list-unstyled mt-3 mb-4">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
                                 <div class="card-header py-3">
                                     <div class="form-check form-check-inline"
-                                         th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}">
+                                         th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}">
                                         <input class="form-check-input check-one" type="checkbox"
                                                th:id="${'inlineCheckbox'+topic.sxh+optStat.index}"
                                                th:value="${opt.subSequence(0,1)}"
@@ -205,18 +205,18 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(moreChoiceTopics)}">
                         <h4 class="topicType">多选题</h4>
                         <div class="col" th:each="topic:${moreChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
-                                    <ul class="list-unstyled mt-3 mb-4">
-                                        <li th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}"
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
                                             th:text="${opt}"></li>
                                     </ul>
                                 </div>
                                 <div class="card-header py-3">
                                     <div class="form-check form-check-inline"
-                                         th:each="opt:${#strings.listSplit(topic.getTopic().getOpts(), '{{separator}}')}">
+                                         th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}">
                                         <input class="form-check-input" type="checkbox"
                                                th:id="${'inlineCheckbox'+topic.sxh+optStat.index}"
                                                th:value="${opt.subSequence(0,1)}"
@@ -233,7 +233,7 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(estimateTopics)}">
                         <h4 class="topicType">判断题</h4>
                         <div class="col" th:each="topic:${estimateTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
@@ -262,7 +262,7 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(fillEmptyTopics)}">
                         <h4 class="topicType">填空题</h4>
                         <div class="col" th:each="topic:${fillEmptyTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
@@ -270,7 +270,7 @@
                                 <div class="card-header py-3">
                                     <input class="form-control" type="text"
                                            th:name="${'fillEmpty_answer'+topicStat.index}"
-                                           th:each="answer:${#strings.listSplit(topic.getTopic().getAnswer(), '{{separator}}')}"
+                                           th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
                                            th:onblur="relateFillEmptyCard([[${topic.sxh}]],this)">
                                 </div>
                             </div>
@@ -279,7 +279,7 @@
                     <div class="paperTopicDiv" th:if="${not #lists.isEmpty(subjectiveTopics)}">
                         <h4 class="topicType">主观题</h4>
                         <div class="col" th:each="topic:${subjectiveTopics}" th:id="${'seq'+topic.getSxh()}">
-                            <div class="card mb-4 rounded-3 shadow-sm">
+                            <div class="card mb-2 rounded-3 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title pricing-card-title"
                                         th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
@@ -312,6 +312,8 @@
             setTimeout("showTimeClock()", 1000);
         } else {
             $("#time-clock").text("考试已结束");
+            //自动交卷
+            submitExam(2);
         }
     }
 
@@ -335,6 +337,7 @@
         var totalLen = singleChoiceLen + moreChoiceLen + estimateLen + fillEmptyLen + subjectiveLen;
         var isFlag = true;
         for (var i = 0; i < totalLen; i++) {
+            //判断题目是否都已完成
             if ($("li:eq(" + i + ")").attr("class") !== "turn") {
                 isFlag = false;
                 break;
@@ -342,132 +345,144 @@
         }
         if (isFlag) {
             if (confirm("请确认是否交卷？")) {
-                submitExam();
+                submitExam(1);
             }
         } else {
             if (confirm("您有题目未完成，是否继续交卷？")) {
-                submitExam();
+                submitExam(1);
             }
         }
+    });
 
-        function submitExam() {
-            showLoading();
-            console.log("正在提交考试答案中...");
-            //alert(document.getElementsByName("subjective_answer").length);
-            //alert($(":input[ name = 'subjective_answer' ]:eq(0)").val());
-            var obj = {};
-            var objArray = [];
-            //单选题
-            for (var i = 0; i < singleChoiceLen; i++) {
-                obj.type = "single_choice";
-                var flag = false;
-                var sca = $(":input[ name = 'single_choice_answer" + i + "' ]");
-                for (var j = 0; j < sca.length; j++) {
-                    if (sca[j].checked === true) {
-                        flag = true;
-                        obj.answer = sca[j].value;
-                        break;
-                    }
+    function submitExam(submitType) {
+        //submitType为1手动交卷 2自动交卷
+        showLoading();
+        console.log("正在提交考试答案中...");
+        //alert(document.getElementsByName("subjective_answer").length);
+        //alert($(":input[ name = 'subjective_answer' ]:eq(0)").val());
+        var obj = {};
+        var objArray = [];
+        //单选题
+        for (var i = 0; i < singleChoiceLen; i++) {
+            obj.type = "single_choice";
+            var flag = false;
+            var sca = $(":input[ name = 'single_choice_answer" + i + "' ]");
+            for (var j = 0; j < sca.length; j++) {
+                if (sca[j].checked === true) {
+                    flag = true;
+                    obj.answer = sca[j].value;
+                    break;
                 }
-                if (!flag) {
-                    obj.answer = "";
-                }
-                objArray.push(obj);
-                obj = {};
             }
-            //多选题
-            for (var i = 0; i < moreChoiceLen; i++) {
-                obj.type = "more_choice";
+            if (!flag) {
                 obj.answer = "";
-                var flag = false;
-                var mca = $(":input[ name = 'more_choice_answer" + i + "' ]");
-                for (var j = 0; j < mca.length; j++) {
-                    if (mca[j].checked === true) {
-                        flag = true;
-                        obj.answer += mca[j].value;
-                    }
-                }
-                if (!flag) {
-                    obj.answer = "";
-                }
-                objArray.push(obj);
-                obj = {};
             }
-            //判断题
-            for (var i = 0; i < estimateLen; i++) {
-                obj.type = "estimate";
-                var flag = false;
-                var ea = $(":input[ name = 'estimate_answer" + i + "' ]");
-                for (var j = 0; j < ea.length; j++) {
-                    if (ea[j].checked === true) {
-                        flag = true;
-                        obj.answer = ea[j].value;
-                        break;
-                    }
+            objArray.push(obj);
+            obj = {};
+        }
+        //多选题
+        for (var i = 0; i < moreChoiceLen; i++) {
+            obj.type = "more_choice";
+            obj.answer = "";
+            var flag = false;
+            var mca = $(":input[ name = 'more_choice_answer" + i + "' ]");
+            for (var j = 0; j < mca.length; j++) {
+                if (mca[j].checked === true) {
+                    flag = true;
+                    obj.answer += mca[j].value;
                 }
-                if (!flag) {
-                    obj.answer = "";
+            }
+            if (!flag) {
+                obj.answer = "";
+            }
+            objArray.push(obj);
+            obj = {};
+        }
+        //判断题
+        for (var i = 0; i < estimateLen; i++) {
+            obj.type = "estimate";
+            var flag = false;
+            var ea = $(":input[ name = 'estimate_answer" + i + "' ]");
+            for (var j = 0; j < ea.length; j++) {
+                if (ea[j].checked === true) {
+                    flag = true;
+                    obj.answer = ea[j].value;
+                    break;
                 }
-                objArray.push(obj);
-                obj = {};
             }
-            //填空题
-            for (var i = 0; i < fillEmptyLen; i++) {
-                obj.type = "fillEmpty";
-                var fa = $(":input[ name = 'fillEmpty_answer" + i + "' ]");
-                for (var j = 0; j < fa.length; j++) {
-                    if (obj.answer1 === undefined) {
-                        obj.answer1 = $.trim(fa[j].value);
-                    } else if (obj.answer2 === undefined) {
-                        obj.answer2 = $.trim(fa[j].value);
-                    } else if (obj.answer3 === undefined) {
-                        obj.answer3 = $.trim(fa[j].value);
-                    } else if (obj.answer4 === undefined) {
-                        obj.answer4 = $.trim(fa[j].value);
-                    } else if (obj.answer5 === undefined) {
-                        obj.answer5 = $.trim(fa[j].value);
-                    }
+            if (!flag) {
+                obj.answer = "";
+            }
+            objArray.push(obj);
+            obj = {};
+        }
+        //填空题
+        for (var i = 0; i < fillEmptyLen; i++) {
+            obj.type = "fillEmpty";
+            var fa = $(":input[ name = 'fillEmpty_answer" + i + "' ]");
+            for (var j = 0; j < fa.length; j++) {
+                if (obj.answer1 === undefined) {
+                    obj.answer1 = $.trim(fa[j].value);
+                } else if (obj.answer2 === undefined) {
+                    obj.answer2 = $.trim(fa[j].value);
+                } else if (obj.answer3 === undefined) {
+                    obj.answer3 = $.trim(fa[j].value);
+                } else if (obj.answer4 === undefined) {
+                    obj.answer4 = $.trim(fa[j].value);
+                } else if (obj.answer5 === undefined) {
+                    obj.answer5 = $.trim(fa[j].value);
                 }
-                objArray.push(obj);
-                obj = {};
             }
-            //主观题
-            for (var i = 0; i < subjectiveLen; i++) {
-                obj.type = "subjective";
-                obj.answer = $.trim($(":input[ name = 'subjective_answer" + i + "' ]:eq(0)").val());
-                objArray.push(obj);
-                obj = {};
-            }
-            console.log(objArray);
-            $.ajax({
-                url: "[[@{/exam/submitExam?code=}]]" + "[[${currentExam.code}]]",
-                data: JSON.stringify(objArray),
-                contentType: "application/json",
-                type: "POST",
-                dataType: "json",
-                success: function (data) {
-                    hideLoading();
-                    setTimeout(function () {
+            objArray.push(obj);
+            obj = {};
+        }
+        //主观题
+        for (var i = 0; i < subjectiveLen; i++) {
+            obj.type = "subjective";
+            obj.answer = $.trim($(":input[ name = 'subjective_answer" + i + "' ]:eq(0)").val());
+            objArray.push(obj);
+            obj = {};
+        }
+        console.log(objArray);
+        $.ajax({
+            url: "[[@{/exam/submitExam?code=}]]" + "[[${currentExam.code}]]",
+            data: JSON.stringify(objArray),
+            contentType: "application/json",
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                hideLoading();
+                setTimeout(function () {
+                    if (submitType === 1) {
                         alert(data.msg);
                         if (data.code === 0) {
                             window.location.href = "[[@{/exam/current.html}]]";
                         }
-                    }, 300);
-                },
-                error: function (xhr) {
-                    hideLoading();
-                    setTimeout(function () {
-                        if (xhr.status === 500) {
-                            alert("程序异常\n\nHTTP响应码：" + xhr.status);
-                        } else if (xhr.status === 405) {
-                            alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
-                            window.location.href = "[[@{/login.html}]]";
+                    } else {
+                        if (data.msg === "交卷成功！") {
+                            alert("考试已结束，已自动完成交卷！");
+                        } else {
+                            alert(data.msg);
                         }
-                    }, 300);
-                }
-            });
-        }
-    });
+                        if (data.code === 0) {
+                            window.location.href = "[[@{/exam/current.html}]]";
+                        }
+                    }
+                }, 300);
+            },
+            error: function (xhr) {
+                hideLoading();
+                setTimeout(function () {
+                    if (xhr.status === 405) {
+                        alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
+                        window.location.href = "[[@{/login.html}]]";
+                    } else {
+                        alert("程序异常\n\nHTTP响应码：" + xhr.status);
+                    }
+                }, 300);
+            }
+        });
+    }
 
     function relateCard(sxh, obj, type) {
         var isFlag = false;
