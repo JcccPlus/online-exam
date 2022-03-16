@@ -38,17 +38,15 @@ public class PaperController extends BaseController {
     @RequestMapping("/list.html")
     public String list(Paper paper, Model model, @ModelAttribute("searchValue") String searchValue, @ModelAttribute("pageNum") String pageNum) {
         getRequest().setAttribute("orderBy", "id desc");
-        Teacher user = null;
-        try {
-            user = (Teacher) getSession().getAttribute("user");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            model.addAttribute("msg", "无权限访问");
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            model.addAttribute("msg","无访问权限");
             return "error/404";
         }
-        paper.setTeaId(user.getId());
+        Teacher teacher = (Teacher) user;
+        paper.setTeaId(teacher.getId());
         Course param = new Course();
-        param.setTeaId(user.getId());
+        param.setTeaId(teacher.getId());
         List<Course> currentCourses = courseService.selectCourseList(param);
         model.addAttribute("courseList", currentCourses);
         List<Type> types = typeService.selectTypeList(new Type());
@@ -88,18 +86,30 @@ public class PaperController extends BaseController {
     @PostMapping("/autoGenerate")
     @ResponseBody
     public AjaxResult autoGeneratePaper(@RequestBody List<AutomaticPaperVo> vos) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         return paperService.autoGeneratePaper(vos);
     }
 
     @PostMapping("/manuallyGenerate")
     @ResponseBody
     public AjaxResult manuallyGeneratePaper(@RequestBody List<ManualPaperVo> vos) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         return paperService.manuallyGeneratePaper(vos, false);
     }
 
     @PostMapping("/manuallyGeneratePlus")
     @ResponseBody
     public AjaxResult manuallyGeneratePlus(@RequestBody List<ManualPaperVo> vos) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         return paperService.manuallyGeneratePaper(vos, true);
     }
 
@@ -108,6 +118,10 @@ public class PaperController extends BaseController {
     public AjaxResult edit(Paper paper) {
         if (ObjectUtils.isEmpty(paper.getId()) || ObjectUtils.isEmpty(paper.getCode())) {
             return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
         }
         if (paperService.updatePaper(paper)) {
             return success("更新成功");
@@ -121,6 +135,10 @@ public class PaperController extends BaseController {
     public AjaxResult delete(@RequestParam("paperId") Integer id, @RequestParam("code") String code) {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
         }
         Exam exam = new Exam();
         exam.setPaperId(id);
@@ -139,16 +157,14 @@ public class PaperController extends BaseController {
 
     @GetMapping("/list.html/{code}")
     public String toPaperInfoHtml(@PathVariable(value = "code", required = true) String code, Model model) {
-        Paper param = new Paper();
-        param.setCode(code);
-        try {
-            Teacher teacher = (Teacher) getSession().getAttribute("user");
-            param.setTeaId(teacher.getId());
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            model.addAttribute("msg", "无访问权限");
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            model.addAttribute("msg","无访问权限");
             return "error/404";
         }
+        Paper param = new Paper();
+        param.setCode(code);
+        param.setTeaId(((Teacher) user).getId());
         List<Paper> papers = paperService.selectPaperList(param);
         if (papers.isEmpty()) {
             model.addAttribute("msg", "数据异常");
@@ -212,16 +228,14 @@ public class PaperController extends BaseController {
 
     @GetMapping("/downPaper/{code}")
     public String downPaper(@PathVariable(value = "code", required = true) String code, Model model) {
-        Paper param = new Paper();
-        param.setCode(code);
-        try {
-            Teacher teacher = (Teacher) getSession().getAttribute("user");
-            param.setTeaId(teacher.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("msg", "无权限访问");
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            model.addAttribute("msg","无访问权限");
             return "error/404";
         }
+        Paper param = new Paper();
+        param.setCode(code);
+        param.setTeaId(((Teacher) user).getId());
         List<Paper> papers = paperService.selectPaperList(param);
         if (papers.isEmpty()) {
             model.addAttribute("msg", "数据异常");

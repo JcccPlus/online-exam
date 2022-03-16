@@ -11,7 +11,6 @@
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/public.css}" rel="stylesheet">
-    <script th:src="@{/js/common.js}"></script>
     <style>
         .content .content-right .right-con .right-operation .title {
             float: left;
@@ -90,7 +89,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="student:${studentList}">
-                        <th scope="row" th:text="${student.getId()}"></th>
+                        <th scope="row" th:text="${pageInfo.startRow+studentStat.index}"></th>
                         <td th:text="${student.stuNum}"></td>
                         <td th:text="${student.getName()}"></td>
                         <td th:text="${student.getGender()}"></td>
@@ -110,7 +109,7 @@
                                 </svg>
                             </button>
                             <button class="btn btn-outline-secondary"
-                                    th:onclick="delStudent([[${student.getId()}]],[[${student.getName()}]],[[${student.getCode()}]])">
+                                    th:onclick="delStudent([[${student.getId()}]],[[${student.getName()}]],[[${student.getCode()}]],[[${student.getClassId()}]])">
                                 <svg t="1643123690316" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg" p-id="2260"
                                      width="16" height="16">
@@ -310,31 +309,15 @@
 </div>
 <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
 <script>
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
-
-    $(document).ready(function () {
-        $(".user ").mouseover(function () {
-            $(".user-popup ").show();
-        });
-        $(".user ").mouseout(function () {
-            $(".user-popup ").hide();
-        });
-    })
 
     function addStudent() {
         $.post("[[@{/student/add}]]",
             $("#new_student_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    getStudentList([[${pageInfo.getPageNum()}]],null);
+                    getStudentList([[${pageInfo.getPageNum()}]], null);
                 }
             });
     }
@@ -350,12 +333,12 @@
         }
     }
 
-    function delStudent(studentId, studentName, code) {
+    function delStudent(studentId, studentName, code, cid) {
         if (confirm("确定删除" + studentName + "吗？")) {
-            $.post("[[@{/student/delete}]]", {"studentId": studentId, "code": code}, function (data) {
+            $.post("[[@{/student/delete}]]", {"studentId": studentId, "cid": cid, "code": code}, function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    getStudentList([[${pageInfo.getPageNum()}]],null);
+                    getStudentList([[${pageInfo.getPageNum()}]], null);
                 }
             }, "json");
         }
@@ -394,7 +377,7 @@
             $.post("[[@{/student/edit}]]", $("#edit_student_form").serialize(), function (data) {
                 alert(data.msg);
                 if (data.code === 0) {
-                    getStudentList([[${pageInfo.getPageNum()}]],null);
+                    getStudentList([[${pageInfo.getPageNum()}]], null);
                 }
             }, "json");
         }

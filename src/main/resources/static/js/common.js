@@ -11,6 +11,17 @@ $(document).ready(function () {
     });
 });
 
+//为url添加时间戳
+function timestamp(url) {
+    var getTimestamp = new Date().getTime();
+    if (url.indexOf("?") > -1) {
+        url = url + "&timestamp=" + getTimestamp
+    } else {
+        url = url + "?timestamp=" + getTimestamp
+    }
+    return url;
+}
+
 function showLoading(){
     $("body").addClass("modal-open");
     $("body").append("<div id='loadingDiv' style=\"position: fixed;top: calc(40%);left: calc(47%);z-index: 2000;background-color: #e1e1e1d4;width: 135px;height: 90px;border-radius: 15px;text-align: center;padding: 18px;\"><div class=\"spinner-border\" role=\"status\">\n" +

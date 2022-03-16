@@ -159,9 +159,10 @@ public class TeacherController extends BaseController {
 
     @PostMapping("/updateSex")
     @ResponseBody
-    public AjaxResult updateSex(Integer user_id, String user_code, String user_gender) {
-        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
-            return error("系统错误，请稍后重试");
+    public AjaxResult updateSex(String user_gender) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error();
         }
         if (ObjectUtils.isEmpty(user_gender)) {
             return error();
@@ -169,12 +170,13 @@ public class TeacherController extends BaseController {
         if (!user_gender.equals("男") && !user_gender.equals("女")) {
             return error();
         }
+        Teacher currentTeacher = (Teacher) user;
         Teacher teacher = new Teacher();
-        teacher.setId(user_id);
-        teacher.setCode(user_code);
+        teacher.setId(currentTeacher.getId());
+        teacher.setCode(currentTeacher.getCode());
         teacher.setGender(user_gender);
         if (teacherService.updateTeacher(teacher)) {
-            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            currentTeacher.setGender(user_gender);
             getSession().setAttribute("user", currentTeacher);
             return success("性别修改成功");
         }
@@ -183,9 +185,10 @@ public class TeacherController extends BaseController {
 
     @PostMapping("/updatePhone")
     @ResponseBody
-    public AjaxResult updatePhone(Integer user_id, String user_code, String user_phone) {
-        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
-            return error("系统错误，请稍后重试");
+    public AjaxResult updatePhone(String user_phone) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error();
         }
         if (ObjectUtils.isEmpty(user_phone)) {
             return error("请输入手机号码");
@@ -194,12 +197,13 @@ public class TeacherController extends BaseController {
                 return error("手机号码格式错误");
             }
         }
+        Teacher currentTeacher = (Teacher) user;
         Teacher teacher = new Teacher();
-        teacher.setId(user_id);
-        teacher.setCode(user_code);
+        teacher.setId(currentTeacher.getId());
+        teacher.setCode(currentTeacher.getCode());
         teacher.setPhone(user_phone);
         if (teacherService.updateTeacher(teacher)) {
-            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            currentTeacher.setPhone(user_phone);
             getSession().setAttribute("user", currentTeacher);
             return success("手机号码更新成功");
         }
@@ -208,10 +212,12 @@ public class TeacherController extends BaseController {
 
     @PostMapping("/updatePsw")
     @ResponseBody
-    public AjaxResult updatePsw(Integer user_id, String user_code, String oldPsw, String newPsw, String confirmPsw) {
-        if (ObjectUtils.isEmpty(user_id) || ObjectUtils.isEmpty(user_code)) {
-            return error("系统错误，请稍后重试");
+    public AjaxResult updatePsw(String oldPsw, String newPsw, String confirmPsw, String code) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error();
         }
+        Teacher currentTeacher = (Teacher) user;
         if (ObjectUtils.isEmpty(oldPsw)) {
             return error("请输入旧密码");
         } else {
@@ -227,12 +233,15 @@ public class TeacherController extends BaseController {
                         if (!confirmPsw.equals(newPsw)) {
                             return error("新密码与确认密码不一致");
                         }
-                        Teacher preTeacher = (Teacher) getSession().getAttribute("user");
-                        if (!preTeacher.getPassword().equals(oldPsw)) {
+                        if (!currentTeacher.getPassword().equals(oldPsw)) {
                             return error("旧密码输入错误");
                         } else {
                             if (oldPsw.equals(newPsw)) {
                                 return error("新密码不能为旧密码");
+                            }else{
+                                if(!code.equals(getSession().getAttribute("VerifyCode"))){
+                                    return error("验证码错误");
+                                }
                             }
                         }
                     }
@@ -240,11 +249,11 @@ public class TeacherController extends BaseController {
             }
         }
         Teacher teacher = new Teacher();
-        teacher.setId(user_id);
-        teacher.setCode(user_code);
+        teacher.setId(currentTeacher.getId());
+        teacher.setCode(currentTeacher.getCode());
         teacher.setPassword(newPsw);
         if (teacherService.updateTeacher(teacher)) {
-            Teacher currentTeacher = teacherService.selectTeacherById(user_id);
+            currentTeacher.setPassword(newPsw);
             getSession().setAttribute("user", currentTeacher);
             return success("密码修改成功");
         }

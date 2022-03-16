@@ -31,11 +31,16 @@ public class TopicController extends BaseController {
 
     @RequestMapping("/list.html")
     public String list(TopicVo topicVo, Model model, @ModelAttribute("pageNum") String pageNum) {
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            model.addAttribute("msg","无访问权限");
+            return "error/404";
+        }
         getRequest().setAttribute("orderBy", "id");
-        Teacher user = (Teacher) getSession().getAttribute("user");
-        topicVo.setTeaId(user.getId());
+        Teacher teacher = (Teacher) user;
+        topicVo.setTeaId(teacher.getId());
         Course param = new Course();
-        param.setTeaId(user.getId());
+        param.setTeaId(teacher.getId());
         List<Course> currentCourses = courseService.selectCourseList(param);
         model.addAttribute("courseList", currentCourses);
         List<Type> types = typeService.selectTypeList(new Type());
@@ -73,6 +78,10 @@ public class TopicController extends BaseController {
         if (ObjectUtils.isEmpty(topic.getId()) || ObjectUtils.isEmpty(topic.getCode())) {
             return error("数据异常");
         }
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
+        }
         if (topicService.updateTopic(topic)) {
             return success("更新成功");
         } else {
@@ -85,6 +94,10 @@ public class TopicController extends BaseController {
     public AjaxResult delete(@RequestParam("topicId") Integer id, @RequestParam("code") String code) {
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
         }
         Topic param = new Topic();
         param.setId(id);
@@ -101,6 +114,10 @@ public class TopicController extends BaseController {
     public AjaxResult getTopicByIdAndCode(@RequestParam("topicId") Integer id, @RequestParam("code") String code){
         if (ObjectUtils.isEmpty(id) || ObjectUtils.isEmpty(code)) {
             return error("数据异常");
+        }
+        Object user = getSession().getAttribute("user");
+        if(!(user instanceof Teacher)){
+            return error("无访问权限");
         }
         Topic param = new Topic();
         param.setId(id);

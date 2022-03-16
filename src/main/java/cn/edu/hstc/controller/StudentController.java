@@ -161,15 +161,15 @@ public class StudentController extends BaseController {
     public AjaxResult updateSex(String user_gender) {
         Object user = getSession().getAttribute("user");
         if (!(user instanceof Student)) {
-            return error("无访问权限");
+            return error();
         }
-        Student currentStudent = (Student) user;
         if (ObjectUtils.isEmpty(user_gender)) {
             return error();
         }
         if (!user_gender.equals("男") && !user_gender.equals("女")) {
             return error();
         }
+        Student currentStudent = (Student) user;
         Student student = new Student();
         student.setId(currentStudent.getId());
         student.setCode(currentStudent.getCode());
@@ -187,9 +187,8 @@ public class StudentController extends BaseController {
     public AjaxResult updatePhone(String user_phone) {
         Object user = getSession().getAttribute("user");
         if (!(user instanceof Student)) {
-            return error("无访问权限");
+            return error();
         }
-        Student currentStudent = (Student) user;
         if (ObjectUtils.isEmpty(user_phone)) {
             return error("请输入手机号码");
         } else {
@@ -197,6 +196,7 @@ public class StudentController extends BaseController {
                 return error("手机号码格式错误");
             }
         }
+        Student currentStudent = (Student) user;
         Student student = new Student();
         student.setId(currentStudent.getId());
         student.setCode(currentStudent.getCode());
@@ -211,10 +211,10 @@ public class StudentController extends BaseController {
 
     @RequestMapping("/updatePsw")
     @ResponseBody
-    public AjaxResult updatePsw(String oldPsw, String newPsw, String confirmPsw) {
+    public AjaxResult updatePsw(String oldPsw, String newPsw, String confirmPsw, String code) {
         Object user = getSession().getAttribute("user");
         if (!(user instanceof Student)) {
-            return error("无访问权限");
+            return error();
         }
         Student currentStudent = (Student) user;
         if (ObjectUtils.isEmpty(oldPsw)) {
@@ -231,6 +231,17 @@ public class StudentController extends BaseController {
                     } else {
                         if (!confirmPsw.equals(newPsw)) {
                             return error("新密码与确认密码不一致");
+                        }
+                        if (!currentStudent.getPassword().equals(oldPsw)) {
+                            return error("旧密码输入错误");
+                        } else {
+                            if (oldPsw.equals(newPsw)) {
+                                return error("新密码不能为旧密码");
+                            }else{
+                                if(!code.equals(getSession().getAttribute("VerifyCode"))){
+                                    return error("验证码错误");
+                                }
+                            }
                         }
                     }
                 }
