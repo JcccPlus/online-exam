@@ -34,6 +34,10 @@
             top: 177px;
         }
 
+        .wrong {
+            border-color: #f01414;
+        }
+
         .row {
             margin-bottom: 20px;
         }
@@ -66,8 +70,6 @@
                                 <label class="col-form-label">学号</label>
                             </div>
                             <div class="col-auto" style="margin-left: 30px;">
-                                <input type="hidden" th:value="${session.user.id}" id="user_id">
-                                <input type="hidden" th:value="${session.user.code}" id="user_code">
                                 <input type="text" class="form-control" th:value="${session.user.stuNum}" size="22"
                                        disabled readonly>
                             </div>
@@ -176,10 +178,11 @@
                                     <label class="col-form-label">验证码</label>
                                 </div>
                                 <div class="col-auto" style="margin-left: 30px;">
-                                    <input type="text" class="form-control" placeholder="请输入验证码" size="10">
+                                    <input type="text" class="form-control" placeholder="请输入验证码" id="recode" size="10"
+                                           onblur="checkCode(this)">
                                 </div>
                                 <div class="col-auto">
-                                    <input type="text" class="form-control" size="5">
+                                    <img onclick="javascript:getvCode()" id="verifyimg"/>
                                 </div>
                             </div>
                             <div>
@@ -220,6 +223,9 @@
 <script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/js/common.js}"></script>
 <script>
+
+    getvCode();
+
     $(document).ready(function () {
         $(".menu").hover(
             function () {
@@ -228,6 +234,23 @@
                 $(this).find("h6").removeClass("active");
             });
     });
+
+    /**
+     * 获取验证码
+     * 将验证码写到页面的id = verifyimg 的地方
+     */
+    function getvCode() {
+        document.getElementById("verifyimg").src = timestamp("[[@{/verify/code.jpg}]]");
+    }
+
+    function checkCode(obj) {
+        if ($.trim($(obj).val()) === "") {
+            $(obj).addClass("wrong");
+        } else {
+            $(obj).removeClass("wrong");
+        }
+        $(obj).val($.trim($(obj).val()));
+    }
 
     $(document).ready(function () {
         $(".menu").click(
@@ -250,11 +273,7 @@
     });
 
     $('input[type=radio][name=gender]').change(function () {
-        var user_id = $("#user_id").val();
-        var user_code = $("#user_code").val();
         $.post("[[@{/student/updateSex}]]", {
-            "user_id": user_id,
-            "user_code": user_code,
             "user_gender": this.value
         }, function (data) {
             alert(data.msg);
@@ -266,12 +285,8 @@
     }
 
     function editPhone() {
-        var user_id = $("#user_id").val();
-        var user_code = $("#user_code").val();
         var phone = $("#user_phone").val();
         $.post("[[@{/student/updatePhone}]]", {
-            "user_id": user_id,
-            "user_code": user_code,
             "user_phone": phone
         }, function (data) {
             alert(data.msg);
@@ -282,23 +297,26 @@
     }
 
     function editPsw() {
-        var user_id = $("#user_id").val();
-        var user_code = $("#user_code").val();
         var oldPsw = $("#oldPsw").val();
         var newPsw = $("#newPsw").val();
         var confirmPsw = $("#confirmPsw").val();
-        $.post("[[@{/student/updatePsw}]]", {
-            "user_id": user_id,
-            "user_code": user_code,
-            "oldPsw": oldPsw,
-            "newPsw": newPsw,
-            "confirmPsw": confirmPsw
-        }, function (data) {
-            alert(data.msg);
-            if (data.code === 0) {
-                window.location.reload();
-            }
-        });
+        var recode = $("#recode").val();
+        if (recode === "") {
+            $("#recode").addClass("wrong");
+            alert("请输入验证码");
+        }else{
+            $.post("[[@{/student/updatePsw}]]", {
+                "oldPsw": oldPsw,
+                "newPsw": newPsw,
+                "confirmPsw": confirmPsw,
+                "code": recode
+            }, function (data) {
+                alert(data.msg);
+                if (data.code === 0) {
+                    window.location.reload();
+                }
+            });
+        }
     }
 
     $("#inputFileBtn").click(function () {

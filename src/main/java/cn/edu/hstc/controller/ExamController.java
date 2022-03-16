@@ -289,6 +289,9 @@ public class ExamController extends BaseController {
                     break;
             }
         }
+        logger.info("考试前session过期时间为"+(getSession().getMaxInactiveInterval()/3600)+"小时！");
+        getSession().setMaxInactiveInterval(getSession().getMaxInactiveInterval()+(currentExam.getTime()+10)*60);
+        logger.info(currentStudent.getName()+"进入考试！已将session过期时间调整至"+(getSession().getMaxInactiveInterval()/3600)+"小时！");
         model.addAttribute("singleChoiceTopics", singleChoiceTopics);
         model.addAttribute("moreChoiceTopics", moreChoiceTopics);
         model.addAttribute("estimateTopics", estimateTopics);
