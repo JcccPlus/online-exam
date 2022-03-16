@@ -84,10 +84,14 @@ public class TeacherController extends BaseController {
                 return error("性别数据出错");
             }
         }
-        if (teacherService.insertTeacher(teacher)) {
-            return success("添加教师成功");
-        } else {
-            return error();
+        try{
+            if (teacherService.insertTeacher(teacher)) {
+                return success("添加教师成功");
+            } else {
+                return error();
+            }
+        }catch (Exception e){
+            return error("该工号已存在！");
         }
     }
 

@@ -9,11 +9,15 @@ import cn.edu.hstc.service.StudentService;
 import cn.edu.hstc.util.ProjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -52,6 +56,51 @@ public class StudentServiceImpl implements StudentService {
         //默认密码
         student.setPassword(student.getStuNum());
         return studentDao.insertStudent(student) > 0;
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult addStudents(List<Student> students) {
+        int rows = 0;
+        try {
+            for (Student student : students) {
+                if (ObjectUtils.isEmpty(student.getClassId()) || student.getClassId() == 0) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("请选择班级");
+                }
+                if (ObjectUtils.isEmpty(student.getStuNum())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("学号不为空且不能与已有学号重复");
+                }
+                if (ObjectUtils.isEmpty(student.getName())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("请确认是否有姓名没有输入");
+                }
+                if (ObjectUtils.isEmpty(student.getGender())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("性别不为空");
+                } else {
+                    if (!student.getGender().equals("男") && !student.getGender().equals("女")) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return AjaxResult.error("性别数据出错");
+                    }
+                }
+                if (!ObjectUtils.isEmpty(student.getPhone()) && !ProjectUtil.isPhoneNum(student.getPhone())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("请确认是否有手机号码不符合规范");
+                }
+                if (insertStudent(student)) {
+                    rows += 1;
+                } else {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return AjaxResult.error("新增学生程序异常，请稍后重试！");
+                }
+            }
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return AjaxResult.error("请确认是否有学号重复！");
+        }
+        return AjaxResult.success("成功添加" + rows + "条学生数据！");
     }
 
     @Override

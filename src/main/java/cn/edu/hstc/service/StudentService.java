@@ -27,4 +27,9 @@ public interface StudentService {
     List<Student> selectStudentsOfMissingExam(Exam exam);
 
     AjaxResult updateHeadPic(Student student, MultipartFile file);
+
+    /**
+     * 批量添加学生业务
+     */
+    AjaxResult addStudents(List<Student> students);
 }

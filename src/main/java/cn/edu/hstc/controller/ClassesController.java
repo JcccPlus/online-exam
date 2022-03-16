@@ -72,10 +72,14 @@ public class ClassesController extends BaseController {
         if (ObjectUtils.isEmpty(classes.getMajorId()) || classes.getMajorId() == 0) {
             return error("请选择专业");
         }
-        if (classesService.insertClass(classes)) {
-            return success("添加班级成功");
-        } else {
-            return error("添加失败");
+        try{
+            if (classesService.insertClass(classes)) {
+                return success("添加班级成功");
+            } else {
+                return error("添加失败");
+            }
+        }catch (Exception e){
+            return error("该班级已存在！");
         }
     }
 
