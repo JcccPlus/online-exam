@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.ExamDao">
+
+    <resultMap id="ExamResult" type="Exam">
+        <id column="id" property="id"/>
+        <result column="start" property="start"/>
+        <result column="time" property="time"/>
+        <result column="end" property="end"/>
+        <result column="score" property="score"/>
+        <result column="late_time" property="lateTime"/>
+        <result column="code" property="code"/>
+        <result column="paper_id" property="paperId"/>
+        <result column="class_id" property="classId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <association column="paper_id" property="paper" select="cn.edu.hstc.dao.PaperDao.selectPaperById"
+                     fetchType="eager"/>
+        <association column="class_id" property="classes" select="cn.edu.hstc.dao.ClassesDao.selectClassById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectExamList" parameterType="Exam" resultMap="ExamResult">
+        select exam.* from tb_exam exam,tb_paper paper,tb_class class,tb_course course where exam.paper_id = paper.id
+        and
+        exam.class_id = class.id and paper.course_id = course.id
+        <if test="id != null">and exam.id = #{id}</if>
+        <if test="start != null">and exam.start = #{start}</if>
+        <if test="time != null">and exam.time = #{time}</if>
+        <if test="end != null">and exam.end = #{end}</if>
+        <if test="score != null">and exam.score = #{score}</if>
+        <if test="lateTime != null">and exam.late_time = #{lateTime}</if>
+        <if test="code != null and code != ''">and exam.code = #{code}</if>
+        <if test="paperId != null">and exam.paper_id = #{paperId}</if>
+        <if test="classId != null">and exam.class_id = #{classId}</if>
+        <if test="paper != null and paper.teaId != null">and paper.tea_id = #{paper.teaId}</if>
+        <if test="searchValue != null and searchValue != ''">
+            and (class.name like "%${searchValue}%"
+            or course.name like
+            "%${searchValue}%")
+        </if>
+        <!--<if test="searchValue != null and searchValue != '' and classId != null">
+            and paper.name like "%${searchValue}%"
+        </if>-->
+    </select>
+
+    <select id="selectExamById" parameterType="int" resultMap="ExamResult">
+        select *
+        from tb_exam
+        where id = #{id}
+    </select>
+
+    <insert id="insertExam" parameterType="Exam">
+        insert into tb_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="start != null">start,</if>
+            <if test="time != null">time,</if>
+            <if test="end != null">end,</if>
+            <if test="score != null">score,</if>
+            <if test="lateTime != null">late_time,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="paperId != null">paper_id,</if>
+            <if test="classId != null">class_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="start != null">#{start},</if>
+            <if test="time != null">#{time},</if>
+            <if test="end != null">#{end},</if>
+            <if test="score != null">#{score},</if>
+            <if test="lateTime != null">#{lateTime},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="paperId != null">#{paperId},</if>
+            <if test="classId != null">#{classId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateExam" parameterType="Exam">
+        update tb_exam
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="id != null">id = #{id},</if>
+            <if test="start != null">start = #{start},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="end != null">end = #{end},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="lateTime != null">late_time = #{lateTime},</if>
+            <!--<if test="code != null and code != ''">code = #{code},</if>-->
+            <if test="paperId != null">paper_id = #{paperId},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id} and code = #{code}
+    </update>
+
+    <delete id="deleteExam" parameterType="Exam">
+        delete
+        from tb_exam
+        where id = #{id}
+          and code = #{code}
+    </delete>
+
+    <select id="selectCurrentExam" resultMap="ExamResult">
+        select exam.* from tb_exam exam,tb_paper paper,tb_course course where exam.paper_id=paper.id and paper.course_id = course.id and exam.class_id = #{exam.classId}
+        and not exists(select 1 from tb_record record where exam.id=record.exam_id and record.stu_id = #{stuId})
+        <if test="exam.searchValue!=null and exam.searchValue!=''">
+            and (paper.name like "%${exam.searchValue}%" or course.name like "%${exam.searchValue}%")
+        </if>
+        <if test="exam.code != null and exam.code != ''">and exam.code = #{exam.code}</if>
+    </select>
+
+</mapper>

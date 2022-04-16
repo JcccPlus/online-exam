@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.CourseDao">
+
+    <resultMap id="CourseResult" type="Course">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="info" property="info"/>
+        <result column="tea_id" property="teaId"/>
+        <association column="tea_id" property="teacher" select="cn.edu.hstc.dao.TeacherDao.selectTeacherById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectCourseList" parameterType="Course" resultMap="CourseResult">
+        select * from tb_course
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="name != null  and name != ''">and name = #{name}</if>
+            <if test="searchValue != null and searchValue != ''">and name like "%${searchValue}%"</if>
+            <if test="info != null and info !=''">and info = #{info}</if>
+            <if test="code != null and code !=''">and code = #{code}</if>
+            <if test="teaId != null">and tea_id = #{teaId}</if>
+        </where>
+    </select>
+
+    <select id="selectCourseById" parameterType="int" resultMap="CourseResult">
+        select *
+        from tb_course
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourse" parameterType="Course">
+        insert into tb_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="info != null and info !=''">info,</if>
+            <if test="teaId != null">tea_id,</if>
+            <if test="code != null and code !=''">code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="info != null and info !=''">#{info},</if>
+            <if test="teaId != null">#{teaId},</if>
+            <if test="code != null and code !=''">#{code},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCourse" parameterType="Course">
+        update tb_course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="info != null">info = #{info},</if>
+            <if test="teaId != null">tea_id = #{teaId},</if>
+            <!--<if test="code != null and code !=''">code = #{code},</if>-->
+        </trim>
+        where id = #{id} and code = #{code}
+    </update>
+
+    <delete id="deleteCourse" parameterType="Course">
+        delete
+        from tb_course
+        where id = #{id}
+          and code = #{code}
+    </delete>
+
+</mapper>

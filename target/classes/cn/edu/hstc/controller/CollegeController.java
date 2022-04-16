@@ -68,10 +68,14 @@ public class CollegeController extends BaseController {
         }
         College college = new College();
         college.setName(name);
-        if (collegeService.insertCollege(college)) {
-            return success("添加学院成功");
-        } else {
-            return error("添加失败");
+        try{
+            if (collegeService.insertCollege(college)) {
+                return success("添加学院成功");
+            } else {
+                return error("添加失败");
+            }
+        }catch (Exception e){
+            return error("该学院已存在！");
         }
     }
 

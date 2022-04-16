@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.StatsDao">
+
+    <resultMap id="StatsResult" type="Stats">
+        <id column="id" property="id"/>
+        <result column="exam_id" property="examId"/>
+        <result column="s_average" property="sAverage"/>
+        <result column="s_median" property="sMedian"/>
+        <result column="s_top" property="sTop"/>
+        <result column="s_low" property="sLow"/>
+        <result column="good" property="good"/>
+        <result column="med" property="med"/>
+        <result column="nor" property="nor"/>
+        <result column="bad" property="bad"/>
+        <result column="turnout" property="turnout"/>
+        <result column="absence" property="absence"/>
+        <result column="flag" property="flag"/>
+        <association column="exam_id" property="exam" select="cn.edu.hstc.dao.ExamDao.selectExamById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectStatsList" parameterType="Stats" resultMap="StatsResult">
+        select * from tb_stats
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="examId != null">and exam_id = #{examId}</if>
+            <if test="sAverage != null">and s_average = #{sAverage}</if>
+            <if test="sMedian != null">and s_median = #{sMedian}</if>
+            <if test="sTop != null">and s_top = #{sTop}</if>
+            <if test="sLow != null">and s_low = #{sLow}</if>
+            <if test="good != null">and good = #{good}</if>
+            <if test="med != null">and med = #{med}</if>
+            <if test="nor != null">and nor = #{nor}</if>
+            <if test="bad != null">and bad = #{bad}</if>
+            <if test="turnout != null">and turnout = #{turnout}</if>
+            <if test="absence != null">and absence = #{absence}</if>
+            <if test="flag != null and flag != ''">and flag = #{flag}</if>
+        </where>
+    </select>
+
+    <insert id="insertStats" parameterType="Stats">
+        insert into tb_stats
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="examId != null">exam_id,</if>
+            <if test="sAverage != null">s_average,</if>
+            <if test="sMedian != null">s_median,</if>
+            <if test="sTop != null">s_top,</if>
+            <if test="sLow != null">s_low,</if>
+            <if test="good != null">good,</if>
+            <if test="med != null">med,</if>
+            <if test="nor != null">nor,</if>
+            <if test="bad != null">bad,</if>
+            <if test="turnout != null">turnout,</if>
+            <if test="absence != null">absence,</if>
+            <if test="flag != null and flag != ''">flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="examId != null">#{examId},</if>
+            <if test="sAverage != null">#{sAverage},</if>
+            <if test="sMedian != null">#{sMedian},</if>
+            <if test="sTop != null">#{sTop},</if>
+            <if test="sLow != null">#{sLow},</if>
+            <if test="good != null">#{good},</if>
+            <if test="med != null">#{med},</if>
+            <if test="nor != null">#{nor},</if>
+            <if test="bad != null">#{bad},</if>
+            <if test="turnout != null">#{turnout},</if>
+            <if test="absence != null">#{absence},</if>
+            <if test="flag != null and flag != ''">#{flag},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStats" parameterType="Stats">
+        update tb_stats
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sAverage != null">s_average = #{sAverage},</if>
+            <if test="sMedian != null">s_median = #{sMedian},</if>
+            <if test="sTop != null">s_top = #{sTop},</if>
+            <if test="sLow != null">s_low = #{sLow},</if>
+            <if test="good != null">good = #{good},</if>
+            <if test="med != null">med = #{med},</if>
+            <if test="nor != null">med = #{nor},</if>
+            <if test="bad != null">bad = #{bad},</if>
+            <if test="turnout != null">turnout = #{turnout},</if>
+            <if test="absence != null">absence = #{absence},</if>
+            <if test="flag != null and flag != ''">flag = #{flag},</if>
+        </trim>
+        where id = #{id} and exam_id = #{examId}
+    </update>
+
+</mapper>

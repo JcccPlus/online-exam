@@ -21,7 +21,7 @@ import java.util.List;
  * 登录/退出控制器
  */
 @Controller
-public class LoginController {
+public class LoginController extends BaseController {
     @Autowired
     private AdminService adminService;
     @Autowired
@@ -46,6 +46,8 @@ public class LoginController {
                     Teacher teacher = teachers.get(0);
                     if (teacher.getPassword().equals(password)) {
                         session.setAttribute("user", teacher);
+                        session.setMaxInactiveInterval(6*60*60);  //设置session过期时间为6个小时
+                        logger.info(teacher.getTeaNum()+"用户登陆成功！session过期时间为"+(session.getMaxInactiveInterval()/3600)+"小时！");
                         return "redirect:/course/list.html";
                     } else {
                         message = "账号或密码错误";
@@ -65,6 +67,8 @@ public class LoginController {
                     Student student = students.get(0);
                     if (student.getPassword().equals(password)) {
                         session.setAttribute("user", student);
+                        session.setMaxInactiveInterval(6*60*60);  //设置session过期时间为6个小时
+                        logger.info(student.getStuNum()+"用户登陆成功！session过期时间为"+(session.getMaxInactiveInterval()/3600)+"小时！");
                         return "redirect:/exam/current.html";
                     } else {
                         message = "账号或密码错误";
@@ -77,6 +81,8 @@ public class LoginController {
             Admin admin = adminService.getAdmin(id, password);
             if (admin != null) {
                 session.setAttribute("user", admin);
+                session.setMaxInactiveInterval(6*60*60);  //设置session过期时间为6个小时
+                logger.info(admin.getUsername()+"用户登陆成功！session过期时间为"+(session.getMaxInactiveInterval()/3600)+"小时！");
                 return "redirect:/college/list.html";
             } else {
                 message = "账号或密码错误";

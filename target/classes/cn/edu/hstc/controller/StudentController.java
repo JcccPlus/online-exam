@@ -62,32 +62,12 @@ public class StudentController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult add(Student student) {
+    public AjaxResult add(@RequestBody List<Student> students) {
         Object user = getSession().getAttribute("user");
         if (!(user instanceof Admin)) {
             return error("无访问权限");
         }
-        if (ObjectUtils.isEmpty(student.getClassId()) || student.getClassId() == 0) {
-            return error("请选择专业");
-        }
-        if (ObjectUtils.isEmpty(student.getStuNum())) {
-            return error("学号不为空且不能与已有学号重复");
-        }
-        if (ObjectUtils.isEmpty(student.getName())) {
-            return error("姓名不为空");
-        }
-        if (ObjectUtils.isEmpty(student.getGender())) {
-            return error("性别不为空");
-        } else {
-            if (!student.getGender().equals("男") && !student.getGender().equals("女")) {
-                return error("性别数据出错");
-            }
-        }
-        if (studentService.insertStudent(student)) {
-            return success("添加学生成功");
-        } else {
-            return error("添加失败");
-        }
+        return studentService.addStudents(students);
     }
 
     @PostMapping("/edit")

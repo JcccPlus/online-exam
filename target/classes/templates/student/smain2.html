@@ -202,8 +202,7 @@
                                     <li th:text="${'考试科目：'+record.exam.paper.course.name}"></li>
                                     <li th:text="${'评卷老师：'+record.exam.paper.course.teacher.name}"></li>
                                     <li>[[${#dates.format(record.exam.start,'yyyy/MM/dd')+' '+
-                                        record.exam.start.hours+':'+ record.exam.start.minutes+':00'+'-'+
-                                        record.exam.end.hours+':'+record.exam.end.minutes+':00'}]]
+                                        #dates.format(record.exam.start,'hh:mm:ss')+'-'+#dates.format(record.exam.end,'hh:mm:ss')}]]
                                     </li>
                                     <li>考试状态：[[${record.state}]]</li>
                                 </ul>

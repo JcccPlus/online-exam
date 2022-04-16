@@ -27,6 +27,18 @@
             padding: 0.3rem 2rem;
             font-size: 16px;
         }
+
+        .new_or_div .mb-3 {
+            width: 30.3%;
+            display: inline-block;
+            margin-left: 16px;
+        }
+
+        .new_student_div .mb-3 {
+            width: 20%;
+            display: inline-block;
+            margin-left: 16px;
+        }
     </style>
 </head>
 
@@ -65,7 +77,7 @@
                 </div>
             </div>
             <hr style="margin: 0">
-            <div class="right-list" style="padding: 0px 40px">
+            <div class="right-list" style="padding: 0px 40px 40px 40px;">
                 <div style="color: #b2b2b2;margin: 200px auto;font-size: 23px;width: 275px"
                      th:if="${#lists.isEmpty(studentList)}">无学生数据，请<a href="#" data-bs-toggle="modal"
                                                                       data-bs-target="#addModal"
@@ -150,8 +162,9 @@
     </div>
 </div>
 <!-- 添加学生Modal -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" style="min-width: 800px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addModalLabel">添加学生</h5>
@@ -159,70 +172,60 @@
             </div>
             <div class="modal-body">
                 <form id="new_student_form" name="new_student_form">
-                    <div class="div">
-                        <label class="div1">所属学院</label>
-                        <div class="div2">
-                            <select class="form-select" id="add_college" name="college">
-                                <option value="0">-------------------请选择学院-------------------</option>
+                    <div class="new_or_div">
+                        <div class="mb-3">
+                            <select class="form-select" id="add_college" name="college" style="text-align: center">
+                                <option value="0">请选择学院</option>
                                 <option th:each="college:${collegeList}" th:text="${college.getName()}"
                                         th:value="${college.getId()}"></option>
                             </select>
                         </div>
-                    </div>
-                    <div class="div">
-                        <label class="div1">所属专业</label>
-                        <div class="div2">
-                            <select class="form-select" id="add_major" name="major">
-                                <option value="0">-------------------请选择专业-------------------</option>
+                        <div class="mb-3">
+                            <select class="form-select" id="add_major" name="major" style="text-align: center">
+                                <option value="0">请选择专业</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <select class="form-select" id="add_class" name="classId" style="text-align: center">
+                                <option value="0">请选择班级</option>
                             </select>
                         </div>
                     </div>
-                    <div class="div">
-                        <label class="div1">所属班级</label>
-                        <div class="div2">
-                            <select class="form-select" id="add_class" name="classId">
-                                <option value="0">-------------------请选择班级-------------------</option>
-                            </select>
+                    <hr style="margin-top: 0">
+                    <div class="new_student_div">
+                        <div class="mb-3">
+                            <h6>学号:</h6>
+                            <input type="text" class="form-control" name="stuNum" placeholder="请输入学生学号">
                         </div>
-                    </div>
-                    <div class="div">
-                        <label class="div1">学号</label>
-                        <div class="div2">
-                            <input type="text" id="add_stuNum" class="form-control" name="stuNum" placeholder="请输入学生学号">
+                        <div class="mb-3">
+                            <h6>姓名:</h6>
+                            <input type="text" class="form-control" name="name" placeholder="请输入学生姓名">
                         </div>
-                    </div>
-                    <div class="div">
-                        <label class="div1">姓名</label>
-                        <div class="div2">
-                            <input type="text" id="add_name" class="form-control" name="name" placeholder="请输入学生姓名">
-                        </div>
-                    </div>
-                    <div class="div">
-                        <label class="div1">性别</label>
-                        <div class="div2">
+                        <div class="mb-3" style="width: 15%">
+                            <h6 style="margin-bottom: 17px">性别:</h6>
                             <div class="form-check form-check-inline" style="margin-bottom:0">
-                                <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="男"
-                                       style="margin-top: 0.9em;" checked>
+                                <input class="form-check-input" type="checkbox" name="gender" onclick="checkOne(this)"
+                                       id="inlineRadio1" value="男"
+                                       checked>
                                 <label class="form-check-label" for="inlineRadio1">男</label>
                             </div>
                             <div class="form-check form-check-inline" style="margin-bottom:0">
-                                <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="女"
-                                       style="margin-top: 0.9em;">
+                                <input class="form-check-input" type="checkbox" name="gender" onclick="checkOne(this)"
+                                       id="inlineRadio2" value="女">
                                 <label class="form-check-label" for="inlineRadio2">女</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="div">
-                        <label class="div1">手机号码</label>
-                        <div class="div2">
-                            <input type="text" id="add_phone" class="form-control" name="phone"
-                                   placeholder="请输入手机号码（非必填）">
+                        <div class="mb-3" style="width: 33%">
+                            <h6>手机号码:</h6>
+                            <input type="text" class="form-control" name="phone"
+                                   placeholder="请输入手机号码（非必填）" maxlength="11">
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addMoreStudent()">批量</button>
                 <button type="button" class="btn btn-primary" onclick="addStudent()">添加</button>
             </div>
         </div>
@@ -233,7 +236,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">编辑教师信息</h5>
+                <h5 class="modal-title" id="editModalLabel">编辑学生信息</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -295,7 +298,7 @@
                         <label class="div1">手机号码</label>
                         <div class="div2">
                             <input type="text" id="edit_phone" class="form-control" name="phone"
-                                   placeholder="请输入手机号码（非必填）">
+                                   placeholder="请输入手机号码（非必填）" maxlength="11">
                         </div>
                     </div>
                 </form>
@@ -313,13 +316,156 @@
 <script>
 
     function addStudent() {
-        $.post("[[@{/student/add}]]",
-            $("#new_student_form").serialize(), function (data) {
-                alert(data.msg);
-                if (data.code === 0) {
-                    getStudentList([[${pageInfo.getPageNum()}]], null);
+        showLoading();
+        var formArray = $("#new_student_form").serializeArray();
+        //console.log(formArray);
+        var array = [];
+        var obj = {};
+        var cid = 0;
+        var isFlag = true;
+        $.each(formArray, function (i, item) {
+            if (item.name === "classId") {
+                if (item.value === "0") {
+                    hideLoading();
+                    alert("请选择班级！");
+                    isFlag = false;
+                    return false;
                 }
+                cid = item.value;
+            } else if (item.name === "stuNum") {
+                if ($.trim(item.value) === "") {
+                    hideLoading();
+                    alert("请确认是否有学号没有输入！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.classId = cid;
+                obj.stuNum = $.trim(item.value);
+            } else if (item.name === "name") {
+                if ($.trim(item.value) === "") {
+                    hideLoading();
+                    alert("请确认是否有姓名没有输入！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.name = $.trim(item.value);
+            } else if (item.name === "gender") {
+                if ($.trim(item.value) === "") {
+                    hideLoading();
+                    alert("请确认是否有性别没有选择！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.gender = $.trim(item.value);
+            } else if (item.name === "phone") {
+                if ($.trim(item.value) !== "" && !(/^1[3456789]\d{9}$/.test($.trim(item.value)))) {
+                    hideLoading();
+                    alert("请确认是否有手机号码不符合规范！");
+                    isFlag = false;
+                    return false;
+                }
+                obj.phone = $.trim(item.value);
+                array.push(obj);
+                obj = {};
+            }
+        });
+        //console.log(array);
+        if (isFlag) {
+            $.ajax({
+                type: "post",
+                url: "[[@{/student/add}]]",
+                data: JSON.stringify(array),  //转为Json字符串
+                success: function (data, textStatus) {
+                    hideLoading();
+                    setTimeout(function () {
+                        alert(data.msg);
+                        if (data.code === 0) {
+                            getStudentList([[${pageInfo.getPageNum()}]], null);
+                        }
+                    }, 300);
+                },
+                error: function (xhr) {
+                    hideLoading();
+                    setTimeout(function () {
+                        if (xhr.status === 405) {
+                            alert("您的登录信息已经过期，请重新登录！\n\nHTTP响应码：" + xhr.status);
+                            window.location.href = "[[@{/login.html}]]";
+                        } else {
+                            alert("程序异常\n\nHTTP响应码：" + xhr.status);
+                        }
+                    }, 300);
+                },
+                dataType: "json",
+                contentType: "application/json"
             });
+        } else {
+            hideLoading();
+        }
+    }
+
+    function addMoreStudent() {
+        $("#new_student_form").append("<div class=\"new_student_div\">\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>学号:</h6>\n" +
+            "                            <input type=\"text\" class=\"form-control\" name=\"stuNum\" placeholder=\"请输入学生学号\">\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\">\n" +
+            "                            <h6>姓名:</h6>\n" +
+            "                            <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"请输入学生姓名\">\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\" style=\"width: 15%\">\n" +
+            "                            <h6 style=\"margin-bottom: 17px\">性别:</h6>\n" +
+            "                            <div class=\"form-check form-check-inline\" style=\"margin-bottom:0\">\n" +
+            "                                <input class=\"form-check-input\" type=\"checkbox\" name=\"gender\" onclick=\"checkOne(this)\"\n" +
+            "                                       value=\"男\" checked>\n" +
+            "                                <label class=\"form-check-label\">男</label>\n" +
+            "                            </div>\n" +
+            "                            <div class=\"form-check form-check-inline\" style=\"margin-bottom:0\">\n" +
+            "                                <input class=\"form-check-input\" type=\"checkbox\" name=\"gender\" onclick=\"checkOne(this)\"\n" +
+            "                                       value=\"女\">\n" +
+            "                                <label class=\"form-check-label\">女</label>\n" +
+            "                            </div>\n" +
+            "                        </div>\n" +
+            "                        <div class=\"mb-3\" style=\"width: 33%\">\n" +
+            "                            <a href=\"javascript:void(0)\" title=\"删除该列\" onclick=\"dropStudentDiv(this)\" style=\"position:relative;top: 20px;left: 93%;\">\n" +
+            "                                <svg t=\"1646079725352\" class=\"icon\" viewBox=\"0 0 1024 1024\" version=\"1.1\"\n" +
+            "                                     xmlns=\"http://www.w3.org/2000/svg\" p-id=\"10602\" width=\"16\" height=\"16\">\n" +
+            "                                    <path d=\"M1017.6 518.4C1017.6 238.72 791.68 12.8 512 12.8 232.32 12.8 6.4 238.72 6.4 518.4 6.4 798.08 232.32 1024 512 1024c279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#895251\" p-id=\"10603\"></path>\n" +
+            "                                    <path d=\"M1017.6 505.6C1017.6 225.92 791.68 0 512 0 232.32 0 6.4 225.92 6.4 505.6c0 279.68 225.92 505.6 505.6 505.6 279.68 0 505.6-225.92 505.6-505.6z\"\n" +
+            "                                          fill=\"#EB786B\" p-id=\"10604\"></path>\n" +
+            "                                    <path d=\"M729.6 588.8H294.4c-19.2 0-38.4-19.2-38.4-38.4V460.8c0-19.2 19.2-38.4 38.4-38.4h435.2c19.2 0 38.4 19.2 38.4 38.4v89.6c0 19.2-19.2 38.4-38.4 38.4zM294.4 435.2c-12.8 0-25.6 12.8-25.6 25.6v89.6c0 12.8 12.8 19.2 19.2 19.2h435.2c12.8 0 19.2-12.8 19.2-19.2V460.8c0-12.8-12.8-19.2-19.2-19.2H294.4z\"\n" +
+            "                                          fill=\"#808080\" p-id=\"10605\"></path>\n" +
+            "                                    <path d=\"M761.6 550.4V460.8c0-19.2-12.8-32-32-32H294.4c-19.2 0-32 12.8-32 32v89.6c0 19.2 12.8 32 32 32h435.2c19.2 0 32-19.2 32-32z\"\n" +
+            "                                          fill=\"#FBFCFB\" p-id=\"10606\"></path>\n" +
+            "                                </svg>\n" +
+            "                            </a>\n" +
+            "                            <h6>手机号码:</h6>\n" +
+            "                            <input type=\"text\" class=\"form-control\" name=\"phone\"\n" +
+            "                                   placeholder=\"请输入手机号码（非必填）\"  maxlength=\"11\">\n" +
+            "                        </div>\n" +
+            "                    </div>");
+    }
+
+    //只允许checkbox选中一个
+    function checkOne(obj) {
+        var length = $(obj).parent().parent().find("input").length;
+        var flag = false;
+        for (var i = 0; i < length; i++) {
+            if ($(obj).val() !== $(obj).parent().parent().find("input:eq(" + i + ")").attr("value")) {
+                $(obj).parent().parent().find("input:eq(" + i + ")").prop("checked", false);
+            }
+            if ($(obj).parent().parent().find("input:eq(" + i + ")").is(":checked")) {
+                flag = true;
+            }
+        }
+        if (!flag) {
+            $(obj).prop("checked", true);
+        }
+    }
+
+    function dropStudentDiv(obj) {
+        $(obj).closest(".new_student_div").remove();
     }
 
     function getStudentList(pageNum, obj) {

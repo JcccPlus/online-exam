@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.TypeDao">
+
+    <select id="selectTypeList" parameterType="Type" resultType="Type">
+        select * from tb_type
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="name != null  and name != ''">and name = #{name}</if>
+        </where>
+    </select>
+
+    <select id="selectTypeById" parameterType="int" resultType="Type">
+        select *
+        from tb_type
+        where id = #{id}
+    </select>
+
+</mapper>

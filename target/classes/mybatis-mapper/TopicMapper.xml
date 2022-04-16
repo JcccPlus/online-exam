@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.TopicDao">
+
+    <resultMap id="TopicResult" type="Topic">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="opts" property="opts"/>
+        <result column="answer" property="answer"/>
+        <result column="analysis" property="analysis"/>
+        <result column="type_id" property="typeId"/>
+        <result column="level_id" property="levelId"/>
+        <result column="stage_id" property="stageId"/>
+        <result column="code" property="code"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <association column="type_id" property="type" select="cn.edu.hstc.dao.TypeDao.selectTypeById"
+                     fetchType="eager"/>
+        <association column="level_id" property="level" select="cn.edu.hstc.dao.LevelDao.selectLevelById"
+                     fetchType="eager"/>
+        <association column="stage_id" property="stage" select="cn.edu.hstc.dao.StageDao.selectStageById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectTopicList" parameterType="Topic" resultMap="TopicResult">
+        select * from tb_topic
+        <where>
+            <if test="id != null">and id = #{id}</if>
+            <if test="title != null and title != ''">and title = #{title}</if>
+            <if test="opts != null and opts !=''">and opts = #{opts}</if>
+            <if test="answer != null and answer != ''">and answer = #{answer}</if>
+            <if test="analysis != null and analysis != ''">and analysis = #{analysis}</if>
+            <if test="typeId != null">and type_id = #{typeId}</if>
+            <if test="levelId != null">and level_id = #{levelId}</if>
+            <if test="stageId != null">and stage_id = #{stageId}</if>
+            <if test="code != null and code != ''">and code = #{code}</if>
+        </where>
+    </select>
+
+    <select id="selectTopicById" parameterType="int" resultMap="TopicResult">
+        select *
+        from tb_topic
+        where id = #{id}
+    </select>
+
+    <insert id="insertTopic" parameterType="Topic">
+        insert into tb_topic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="opts != null and opts !=''">opts,</if>
+            <if test="answer != null and answer !=''">answer,</if>
+            <if test="analysis != null and analysis !=''">analysis,</if>
+            <if test="typeId != null">type_id,</if>
+            <if test="levelId != null">level_id,</if>
+            <if test="stageId != null">stage_id,</if>
+            <if test="code != null and code !=''">code,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="opts != null and opts !=''">#{opts},</if>
+            <if test="answer != null and answer !=''">#{answer},</if>
+            <if test="analysis != null and analysis !=''">#{analysis},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="levelId != null">#{levelId},</if>
+            <if test="stageId != null">#{stageId},</if>
+            <if test="code != null and code !=''">#{code},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTopic" parameterType="Topic">
+        update tb_topic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="id != null">id = #{id},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="opts != null and opts !=''">opts = #{opts},</if>
+            <if test="answer != null and answer !=''">answer = #{answer},</if>
+            <if test="analysis != null and analysis !=''">analysis = #{analysis},</if>
+            <if test="typeId != null">type_id = #{typeOd},</if>
+            <if test="levelId != null">level_id = #{levelId},</if>
+            <if test="stageId != null">stage_id = #{stageId},</if>
+            <!--<if test="code != null and code !=''">code = #{code},</if>-->
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id} and code = #{code}
+    </update>
+
+    <delete id="deleteTopic" parameterType="Topic">
+        delete
+        from tb_topic
+        where id = #{id}
+          and code = #{code}
+    </delete>
+
+    <select id="selectTopicListByPo" parameterType="TopicVo" resultMap="TopicResult">
+        select t.*
+        from tb_topic t,
+        tb_course c,
+        tb_stage s
+        where t.stage_id = s.id
+        and s.course_id = c.id
+        and c.tea_id = #{teaId}
+        <if test="courseId!=null">
+            and c.id = #{courseId}
+        </if>
+        <if test="stageId!=null">
+            and t.stage_id = #{stageId}
+        </if>
+        <if test="typeId!=null">
+            and t.type_id = #{typeId}
+        </if>
+        <if test="levelId!=null">
+            and t.level_id = #{levelId}
+        </if>
+    </select>
+
+</mapper>

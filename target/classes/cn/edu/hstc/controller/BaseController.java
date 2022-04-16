@@ -60,7 +60,7 @@ public class BaseController {
             pageNum = 1;
         }
         if(StringUtils.isNull(pageSize)){
-            pageSize = 3;
+            pageSize = 10;
         }
         PageHelper.startPage(pageNum, pageSize, orderBy);
     }

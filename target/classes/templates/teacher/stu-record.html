@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线考试云平台</title>
+    <link rel="icon" th:href="@{/images/logo.png}">
+    <!-- Bootstrap core CSS -->
+    <link type="text/css" th:href="@{/bootstrapv5/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/public.css}" rel="stylesheet">
+    <style>
+
+        .header .space-unit h4 {
+            margin-left: 20px;
+        }
+
+        .content .content-right .right-con .right-operation .title {
+            text-align: center;
+        }
+
+        .content .content-right .right-con .right-operation .title .title-con {
+            line-height: 70px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .content .content-right .right-con .right-list {
+            padding: 25px 40px;
+        }
+
+        .answer-div {
+            padding-top: 0 !important;
+            padding: 25px 10px;
+        }
+
+        .answer-div ul {
+            padding: 0;
+        }
+
+        .answer-div li {
+            display: inline-block;
+            background-color: #c1c1c1;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            list-style: none;
+            text-align: center;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .answer-div .green {
+            background-color: #64b649;
+        }
+
+        .answer-div .red {
+            background-color: #ef5151;
+        }
+
+        .answer-div li a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .answer-div .answer-seq {
+            padding: 0px 4px;
+        }
+
+        .paperTopicDiv {
+            margin-bottom: 70px;
+        }
+
+        .paperTopicDiv h4 {
+            text-align: center;
+        }
+
+        .list-unstyled li {
+            font-size: 18px;
+        }
+
+        .card-header p {
+            margin-bottom: 0.1rem;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{common/tcommon::header(title='考试云-学生考试详情')}"></div>
+<div class="content">
+    <div class="content-left bg-light shadow" style="width: 260px;overflow: auto;">
+        <div class="text-center mb-4 mt-5">
+            <h5 th:text="${'学生：'+currentRecord.student.name}"></h5>
+            <h6 th:text="${'考试得分：'+currentRecord.point+'分'}"></h6>
+            <h6 th:text="${'考试状态：'+currentRecord.state}"></h6>
+        </div>
+        <div class="answer-div">
+            <h5 style="text-align: center;">
+                <svg t="1647006845864" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="1608" width="20" height="20">
+                    <path d="M705.82603 650.391548s-27.336602-71.746244-20.78618-78.346011 77.581178 20.97122 77.581178 20.97122zM932.278198 763.426424l-57.646183 58.312327-165.302558-166.943247 57.695527-58.213639 165.253214 166.844559zM892.0628 839.490272a4.934405 4.934405 0 0 0 7.006854 0l50.281584-50.688672a4.934405 4.934405 0 0 0 0-7.068535l-14.741534-14.951246-57.424135 57.794215zM759.142273 207.861798a28.212459 28.212459 0 0 1-8.154104 19.947331 27.805371 27.805371 0 0 1-19.737619 8.22812H287.178799a28.187787 28.187787 0 0 1 0-56.363238h444.022407a27.805371 27.805371 0 0 1 19.737619 8.22812 28.224795 28.224795 0 0 1 8.154104 19.959667zM696.425989 374.126565a28.274139 28.274139 0 0 1-8.154104 19.959667 27.805371 27.805371 0 0 1-19.737618 8.228119H321.978688a28.187787 28.187787 0 0 1 0-56.363237h346.555579a28.089099 28.089099 0 0 1 27.879386 28.175451zM625.987362 518.359214a40.893879 40.893879 0 0 1-4.737029 19.947331c-3.046995 5.292149-7.179559 8.252792-11.484826 8.22812H408.614499c-8.955945 0-16.221855-12.607404-16.221856-28.175451s7.265911-28.187787 16.221856-28.187787h201.188016c8.968281 0.074016 16.184847 12.693756 16.184847 28.187787z"
+                          p-id="1609"></path>
+                    <path d="M818.774554 1024H200.234588c-70.080883 0-127.060921-57.485815-127.060921-128.134154V128.134154C73.173667 57.485815 130.190713 0 200.234588 0h618.539966c70.080883 0 127.060921 57.485815 127.060921 128.134154v462.958185a25.140792 25.140792 0 1 1-50.269248 0V128.134154c0-42.707273-34.466817-77.457818-76.828681-77.457818H200.234588c-42.411208 0.024672-76.828681 34.775217-76.828681 77.457818V895.865846c0 42.707273 34.466817 77.457818 76.828681 77.457818h618.539966c71.178788 0 76.828681-17.714513 76.828681-40.856871a25.140792 25.140792 0 1 1 50.269248 0c0 45.149803-23.722151 66.787168-43.607802 76.976713-25.190136 12.903468-57.843559 14.556494-83.490127 14.556494z"
+                          p-id="1610"></path>
+                </svg>
+                答题卡
+            </h5>
+            <div th:if="${not #lists.isEmpty(singleChoiceTopics)}">
+                <div>单选题</div>
+                <div class="answer-seq">
+                    <ul>
+                        <li th:each="topic:${singleChoiceTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}">
+                            <a th:href="${'#seq'+topic.getSxh()}"
+                               th:text="${topic.getSxh()}"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${not #lists.isEmpty(moreChoiceTopics)}">
+                <div>多选题</div>
+                <div class="answer-seq">
+                    <ul>
+                        <li th:each="topic:${moreChoiceTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${not #lists.isEmpty(estimateTopics)}">
+                <div>判断题</div>
+                <div class="answer-seq">
+                    <ul>
+                        <li th:each="topic:${estimateTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.equals('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${not #lists.isEmpty(fillEmptyTopics)}">
+                <div>填空题</div>
+                <div class="answer-seq">
+                    <ul>
+                        <li th:each="topic:${fillEmptyTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).isRight.contains('true')?'green':'red'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${not #lists.isEmpty(subjectiveTopics)}">
+                <div>主观题</div>
+                <div class="answer-seq">
+                    <ul>
+                        <li th:each="topic:${subjectiveTopics}"
+                            th:class="${answerList.get(topic.getSxh()-1).score==0?'red':'green'}"><a
+                                th:href="${'#seq'+topic.getSxh()}"
+                                th:text="${topic.getSxh()}"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-right">
+        <div class="right-con">
+            <div class="right-operation">
+                <div class="title">
+                    <h4 class="title-con" th:text="${currentRecord.exam.paper.name}"></h4>
+                </div>
+            </div>
+            <hr style="margin: 0">
+            <div class="right-list">
+                <form id="exam_topic_form">
+                    <div class="paperTopicDiv" th:if="${not #lists.isEmpty(singleChoiceTopics)}">
+                        <h4 class="topicType">单选题</h4>
+                        <div class="col" th:each="topic:${singleChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
+                            <div class="card mb-2 rounded-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title pricing-card-title"
+                                        th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
+                                            th:text="${opt}"></li>
+                                    </ul>
+                                </div>
+                                <div class="card-header py-3">
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer)}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paperTopicDiv" th:if="${not #lists.isEmpty(moreChoiceTopics)}">
+                        <h4 class="topicType">多选题</h4>
+                        <div class="col" th:each="topic:${moreChoiceTopics}" th:id="${'seq'+topic.getSxh()}">
+                            <div class="card mb-2 rounded-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title pricing-card-title"
+                                        th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
+                                    <ul class="list-unstyled mt-3 mb-2">
+                                        <li th:each="opt:${topic.getTopic().getOpts().split('[{]{2}[|][}]{2}')}"
+                                            th:text="${opt}"></li>
+                                    </ul>
+                                </div>
+                                <div class="card-header py-3">
+                                    <p th:text="${'正确答案：'+topic.topic.answer}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer)}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paperTopicDiv" th:if="${not #lists.isEmpty(estimateTopics)}">
+                        <h4 class="topicType">判断题</h4>
+                        <div class="col" th:each="topic:${estimateTopics}" th:id="${'seq'+topic.getSxh()}">
+                            <div class="card mb-2 rounded-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title pricing-card-title"
+                                        th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
+                                </div>
+                                <div class="card-header py-3">
+                                    <p th:text="${'正确答案：'+(topic.topic.answer.equals('true')?'正确':'错误')}"></p>
+                                    <p>
+                                        [[${'学生答案：'+(#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':(answerList.get(topic.getSxh()-1).answer.equals('true')?'正确':'错误'))}]]
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${answerList.get(topic.getSxh()-1).isRight.equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paperTopicDiv" th:if="${not #lists.isEmpty(fillEmptyTopics)}">
+                        <h4 class="topicType">填空题</h4>
+                        <div class="col" th:each="topic:${fillEmptyTopics}" th:id="${'seq'+topic.getSxh()}">
+                            <div class="card mb-2 rounded-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title pricing-card-title"
+                                        th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
+                                </div>
+                                <div class="card-header py-3"
+                                     th:with="rightArray=${#strings.listSplit(answerList.get(topic.getSxh()-1).isRight, '、')}">
+                                    <p th:each="answer:${topic.getTopic().getAnswer().split('[{]{2}[|][}]{2}')}"
+                                       th:text="${'正确答案：'+answer}"></p>
+                                    <p th:each="answer:${answerList.get(topic.getSxh()-1).answer.split('[{]{2}[|][}]{2}')}">
+                                        [[${'学生答案：'+(answer.equals('{{null}}')?'学生未作答':answer)}]]
+                                        <svg th:if="${rightArray.get(answerStat.index).equals('true')}"
+                                             t="1647113723886" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="847" width="18" height="18">
+                                            <path d="M0 0h1024v1024H0V0z" fill="#202425" opacity=".01"
+                                                  p-id="848"></path>
+                                            <path d="M955.733333 512c0 245.077333-198.656 443.733333-443.733333 443.733333S68.266667 757.077333 68.266667 512 266.922667 68.266667 512 68.266667s443.733333 198.656 443.733333 443.733333z"
+                                                  fill="#11AA66" p-id="849"></path>
+                                            <path d="M512 102.4C285.7984 102.4 102.4 285.7984 102.4 512s183.3984 409.6 409.6 409.6 409.6-183.3984 409.6-409.6S738.2016 102.4 512 102.4zM34.133333 512C34.133333 248.081067 248.081067 34.133333 512 34.133333s477.866667 213.947733 477.866667 477.866667-213.947733 477.866667-477.866667 477.866667S34.133333 775.918933 34.133333 512z"
+                                                  fill="#11AA66" p-id="850"></path>
+                                            <path d="M787.114667 339.285333a51.2 51.2 0 0 1 0 72.362667l-307.2 307.2a51.2 51.2 0 0 1-72.362667 0l-170.666667-170.666667a51.2 51.2 0 0 1 72.362667-72.362666L443.733333 610.235733l271.018667-271.018666a51.2 51.2 0 0 1 72.362667 0z"
+                                                  fill="#FFFFFF" p-id="851"></path>
+                                        </svg>
+                                        <svg th:if="${rightArray.get(answerStat.index).equals('false')}"
+                                             t="1647114021152" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                             xmlns="http://www.w3.org/2000/svg" p-id="1142" width="16" height="16">
+                                            <path d="M1022.293364 470.409918a511.990827 511.990827 0 1 0-551.883445 551.883446 513.484133 513.484133 0 0 0 551.883445-551.883446zM625.073814 549.768497l100.264871 100.05154A53.332378 53.332378 0 1 1 649.820038 725.338684l-100.051541-100.26487a53.759037 53.759037 0 0 0-75.518647 0L374.198309 725.338684A53.332378 53.332378 0 1 1 298.679662 649.820037l100.264871-100.05154a53.759037 53.759037 0 0 0 0-75.518647L298.679662 374.198309A53.332378 53.332378 0 0 1 374.198309 298.679662l100.051541 100.26487a53.759037 53.759037 0 0 0 75.518647 0l100.051541-100.26487A53.332378 53.332378 0 1 1 725.338685 374.198309l-100.264871 100.051541a53.759037 53.759037 0 0 0 0 75.518647z"
+                                                  fill="#D33737" p-id="1143"></path>
+                                        </svg>
+                                    </p>
+                                    <p th:text="${'题目解析：'+(#strings.isEmpty(topic.topic.analysis)?'无':topic.topic.analysis)}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paperTopicDiv" th:if="${not #lists.isEmpty(subjectiveTopics)}">
+                        <h4 class="topicType">主观题</h4>
+                        <div class="col" th:each="topic:${subjectiveTopics}" th:id="${'seq'+topic.getSxh()}">
+                            <div class="card mb-2 rounded-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title pricing-card-title"
+                                        th:text="${topic.getSxh()+'.'+topic.getTopic().getTitle()+'（'+topic.score+'分）'}"></h5>
+                                </div>
+                                <div class="card-header py-3">
+                                    <p>学生答案：</p>
+                                    <textarea rows="10" class="form-control mb-3" readonly disabled>[[${#strings.isEmpty(answerList.get(topic.getSxh()-1).answer)?'学生未作答':answerList.get(topic.getSxh()-1).answer}]]</textarea>
+                                    <input th:if="${currentRecord.getState().equals('完成')}" class="form-control mb-3"
+                                           style="color:#c47575;width: 200px;text-align: center"
+                                           th:value="${'得分：'+answerList.get(topic.getSxh()-1).score+'分'}" type="text"
+                                           disabled readonly>
+                                    <div th:if="${currentRecord.getState().equals('完成')}">
+                                        <p>参考答案：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnswer())?'无':topic.getTopic().getAnswer()}"></p>
+                                        <p>题目解析：</p>
+                                        <p th:text="${#strings.isEmpty(topic.getTopic().getAnalysis())?'无':topic.getTopic().getAnalysis()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/bootstrapv5/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+
+</script>
+</body>
+
+</html>

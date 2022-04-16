@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.dao.PaperDao">
+
+    <resultMap id="PaperResult" type="Paper">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="score" property="score"/>
+        <result column="code" property="code"/>
+        <result column="course_id" property="courseId"/>
+        <result column="tea_id" property="teaId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <!--<association column="tea_id" property="teacher" select="cn.edu.hstc.dao.TeacherDao.selectTeacherById"
+                     fetchType="eager"/>-->
+        <association column="course_id" property="course" select="cn.edu.hstc.dao.CourseDao.selectCourseById"
+                     fetchType="eager"/>
+    </resultMap>
+
+    <select id="selectPaperById" parameterType="int" resultMap="PaperResult">
+        select *
+        from tb_paper
+        where id = #{id}
+    </select>
+
+    <select id="selectPaperList" parameterType="Paper" resultMap="PaperResult">
+        select p.* from tb_paper p,tb_course c where p.course_id = c.id
+        <if test="id != null">and p.id = #{id}</if>
+        <if test="name != null  and name != ''">and p.name = #{name}</if>
+        <if test="score != null">and p.score = #{score}</if>
+        <if test="code != null and code != ''">and p.code = #{code}</if>
+        <if test="courseId != null">and p.course_id = #{courseId}</if>
+        <if test="teaId != null">and p.tea_id = #{teaId}</if>
+        <if test="teaId != null">and c.tea_id = #{teaId}</if>
+        <if test="searchValue != null and searchValue != ''">and (p.name like "%${searchValue}%" or c.name like
+            "%${searchValue}%")
+        </if>
+    </select>
+
+    <insert id="insertPaper" parameterType="Paper">
+        insert into tb_paper
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="score != null">score,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="teaId != null">tea_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="score != null">#{score},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="teaId != null">#{teaId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePaper" parameterType="Paper">
+        update tb_paper
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="score != null">score = #{score},</if>
+            <!--<if test="code != null and code != ''">code = #{code},</if>-->
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="teaId != null">tea_id = #{teaId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+        </trim>
+        where id = #{id} and code = #{code}
+    </update>
+
+    <delete id="deletePaper" parameterType="Paper">
+        delete
+        from tb_paper
+        where id = #{id}
+          and code = #{code}
+    </delete>
+
+</mapper>

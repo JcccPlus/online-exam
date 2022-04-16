@@ -289,6 +289,7 @@ public class ExamController extends BaseController {
                     break;
             }
         }
+        getSession().setMaxInactiveInterval(6*60*60);  //初始化session过期时间为6个小时
         logger.info("考试前session过期时间为"+(getSession().getMaxInactiveInterval()/3600)+"小时！");
         getSession().setMaxInactiveInterval(getSession().getMaxInactiveInterval()+(currentExam.getTime()+10)*60);
         logger.info(currentStudent.getName()+"进入考试！已将session过期时间调整至"+(getSession().getMaxInactiveInterval()/3600)+"小时！");

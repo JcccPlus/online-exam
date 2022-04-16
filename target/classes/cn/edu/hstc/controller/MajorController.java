@@ -71,10 +71,14 @@ public class MajorController extends BaseController {
         if (ObjectUtils.isEmpty(major.getCollegeId()) || major.getCollegeId() == 0) {
             return error("请选择学院");
         }
-        if (majorService.insertMajor(major)) {
-            return success("添加专业成功");
-        } else {
-            return error("添加失败");
+        try{
+            if (majorService.insertMajor(major)) {
+                return success("添加专业成功");
+            } else {
+                return error("添加失败");
+            }
+        }catch (Exception e){
+            return error("该专业已存在！");
         }
     }
 
